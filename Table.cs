@@ -45,6 +45,8 @@ public class Table:I_Table{
 	#if Impl
 	= new Dictionary<str, object>();
 	#endif
+
+	public I_SqlMkr SqlMkr{get;set;}
 }
 
 
@@ -70,4 +72,78 @@ public static class Extn_I_Table{
 		z.ToCodeType = ToCodeType;
 		return z;
 	}
+
+	public static str Field(
+		this I_Table z
+		,str CodeColName
+	){
+		var DbColName = z.Columns[CodeColName].NameInDb;
+		return z.SqlMkr.Field(DbColName);
+	}
+
+	public static str Param(
+		this I_Table z
+		,str CodeColName
+	){
+		return z.SqlMkr.Param(CodeColName);
+	}
+
+
+	public static IDictionary<str, object> ToCodeDict(
+		this I_Table z
+		,IDictionary<str, object> DbDict
+	){
+		var ans = new Dictionary<str, object>();
+		foreach(var (kDb, vDb) in DbDict){
+			var kCode = z.DbColName__CodeColName[kDb];
+			var colCode = z.Columns[kCode];
+			var vCode = colCode.ToCodeType(vDb);
+			ans[kCode] = vCode;
+		}
+		return ans;
+	}
+
+	public static IDictionary<str, object> ToDbDict(
+		this I_Table z
+		,IDictionary<str, object> CodeDict
+	){
+		var ans = new Dictionary<str, object>();
+		foreach(var (kCode, vCode) in CodeDict){
+			var Col = z.Columns[kCode];
+			var vDb = Col.ToDbType(vCode);
+			ans[Col.NameInDb] = vDb;
+		}
+		return ans;
+	}
+
+
+	public static str UpdateClause(
+		this I_Table z
+		,IEnumerable<str> RawFields
+	){
+		List<str> segs = [];
+		foreach(var rawField in RawFields){
+			var field = z.Field(rawField);
+			var param = z.Param(rawField);
+			segs.Add(field + " = " + param);
+		}
+		return string.Join(", ", segs);
+	}
+
+	public static str InsertClause(
+		this I_Table z
+		,IEnumerable<str> RawFields
+	){
+		List<str> Fields = [];
+		List<str> Params = [];
+		foreach(var rawField in RawFields){
+			var field = z.Field(rawField);
+			var param = z.Param(rawField);
+			Fields.Add(field);
+			Params.Add(param);
+		}
+		return "(" + string.Join(", ", Fields) + ") VALUES (" + string.Join(", ", Params) + ")";
+	}
+
+
 }

@@ -21,6 +21,4 @@ public class Column: I_Column{
 	= (object DbType)=>{return DbType;};
 	#endif
 
-
-
 }

@@ -27,25 +27,6 @@ public interface I_Table{
 	= new Dictionary<str, object>();
 	#endif
 
-	public IDictionary<str, object> ToCodeDict(IDictionary<str, object> DbDict){
-		var ans = new Dictionary<str, object>();
-		foreach(var (kDb, vDb) in DbDict){
-			var kCode = DbColName__CodeColName[kDb];
-			var colCode = Columns[kCode];
-			var vCode = colCode.ToCodeType(vDb);
-			ans[kCode] = vCode;
-		}
-		return ans;
-	}
-
-	public IDictionary<str, object> ToDbDict(IDictionary<str, object> CodeDict){
-		var ans = new Dictionary<str, object>();
-		foreach(var (kCode, vCode) in CodeDict){
-			var Col = Columns[kCode];
-			var vDb = Col.ToDbType(vCode);
-			ans[Col.NameInDb] = vDb;
-		}
-		return ans;
-	}
+	public I_SqlMkr SqlMkr{get;set;}
 
 }

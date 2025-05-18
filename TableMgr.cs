@@ -1,8 +1,10 @@
 namespace Tsinswreng.SqlHelper;
 
-public class TableMgr : I_TableMgr{
-	protected static TableMgr? _Inst = null;
-	public static TableMgr Inst => _Inst??= new TableMgr();
+public class AppTableMgr : I_TableMgr{
+	protected static AppTableMgr? _Inst = null;
+	public static AppTableMgr Inst => _Inst??= new AppTableMgr();
+	public str DbType{get;set;} = "Sqlite";
+	public I_SqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
 
 	public Dictionary<Type, I_Table> Type__Table{get;set;} = new Dictionary<Type, I_Table>();
 
