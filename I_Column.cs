@@ -1,15 +1,16 @@
-#define Impl
 namespace Tsinswreng.SqlHelper;
-
-
 //類型映射與字段映射
-public class Column: I_Column{
+public interface I_Column{
 	/// <summary>
 	/// 在數據庫中 字段ʹ名
 	/// </summary>
-	public string NameInDb { get; set; } = "";
-	public str TypeNameInDb{get;set;} = "";
+	public string NameInDb { get; set; }
+	public str TypeNameInDb{get;set;}
 	public Type TypeInCode{get;set;}
+
+	// public object ToDbType(object CodeType){
+	// 	return CodeType;
+	// }
 	public Func<object,object> ToDbType{get;set;}
 	#if Impl
 	= (object CodeType)=>{return CodeType;};
@@ -21,6 +22,5 @@ public class Column: I_Column{
 	= (object DbType)=>{return DbType;};
 	#endif
 
-
-
 }
+

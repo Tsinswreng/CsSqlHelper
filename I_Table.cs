@@ -12,10 +12,14 @@ public interface I_Table{
 	#if Impl
 	= new Dictionary<str, I_Column>();
 	#endif
+	public str CodeIdName{get;set;}
+	#if Impl
+	= "Id";
+	#endif
 
 	public IDictionary<str, str> DbColName__CodeColName{get;set;}
 	#if Impl
-	= new Dictionary<str, object>();
+	= new Dictionary<str, str>();
 	#endif
 
 	public IDictionary<str, object> ExampleDict{get;set;}
@@ -30,6 +34,16 @@ public interface I_Table{
 			var colCode = Columns[kCode];
 			var vCode = colCode.ToCodeType(vDb);
 			ans[kCode] = vCode;
+		}
+		return ans;
+	}
+
+	public IDictionary<str, object> ToDbDict(IDictionary<str, object> CodeDict){
+		var ans = new Dictionary<str, object>();
+		foreach(var (kCode, vCode) in CodeDict){
+			var Col = Columns[kCode];
+			var vDb = Col.ToDbType(vCode);
+			ans[Col.NameInDb] = vDb;
 		}
 		return ans;
 	}
