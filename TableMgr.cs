@@ -6,7 +6,7 @@ public class AppTableMgr : I_TableMgr{
 	public str DbType{get;set;} = "Sqlite";
 	public I_SqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
 
-	public Dictionary<Type, I_Table> Type__Table{get;set;} = new Dictionary<Type, I_Table>();
+	public IDictionary<Type, I_Table> Type__Table{get;set;} = new Dictionary<Type, I_Table>();
 
 	// public void AddTable<T_Po>(I_Table table){
 	// 	Type__Table.Add(typeof(T_Po), table);

@@ -11,15 +11,15 @@ public interface I_Column{
 	// public object ToDbType(object CodeType){
 	// 	return CodeType;
 	// }
-	public Func<object,object> ToDbType{get;set;}
+	public Func<object?,object?> ToDbType{get;set;}
 	#if Impl
-	= (object CodeType)=>{return CodeType;};
+	= (object? CodeType)=>{return CodeType;};
 	#endif
 
 
-	public Func<object,object> ToCodeType{get;set;}
+	public Func<object?,object?> ToCodeType{get;set;}
 	#if Impl
-	= (object DbType)=>{return DbType;};
+	= (object? DbType)=>{return DbType;};
 	#endif
 
 }

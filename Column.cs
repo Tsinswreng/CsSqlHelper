@@ -10,15 +10,15 @@ public class Column: I_Column{
 	public string NameInDb { get; set; } = "";
 	public str TypeNameInDb{get;set;} = "";
 	public Type TypeInCode{get;set;}
-	public Func<object,object> ToDbType{get;set;}
+	public Func<object?,object?> ToDbType{get;set;}
 	#if Impl
-	= (object CodeType)=>{return CodeType;};
+	= (object? CodeType)=>{return CodeType;};
 	#endif
 
 
-	public Func<object,object> ToCodeType{get;set;}
+	public Func<object?,object?> ToCodeType{get;set;}
 	#if Impl
-	= (object DbType)=>{return DbType;};
+	= (object? DbType)=>{return DbType;};
 	#endif
 
 }

@@ -6,8 +6,9 @@ public interface I_SqlCmd{
 		CancellationToken ct
 	);
 
-	public I_SqlCmd SetParams(IDictionary<str, object> Params);
-	public I_SqlCmd SetParams(IEnumerable<object> Params);
+	public I_SqlCmd Args(IDictionary<str, object> Args);
+	public I_SqlCmd Args(IEnumerable<object> Args);
+	public I_SqlCmd WithCtx(I_DbFnCtx? DbFnCtx);
 
 
 }

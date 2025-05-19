@@ -6,7 +6,7 @@ public class SqliteSqlMkr
 	protected static SqliteSqlMkr? _Inst = null;
 	public static SqliteSqlMkr Inst => _Inst??= new SqliteSqlMkr();
 
-	public str Field(str Name){
+	public str Quote(str Name){
 		return "\"" + Name + "\"";
 	}
 
