@@ -6,14 +6,14 @@ namespace Tsinswreng.SqlHelper;
 using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
 using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 
-public interface I_Table{
+public interface ITable{
 	public IDictMapper DictMapper{get;set;}
 	public Type EntityType{get;set;}
 	public str Name{get;set;}
 	#if Impl
 	= "";
 	#endif
-	public IDictionary<str, I_Column> Columns{get;set;}
+	public IDictionary<str, IColumn> Columns{get;set;}
 	#if Impl
 	= new Dictionary<str, I_Column>();
 	#endif
@@ -32,6 +32,6 @@ public interface I_Table{
 	= new Dictionary<str, object>();
 	#endif
 
-	public I_SqlMkr SqlMkr{get;set;}
+	public ISqlMkr SqlMkr{get;set;}
 
 }

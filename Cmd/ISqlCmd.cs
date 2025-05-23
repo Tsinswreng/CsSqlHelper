@@ -1,14 +1,14 @@
 namespace Tsinswreng.SqlHelper.Cmd;
 
-public interface I_SqlCmd{
+public interface ISqlCmd{
 	public str? Sql{get;set;}
 	public IAsyncEnumerable<IDictionary<str, object>> RunAsy(
 		CancellationToken ct
 	);
 
-	public I_SqlCmd Args(IDictionary<str, object> Args);
-	public I_SqlCmd Args(IEnumerable<object> Args);
-	public I_SqlCmd WithCtx(I_DbFnCtx? DbFnCtx);
+	public ISqlCmd Args(IDictionary<str, object> Args);
+	public ISqlCmd Args(IEnumerable<object> Args);
+	public ISqlCmd WithCtx(IDbFnCtx? DbFnCtx);
 
 
 }

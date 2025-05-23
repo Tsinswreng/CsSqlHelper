@@ -1,6 +1,6 @@
 namespace Tsinswreng.SqlHelper;
 //類型映射與字段映射
-public interface I_Column{
+public interface IColumn{
 	/// <summary>
 	/// 在數據庫中 字段ʹ名
 	/// </summary>

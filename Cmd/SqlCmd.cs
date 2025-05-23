@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 namespace Tsinswreng.SqlHelper.Cmd;
 
 
-public class SqliteCmd: I_SqlCmd{
+public class SqliteCmd: ISqlCmd{
 	public SqliteCommand DbCmd{get;set;}
 	public str? Sql{get;set;}
 	public SqliteCmd(SqliteCommand DbCmd){
@@ -13,7 +13,7 @@ public class SqliteCmd: I_SqlCmd{
 	}
 
 
-	public I_SqlCmd WithCtx(I_DbFnCtx? Ctx){
+	public ISqlCmd WithCtx(IDbFnCtx? Ctx){
 		if(Ctx?.Txn?.RawTxn != null){
 			DbCmd.Transaction = (SqliteTransaction)Ctx.Txn.RawTxn;
 		}
@@ -25,7 +25,7 @@ public class SqliteCmd: I_SqlCmd{
 /// </summary>
 /// <param name="Params"></param>
 /// <returns></returns>
-	public I_SqlCmd Args(IDictionary<str, object> Params){
+	public ISqlCmd Args(IDictionary<str, object> Params){
 		DbCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
 		foreach(var (k,v) in Params){
 			DbCmd.Parameters.AddWithValue("@"+k, CodeValToDbVal(v));
@@ -38,7 +38,7 @@ public class SqliteCmd: I_SqlCmd{
 /// </summary>
 /// <param name="Params"></param>
 /// <returns></returns>
-	public I_SqlCmd Args(IEnumerable<object> Params){
+	public ISqlCmd Args(IEnumerable<object> Params){
 		DbCmd.Parameters.Clear();
 		var i = 1;
 		foreach(var v in Params){

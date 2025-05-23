@@ -3,7 +3,7 @@ using Ngaq.Core.Infra.Db;
 
 namespace Tsinswreng.SqlHelper.Cmd;
 
-public class AdoTxn:I_TxnAsy{
+public class AdoTxn:ITxnAsy{
 	public AdoTxn(IDbTransaction _RawTxn){
 		this._RawTxn = _RawTxn;
 	}

@@ -7,7 +7,7 @@ namespace Tsinswreng.SqlHelper;
 
 
 
-public class Table:I_Table{
+public class Table:ITable{
 	public IDictMapper DictMapper{get;set;} //TODO
 	public Type EntityType{get;set;}
 	public Table(){}
@@ -17,7 +17,7 @@ public class Table:I_Table{
 	}
 
 	bool _Inited = false;
-	public I_Table Init(){
+	public ITable Init(){
 		if(_Inited){
 			return this;
 		}
@@ -31,11 +31,11 @@ public class Table:I_Table{
 		return this;
 	}
 
-	public static I_Table Mk(
+	public static ITable Mk(
 		str Name
 		,IStr_Any ExampleDict
 	){
-		I_Table ans = new Table{
+		ITable ans = new Table{
 			Name = Name
 			,ExampleDict = ExampleDict
 		}.Init();
@@ -58,9 +58,9 @@ public class Table:I_Table{
 	#if Impl
 	= "";
 	#endif
-	public IDictionary<str, I_Column> Columns{get;set;}
+	public IDictionary<str, IColumn> Columns{get;set;}
 	#if Impl
-	= new Dictionary<str, I_Column>();
+	= new Dictionary<str, IColumn>();
 	#endif
 	public str CodeIdName{get;set;}
 	#if Impl
@@ -75,14 +75,14 @@ public class Table:I_Table{
 	= new Str_Any();
 	#endif
 
-	public I_SqlMkr SqlMkr{get;set;}
+	public ISqlMkr SqlMkr{get;set;}
 }
 
 
 #pragma warning disable CS8601
 public static class Extn_I_Table{
-	public static I_Column SetCol(
-		this I_Table z
+	public static IColumn SetCol(
+		this ITable z
 		,str NameInCode
 		,str? NameInDb = null
 	){
@@ -98,8 +98,8 @@ public static class Extn_I_Table{
 		return col;
 	}
 
-	public static I_Column HasConversion(
-		this I_Column z
+	public static IColumn HasConversion(
+		this IColumn z
 		,Func<object?,object?> ToDbType
 		,Func<object?,object?> ToCodeType
 	){
@@ -109,14 +109,14 @@ public static class Extn_I_Table{
 	}
 
 	public static str Quote(
-		this I_Table z
+		this ITable z
 		,str s
 	){
 		return z.SqlMkr.Quote(s);
 	}
 
 	public static str ToDbName(
-		this I_Table z
+		this ITable z
 		,str CodeColName
 	){
 		var DbColName = z.Columns[CodeColName].NameInDb;
@@ -124,7 +124,7 @@ public static class Extn_I_Table{
 	}
 
 	public static str Field(
-		this I_Table z
+		this ITable z
 		,str CodeColName
 	){
 		var DbColName = z.Columns[CodeColName].NameInDb;
@@ -132,7 +132,7 @@ public static class Extn_I_Table{
 	}
 
 	public static str Param(
-		this I_Table z
+		this ITable z
 		,str CodeColName
 	){
 		return z.SqlMkr.Param(CodeColName);
@@ -140,7 +140,7 @@ public static class Extn_I_Table{
 
 
 	public static IStr_Any ToCodeDict(
-		this I_Table z
+		this ITable z
 		,IStr_Any DbDict
 	){
 		var ans = new Str_Any();
@@ -154,7 +154,7 @@ public static class Extn_I_Table{
 	}
 
 	public static T_Po DbDictToPo<T_Po>(
-		this I_Table z
+		this ITable z
 		,IStr_Any DbDict
 	)where T_Po:new(){
 		var CodeDict = z.ToCodeDict(DbDict);
@@ -164,7 +164,7 @@ public static class Extn_I_Table{
 	}
 
 	public static IStr_Any ToDbDict(
-		this I_Table z
+		this ITable z
 		,IStr_Any CodeDict
 	){
 		var ans = new Str_Any();
@@ -180,7 +180,7 @@ public static class Extn_I_Table{
 
 
 	public static str UpdateClause(
-		this I_Table z
+		this ITable z
 		,IEnumerable<str> RawFields
 	){
 		List<str> segs = [];
@@ -193,7 +193,7 @@ public static class Extn_I_Table{
 	}
 
 	public static str InsertClause(
-		this I_Table z
+		this ITable z
 		,IEnumerable<str> RawFields
 	){
 		List<str> Fields = [];

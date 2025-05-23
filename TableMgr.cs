@@ -4,9 +4,9 @@ public class AppTableMgr : ITableMgr{
 	protected static AppTableMgr? _Inst = null;
 	public static AppTableMgr Inst => _Inst??= new AppTableMgr();
 	public str DbType{get;set;} = "Sqlite";
-	public I_SqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
+	public ISqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
 
-	public IDictionary<Type, I_Table> Type__Table{get;set;} = new Dictionary<Type, I_Table>();
+	public IDictionary<Type, ITable> Type__Table{get;set;} = new Dictionary<Type, ITable>();
 
 	// public void AddTable<T_Po>(I_Table table){
 	// 	Type__Table.Add(typeof(T_Po), table);

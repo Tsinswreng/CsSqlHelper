@@ -1,16 +1,16 @@
 namespace Tsinswreng.SqlHelper;
 
 public interface ITableMgr{
-	public IDictionary<Type, I_Table> Type__Table{get;set;}
+	public IDictionary<Type, ITable> Type__Table{get;set;}
 	public str DbType{get;set;}
-	public I_SqlMkr SqlMkr{get;set;}
+	public ISqlMkr SqlMkr{get;set;}
 
-	public void AddTable<T_Po>(I_Table table){
+	public void AddTable<T_Po>(ITable table){
 		table.SqlMkr = SqlMkr;
 		Type__Table.Add(typeof(T_Po), table);
 	}
 
-	public I_Table GetTable<T_Po>(){
+	public ITable GetTable<T_Po>(){
 		return Type__Table[typeof(T_Po)];
 	}
 }
