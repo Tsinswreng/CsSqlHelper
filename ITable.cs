@@ -1,8 +1,13 @@
 using System.Collections;
+using Tsinswreng.SrcGen.Dict;
 
 namespace Tsinswreng.SqlHelper;
 
+using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
+using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
+
 public interface I_Table{
+	public IDictMapper DictMapper{get;set;}
 	public Type EntityType{get;set;}
 	public str Name{get;set;}
 	#if Impl
@@ -22,7 +27,7 @@ public interface I_Table{
 	= new Dictionary<str, str>();
 	#endif
 
-	public IDictionary<str, object> ExampleDict{get;set;}
+	public IStr_Any ExampleDict{get;set;}
 	#if Impl
 	= new Dictionary<str, object>();
 	#endif

@@ -1,6 +1,6 @@
 namespace Tsinswreng.SqlHelper;
 
-public interface I_TableMgr{
+public interface ITableMgr{
 	public IDictionary<Type, I_Table> Type__Table{get;set;}
 	public str DbType{get;set;}
 	public I_SqlMkr SqlMkr{get;set;}

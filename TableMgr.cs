@@ -1,6 +1,6 @@
 namespace Tsinswreng.SqlHelper;
 
-public class AppTableMgr : I_TableMgr{
+public class AppTableMgr : ITableMgr{
 	protected static AppTableMgr? _Inst = null;
 	public static AppTableMgr Inst => _Inst??= new AppTableMgr();
 	public str DbType{get;set;} = "Sqlite";

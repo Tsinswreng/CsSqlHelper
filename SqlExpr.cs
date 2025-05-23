@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Ngaq.Core.Model.Po.Word;
+
 
 namespace Tsinswreng.SqlHelper;
 
@@ -24,16 +24,16 @@ public class SqlExpr{
 }
 
 
-class Test_{
-	void Test(){
-		SqlExpr E = new SqlExpr();
-		// E
-		// 	.Select<Po_Word>(w=>new {w.Id})
-		// 	.Where
-		// 	.Page(2,16)
-		// ;
-		List<Po_Word> Words = [];
-		var Qry = from p in Words
-		select p.Id;
-	}
-}
+// class Test_{
+// 	void Test(){
+// 		SqlExpr E = new SqlExpr();
+// 		// E
+// 		// 	.Select<Po_Word>(w=>new {w.Id})
+// 		// 	.Where
+// 		// 	.Page(2,16)
+// 		// ;
+// 		List<Po_Word> Words = [];
+// 		var Qry = from p in Words
+// 		select p.Id;
+// 	}
+// }

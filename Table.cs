@@ -1,14 +1,17 @@
 #define Impl
 using Ngaq.Core.Infra;
-
+using Tsinswreng.SrcGen.Dict;
+using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
+using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 namespace Tsinswreng.SqlHelper;
 
 
 
 public class Table:I_Table{
+	public IDictMapper DictMapper{get;set;} //TODO
 	public Type EntityType{get;set;}
 	public Table(){}
-	public Table(str Name, IDictionary<str, object> ExampleDict){
+	public Table(str Name, IStr_Any ExampleDict){
 		this.Name = Name;
 		this.ExampleDict = ExampleDict;
 	}
@@ -27,13 +30,29 @@ public class Table:I_Table{
 		_Inited = true;
 		return this;
 	}
-	public static I_Table Mk<T_Po>(str Name, T_Po ExamplePo){
+
+	public static I_Table Mk(
+		str Name
+		,IStr_Any ExampleDict
+	){
 		I_Table ans = new Table{
 			Name = Name
-			,ExampleDict = DictCtx.ToDictT(ExamplePo)
+			,ExampleDict = ExampleDict
 		}.Init();
 		return ans;
 	}
+
+	// [Obsolete()]
+	// public static I_Table Mk<TPo>(
+	// 	IDictMapper DictMapper
+	// 	,str Name, TPo ExamplePo
+	// ){
+	// 	I_Table ans = new Table{
+	// 		Name = Name
+	// 		,ExampleDict = DictMapper.ToDictT(ExamplePo)
+	// 	}.Init();
+	// 	return ans;
+	// }
 
 	public str Name{get;set;}
 	#if Impl
@@ -51,9 +70,9 @@ public class Table:I_Table{
 	#if Impl
 	= new Dictionary<str, str>();
 	#endif
-	public IDictionary<str, object> ExampleDict{get;set;}
+	public IStr_Any ExampleDict{get;set;}
 	#if Impl
-	= new Dictionary<str, object>();
+	= new Str_Any();
 	#endif
 
 	public I_SqlMkr SqlMkr{get;set;}
@@ -120,11 +139,11 @@ public static class Extn_I_Table{
 	}
 
 
-	public static IDictionary<str, object> ToCodeDict(
+	public static IStr_Any ToCodeDict(
 		this I_Table z
-		,IDictionary<str, object> DbDict
+		,IStr_Any DbDict
 	){
-		var ans = new Dictionary<str, object>();
+		var ans = new Str_Any();
 		foreach(var (kDb, vDb) in DbDict){
 			var kCode = z.DbColName__CodeColName[kDb];
 			var colCode = z.Columns[kCode];
@@ -136,19 +155,19 @@ public static class Extn_I_Table{
 
 	public static T_Po DbDictToPo<T_Po>(
 		this I_Table z
-		,IDictionary<str, object> DbDict
+		,IStr_Any DbDict
 	)where T_Po:new(){
 		var CodeDict = z.ToCodeDict(DbDict);
 		var ans = new T_Po();
-		DictCtx.AssignT(ans, CodeDict);
+		z.DictMapper.AssignT(ans, CodeDict);
 		return ans;
 	}
 
-	public static IDictionary<str, object> ToDbDict(
+	public static IStr_Any ToDbDict(
 		this I_Table z
-		,IDictionary<str, object> CodeDict
+		,IStr_Any CodeDict
 	){
-		var ans = new Dictionary<str, object>();
+		var ans = new Str_Any();
 		foreach(var (kCode, vCode) in CodeDict){
 			var Col = z.Columns[kCode];
 			var vDb = Col.ToDbType(vCode);

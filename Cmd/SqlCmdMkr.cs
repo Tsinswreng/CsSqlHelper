@@ -7,7 +7,7 @@ namespace Tsinswreng.SqlHelper.Cmd;
 
 
 public class SqlCmdMkr
-	:I_SqlCmdMkr
+	:ISqlCmdMkr
 	,I_GetTxnAsy
 {
 	public IDbConnection DbConnection{get;set;}
