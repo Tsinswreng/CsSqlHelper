@@ -1,8 +1,8 @@
 namespace Ngaq.Core.Infra.Db;
 
-public interface ITxnAsy : IDisposable{
+public interface ITxn : IDisposable{
 	public object? RawTxn{get;}
-	public Task<nil> BeginAsy(CancellationToken Ct);
-	public Task<nil> CommitAsy(CancellationToken Ct);
-	public Task<nil> RollbackAsy(CancellationToken Ct);
+	public Task<nil> Begin(CancellationToken Ct);
+	public Task<nil> Commit(CancellationToken Ct);
+	public Task<nil> Rollback(CancellationToken Ct);
 }

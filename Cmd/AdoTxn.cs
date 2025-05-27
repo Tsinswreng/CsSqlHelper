@@ -3,20 +3,20 @@ using Ngaq.Core.Infra.Db;
 
 namespace Tsinswreng.SqlHelper.Cmd;
 
-public class AdoTxn:ITxnAsy{
+public class AdoTxn:ITxn{
 	public AdoTxn(IDbTransaction _RawTxn){
 		this._RawTxn = _RawTxn;
 	}
 	public object? RawTxn{get;}
 	IDbTransaction _RawTxn;
-	public async Task<nil> BeginAsy(CancellationToken Ct){
+	public async Task<nil> Begin(CancellationToken Ct){
 		return Nil;
 	}
-	public async Task<nil> CommitAsy(CancellationToken Ct){
+	public async Task<nil> Commit(CancellationToken Ct){
 		_RawTxn.Commit();
 		return Nil;
 	}
-	public async Task<nil> RollbackAsy(CancellationToken Ct){
+	public async Task<nil> Rollback(CancellationToken Ct){
 		_RawTxn.Rollback();
 		return Nil;
 	}

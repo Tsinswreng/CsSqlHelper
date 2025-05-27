@@ -4,7 +4,7 @@ using Tsinswreng.SqlHelper;
 namespace Ngaq.Core.Infra.Db;
 
 public interface IRunInTxn{
-	public Task<T_Ret> RunInTxnAsy<T_Ret>(
+	public Task<T_Ret> RunInTxn<T_Ret>(
 		Func<CancellationToken, Task<T_Ret>> FnAsy
 		,CancellationToken ct
 	);
@@ -12,8 +12,8 @@ public interface IRunInTxn{
 
 
 public interface ITxnRunner{
-	public Task<T_Ret> RunTxnAsy<T_Ret>(
-		ITxnAsy Txn
+	public Task<T_Ret> RunTxn<T_Ret>(
+		ITxn Txn
 		,Func<
 			CancellationToken, Task<T_Ret>
 		> FnAsy

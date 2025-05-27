@@ -3,8 +3,8 @@ namespace Tsinswreng.SqlHelper.Cmd;
 
 public interface ISqlCmdMkr{
 
-	public Task<ISqlCmd> PrepareAsy(
-		IDbFnCtx? DbFnCtx
+	public Task<ISqlCmd> Prepare(
+		IBaseDbFnCtx? DbFnCtx
 		,str Sql
 		,CancellationToken ct
 	);

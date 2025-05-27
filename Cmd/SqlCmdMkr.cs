@@ -8,14 +8,14 @@ namespace Tsinswreng.SqlHelper.Cmd;
 
 public class SqlCmdMkr
 	:ISqlCmdMkr
-	,IGetTxnAsy
+	,IGetTxn
 {
 	public IDbConnection DbConnection{get;set;}
 	public SqlCmdMkr(IDbConnection DbConnection){
 		this.DbConnection = DbConnection;
 	}
-	public async Task<ISqlCmd> PrepareAsy(
-		IDbFnCtx? DbFnCtx
+	public async Task<ISqlCmd> Prepare(
+		IBaseDbFnCtx? DbFnCtx
 		,str Sql
 		,CancellationToken ct
 	){
@@ -32,7 +32,7 @@ public class SqlCmdMkr
 		return ans;
 	}
 
-	public async Task<ITxnAsy> GetTxnAsy(){
+	public async Task<ITxn> GetTxn(){
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
 		return Ans;
