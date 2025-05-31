@@ -8,10 +8,15 @@ namespace Tsinswreng.SqlHelper;
 
 
 public class Table:ITable{
-	public IDictMapper DictMapper{get;set;} //TODO
+	public IDictMapper DictMapper{get;set;}
 	public Type EntityType{get;set;}
 	public Table(){}
-	public Table(str Name, IStr_Any ExampleDict){
+	public Table(
+		IDictMapper DictMapper
+		,str Name
+		,IStr_Any ExampleDict
+	){
+		this.DictMapper = DictMapper;
 		this.Name = Name;
 		this.ExampleDict = ExampleDict;
 	}
@@ -32,11 +37,13 @@ public class Table:ITable{
 	}
 
 	public static ITable Mk(
-		str Name
+		IDictMapper DictMapper
+		,str Name
 		,IStr_Any ExampleDict
 	){
 		ITable ans = new Table{
-			Name = Name
+			DictMapper = DictMapper
+			,Name = Name
 			,ExampleDict = ExampleDict
 		}.Init();
 		return ans;
