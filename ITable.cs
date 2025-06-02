@@ -22,7 +22,7 @@ public interface ITable{
 	= "Id";
 	#endif
 
-	public IDictionary<str, str> DbColName__CodeColName{get;set;}
+	public IDictionary<str, str> DbColName_CodeColName{get;set;}
 	#if Impl
 	= new Dictionary<str, str>();
 	#endif

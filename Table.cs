@@ -30,7 +30,7 @@ public class Table:ITable{
 			var column = new Column();
 			column.NameInDb = k;
 			Columns[k] = column;
-			DbColName__CodeColName[k] = k;
+			DbColName_CodeColName[k] = k;
 		}
 		_Inited = true;
 		return this;
@@ -73,7 +73,7 @@ public class Table:ITable{
 	#if Impl
 	= "Id";
 	#endif
-	public IDictionary<str, str> DbColName__CodeColName{get;set;}
+	public IDictionary<str, str> DbColName_CodeColName{get;set;}
 	#if Impl
 	= new Dictionary<str, str>();
 	#endif
@@ -87,7 +87,7 @@ public class Table:ITable{
 
 
 #pragma warning disable CS8601
-public static class Extn_I_Table{
+public static class ExtnITable{
 	public static IColumn SetCol(
 		this ITable z
 		,str NameInCode
@@ -100,7 +100,7 @@ public static class Extn_I_Table{
 		var col = z.Columns[NameInCode];
 		if(NameInDb != null){
 			col.NameInDb = NameInDb;
-			z.DbColName__CodeColName[NameInDb] = NameInCode;
+			z.DbColName_CodeColName[NameInDb] = NameInCode;
 		}
 		return col;
 	}
@@ -152,7 +152,7 @@ public static class Extn_I_Table{
 	){
 		var ans = new Str_Any();
 		foreach(var (kDb, vDb) in DbDict){
-			var kCode = z.DbColName__CodeColName[kDb];
+			var kCode = z.DbColName_CodeColName[kDb];
 			var colCode = z.Columns[kCode];
 			var vCode = colCode.ToCodeType(vDb);
 			ans[kCode] = vCode;
@@ -160,12 +160,22 @@ public static class Extn_I_Table{
 		return ans;
 	}
 
-	public static T_Po DbDictToPo<T_Po>(
+	public static T AssignCodePo<T>(
 		this ITable z
 		,IStr_Any DbDict
-	)where T_Po:new(){
+		,T ToBeAssigned
+	){
 		var CodeDict = z.ToCodeDict(DbDict);
-		var ans = new T_Po();
+		z.DictMapper.AssignT(ToBeAssigned, CodeDict);
+		return ToBeAssigned;
+	}
+
+	public static TPo DbDictToPo<TPo>(
+		this ITable z
+		,IStr_Any DbDict
+	)where TPo:new(){
+		var CodeDict = z.ToCodeDict(DbDict);
+		var ans = new TPo();
 		z.DictMapper.AssignT(ans, CodeDict);
 		return ans;
 	}
@@ -183,8 +193,13 @@ public static class Extn_I_Table{
 		return ans;
 	}
 
-
-
+	public static object? ToDbType(
+		this ITable z
+		,str CodeColName
+		,object? CodeValue
+	){
+		return z.Columns[CodeColName].ToDbType(CodeValue);
+	}
 
 	public static str UpdateClause(
 		this ITable z
@@ -213,6 +228,5 @@ public static class Extn_I_Table{
 		}
 		return "(" + string.Join(", ", Fields) + ") VALUES (" + string.Join(", ", Params) + ")";
 	}
-
 
 }

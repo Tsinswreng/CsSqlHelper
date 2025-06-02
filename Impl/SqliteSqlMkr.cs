@@ -14,5 +14,9 @@ public class SqliteSqlMkr
 		return "@" + Name;
 	}
 
+	public str LimitOffset(str Limit, str Offset){
+		return $"LIMIT {Param(Limit)} OFFSET {Param(Offset)}";
+	}
+
 
 }
