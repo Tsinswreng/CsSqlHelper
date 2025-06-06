@@ -1,4 +1,5 @@
 #define Impl
+using System.Net;
 using Ngaq.Core.Infra;
 using Tsinswreng.SrcGen.Dict;
 using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
@@ -69,6 +70,9 @@ public class Table:ITable{
 	#if Impl
 	= new Dictionary<str, IColumn>();
 	#endif
+	/// <summary>
+	/// 編程代碼中實體主鍵字段名
+	/// </summary>
 	public str CodeIdName{get;set;}
 	#if Impl
 	= "Id";
@@ -105,6 +109,7 @@ public static class ExtnITable{
 		return col;
 	}
 
+[Obsolete("用泛型版本")]
 	public static IColumn HasConversion(
 		this IColumn z
 		,Func<object?,object?> ToDbType
@@ -112,6 +117,37 @@ public static class ExtnITable{
 	){
 		z.ToDbType = ToDbType;
 		z.ToCodeType = ToCodeType;
+		return z;
+	}
+
+	static i32 debug = 0;
+	public static IColumn HasConversion<TCode,TDb>(
+		this IColumn z
+		,Func<TCode,TDb> ToDbType
+		,Func<TDb,TCode> ToCodeType
+	){
+
+		z.ToDbType = (x)=>{
+			try{
+				return ToDbType((TCode)x!);
+			}
+			catch (System.Exception){
+				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ z.NameInDb);
+				throw;
+			}
+		};
+		z.ToCodeType = (x)=>{
+			try{
+				return ToCodeType((TDb)x!);
+			}
+			catch (System.Exception){
+				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ z.NameInDb);
+				throw;
+			}
+		};
+
+		// z.ToDbType = ToDbType;
+		// z.ToCodeType = ToCodeType;
 		return z;
 	}
 
@@ -130,6 +166,12 @@ public static class ExtnITable{
 		return DbColName;
 	}
 
+/// <summary>
+/// 映射到數據庫表ʹ字段名 並加引號/括號
+/// </summary>
+/// <param name="z"></param>
+/// <param name="CodeColName"></param>
+/// <returns></returns>
 	public static str Field(
 		this ITable z
 		,str CodeColName
@@ -180,6 +222,8 @@ public static class ExtnITable{
 		return ans;
 	}
 
+	//static i32 i = 0;
+
 	public static IStr_Any ToDbDict(
 		this ITable z
 		,IStr_Any CodeDict
@@ -187,10 +231,11 @@ public static class ExtnITable{
 		var ans = new Str_Any();
 		foreach(var (kCode, vCode) in CodeDict){
 			var Col = z.Columns[kCode];
-			var vDb = Col.ToDbType(vCode);
+			var vDb = Col.ToDbType(vCode);//-
 			ans[Col.NameInDb] = vDb;
 		}
 		return ans;
+
 	}
 
 	public static object? ToDbType(
