@@ -1,4 +1,4 @@
-namespace Tsinswreng.SqlHelper.Models;
+namespace Tsinswreng.CsSqlHelper.Models;
 
 public class PageQuery
 	:IPageQuery

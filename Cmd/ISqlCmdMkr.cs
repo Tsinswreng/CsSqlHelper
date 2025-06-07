@@ -1,4 +1,4 @@
-namespace Tsinswreng.SqlHelper.Cmd;
+namespace Tsinswreng.CsSqlHelper.Cmd;
 
 
 public interface ISqlCmdMkr{

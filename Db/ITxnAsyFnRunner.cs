@@ -1,5 +1,5 @@
-//using Tsinswreng.SqlHelper;
-using Tsinswreng.SqlHelper;
+//using Tsinswreng.CsSqlHelper;
+using Tsinswreng.CsSqlHelper;
 
 namespace Ngaq.Core.Infra.Db;
 

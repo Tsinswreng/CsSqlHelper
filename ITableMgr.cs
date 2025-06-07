@@ -1,4 +1,4 @@
-namespace Tsinswreng.SqlHelper;
+namespace Tsinswreng.CsSqlHelper;
 
 public interface ITableMgr{
 	public IDictionary<Type, ITable> Type__Table{get;set;}

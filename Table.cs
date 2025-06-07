@@ -1,10 +1,10 @@
 #define Impl
 using System.Net;
 using Ngaq.Core.Infra;
-using Tsinswreng.SrcGen.Dict;
+using Tsinswreng.CsSrcGen.Dict;
 using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
 using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
-namespace Tsinswreng.SqlHelper;
+namespace Tsinswreng.CsSqlHelper;
 
 
 

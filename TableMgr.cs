@@ -1,4 +1,4 @@
-namespace Tsinswreng.SqlHelper;
+namespace Tsinswreng.CsSqlHelper;
 
 public class AppTableMgr : ITableMgr{
 	protected static AppTableMgr? _Inst = null;

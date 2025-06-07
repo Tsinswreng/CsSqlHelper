@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 
 
-namespace Tsinswreng.SqlHelper;
+namespace Tsinswreng.CsSqlHelper;
 
 public class SqlExpr{
 	public SqlExpr Select<T>(

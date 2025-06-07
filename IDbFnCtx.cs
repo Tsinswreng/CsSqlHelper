@@ -1,6 +1,6 @@
 using Ngaq.Core.Infra.Db;
 
-namespace Tsinswreng.SqlHelper;
+namespace Tsinswreng.CsSqlHelper;
 
 public interface IBaseDbFnCtx{
 	public ITxn? Txn{get;set;}

@@ -1,5 +1,5 @@
 #define Impl
-namespace Tsinswreng.SqlHelper;
+namespace Tsinswreng.CsSqlHelper;
 
 
 //類型映射與字段映射

@@ -1,4 +1,4 @@
-namespace Tsinswreng.SqlHelper;
+namespace Tsinswreng.CsSqlHelper;
 
 public interface ISqlMkr{
 	/// <summary>
