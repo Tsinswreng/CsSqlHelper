@@ -10,15 +10,15 @@ public class AdoTxn:ITxn{
 	public object? RawTxn{get;}
 	IDbTransaction _RawTxn;
 	public async Task<nil> Begin(CancellationToken Ct){
-		return Nil;
+		return NIL;
 	}
 	public async Task<nil> Commit(CancellationToken Ct){
 		_RawTxn.Commit();
-		return Nil;
+		return NIL;
 	}
 	public async Task<nil> Rollback(CancellationToken Ct){
 		_RawTxn.Rollback();
-		return Nil;
+		return NIL;
 	}
 	public void Dispose(){
 		_RawTxn.Dispose();
