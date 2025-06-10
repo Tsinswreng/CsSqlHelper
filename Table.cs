@@ -274,4 +274,41 @@ public static class ExtnITable{
 		return "(" + string.Join(", ", Fields) + ") VALUES (" + string.Join(", ", Params) + ")";
 	}
 
+
+/// <summary>
+/// (@0, @1, @2 ...)
+/// </summary>
+/// <param name="z"></param>
+/// <param name="Count"></param>
+/// <returns></returns>
+	public static str NumParamClause(
+		this ITable z
+		,u64 Count
+	){
+		List<str> R = [];
+		R.Add("(");
+		for(u64 i = 0; i < Count; i++){
+			var Param = z.Param(i+"");
+			R.Add(Param);
+			if(i < Count-1){
+				R.Add(", ");
+			}
+		}
+		R.Add(")");
+		return string.Join("", R);
+	}
+
+	public static IList<str> MkUnnamedParam(
+		this ITable z
+		,u64 Count
+	){
+		var R = new List<str>((i32)Count);
+		for(u64 i = 0; i < Count; i++){
+			var Param = z.Param(i+"");
+			R.Add(Param);
+		}
+		return R;
+	}
+
+
 }

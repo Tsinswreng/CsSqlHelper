@@ -34,16 +34,16 @@ public class SqliteCmd: ISqlCmd{
 	}
 
 /// <summary>
-/// 「?」 佔位
+/// @0, @1, @2 ...
 /// </summary>
 /// <param name="Params"></param>
 /// <returns></returns>
 	public ISqlCmd Args(IEnumerable<object?> Params){
 		DbCmd.Parameters.Clear();
-		var i = 1;
+		var i = 0;
 		foreach(var v in Params){
-			DbCmd.Parameters.AddWithValue("@"+i, CodeValToDbVal(v)); //這対嗎?
-		}
+			DbCmd.Parameters.AddWithValue("@"+i, CodeValToDbVal(v));
+		i++;}
 		return this;
 	}
 
