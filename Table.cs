@@ -73,10 +73,12 @@ public class Table:ITable{
 	/// <summary>
 	/// 編程代碼中實體主鍵字段名
 	/// </summary>
-	public str CodeIdName{get;set;}
+	public str CodeColId{get;set;}
 	#if Impl
 	= "Id";
 	#endif
+
+	public ISoftDeleteCol? SoftDeleteCol{get;set;}
 	public IDictionary<str, str> DbColName_CodeColName{get;set;}
 	#if Impl
 	= new Dictionary<str, str>();
@@ -281,16 +283,18 @@ public static class ExtnITable{
 /// <param name="z"></param>
 /// <param name="Count"></param>
 /// <returns></returns>
+[Obsolete]
 	public static str NumParamClause(
 		this ITable z
-		,u64 Count
+		,u64 EndPos
+		,u64 StartPos = 0
 	){
 		List<str> R = [];
 		R.Add("(");
-		for(u64 i = 0; i < Count; i++){
+		for(u64 i = StartPos; i <= EndPos; i++){
 			var Param = z.Param(i+"");
 			R.Add(Param);
-			if(i < Count-1){
+			if(i == EndPos){
 				R.Add(", ");
 			}
 		}
@@ -298,12 +302,20 @@ public static class ExtnITable{
 		return string.Join("", R);
 	}
 
+/// <summary>
+/// [@0, @1, @2 ...]
+/// </summary>
+/// <param name="z"></param>
+/// <param name="Start">含</param>
+/// <param name="End">含</param>
+/// <returns></returns>
 	public static IList<str> MkUnnamedParam(
 		this ITable z
-		,u64 Count
+		,u64 Start
+		,u64 End
 	){
-		var R = new List<str>((i32)Count);
-		for(u64 i = 0; i < Count; i++){
+		var R = new List<str>();
+		for(u64 i = Start; i <= End; i++){
 			var Param = z.Param(i+"");
 			R.Add(Param);
 		}

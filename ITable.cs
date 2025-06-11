@@ -17,10 +17,12 @@ public interface ITable{
 	#if Impl
 	= new Dictionary<str, I_Column>();
 	#endif
-	public str CodeIdName{get;set;}
+	public str CodeColId{get;set;}
 	#if Impl
 	= "Id";
 	#endif
+
+	public ISoftDeleteCol? SoftDeleteCol{get;set;}
 
 	public IDictionary<str, str> DbColName_CodeColName{get;set;}
 	#if Impl
