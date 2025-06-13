@@ -6,12 +6,12 @@ namespace Tsinswreng.CsSqlHelper.Cmd;
 
 
 
-public class SqlCmdMkr
+public class SqliteCmdMkr
 	:ISqlCmdMkr
 	,IGetTxn
 {
 	public IDbConnection DbConnection{get;set;}
-	public SqlCmdMkr(IDbConnection DbConnection){
+	public SqliteCmdMkr(IDbConnection DbConnection){
 		this.DbConnection = DbConnection;
 	}
 	public async Task<ISqlCmd> Prepare(

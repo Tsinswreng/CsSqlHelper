@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSqlHelper.Impl.Sqlite;
 
 public class SqliteSqlMkr
 	:ISqlMkr

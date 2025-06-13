@@ -94,10 +94,13 @@ public class Table:ITable{
 
 #pragma warning disable CS8601
 public static class ExtnITable{
-	public static IColumn SetCol(
+
+	[Obsolete("用ColBuilder")]
+	public static IColumn OldSetCol(
 		this ITable z
 		,str NameInCode
 		,str? NameInDb = null
+		,Type? Type = null
 	){
 		// System.Console.WriteLine("一睡眠");
 		// System.Console.WriteLine(
@@ -108,28 +111,32 @@ public static class ExtnITable{
 			col.NameInDb = NameInDb;
 			z.DbColName_CodeColName[NameInDb] = NameInCode;
 		}
+		col.RawClrType = Type;
 		return col;
 	}
 
-[Obsolete("用泛型版本")]
-	public static IColumn HasConversion(
+
+
+	[Obsolete("用泛型版本")]
+	public static IColumn OldHasConversion(
 		this IColumn z
 		,Func<object?,object?> ToDbType
 		,Func<object?,object?> ToCodeType
 	){
-		z.ToDbType = ToDbType;
-		z.ToCodeType = ToCodeType;
+		z.UpperToRaw = ToDbType;
+		z.RawToUpper = ToCodeType;
 		return z;
 	}
 
 	static i32 debug = 0;
-	public static IColumn HasConversion<TCode,TDb>(
+	[Obsolete("用ColBuilder")]
+	public static IColumn OldHasConversion<TCode,TDb>(
 		this IColumn z
 		,Func<TCode,TDb> ToDbType
 		,Func<TDb,TCode> ToCodeType
 	){
 
-		z.ToDbType = (x)=>{
+		z.UpperToRaw = (x)=>{
 			try{
 				return ToDbType((TCode)x!);
 			}
@@ -138,7 +145,7 @@ public static class ExtnITable{
 				throw;
 			}
 		};
-		z.ToCodeType = (x)=>{
+		z.RawToUpper = (x)=>{
 			try{
 				return ToCodeType((TDb)x!);
 			}
@@ -198,7 +205,7 @@ public static class ExtnITable{
 		foreach(var (kDb, vDb) in DbDict){
 			var kCode = z.DbColName_CodeColName[kDb];
 			var colCode = z.Columns[kCode];
-			var vCode = colCode.ToCodeType(vDb);
+			var vCode = colCode.RawToUpper(vDb);
 			ans[kCode] = vCode;
 		}
 		return ans;
@@ -233,7 +240,7 @@ public static class ExtnITable{
 		var ans = new Str_Any();
 		foreach(var (kCode, vCode) in CodeDict){
 			var Col = z.Columns[kCode];
-			var vDb = Col.ToDbType(vCode);//-
+			var vDb = Col.UpperToRaw(vCode);//-
 			ans[Col.NameInDb] = vDb;
 		}
 		return ans;
@@ -245,7 +252,7 @@ public static class ExtnITable{
 		,str CodeColName
 		,object? CodeValue
 	){
-		return z.Columns[CodeColName].ToDbType(CodeValue);
+		return z.Columns[CodeColName].UpperToRaw(CodeValue);
 	}
 
 	public static str UpdateClause(
