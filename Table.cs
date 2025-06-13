@@ -28,9 +28,9 @@ public class Table:ITable{
 			return this;
 		}
 		foreach(var (k,v) in ExampleDict){
-			var column = new Column();
-			column.NameInDb = k;
-			Columns[k] = column;
+			var Col = new Column();
+			Col.NameInDb = k;
+			Columns[k] = Col;
 			DbColName_CodeColName[k] = k;
 		}
 		_Inited = true;
@@ -328,6 +328,32 @@ public static class ExtnITable{
 		}
 		return R;
 	}
+
+// 	public static str SqlMkTbl(
+// 		this ITable z
+// 	){
+// 		str OneCol(ITable Tbl, IColumn Col){
+// 			var R = new List<str>();
+// 			R.Add(Tbl.Quote(Col.NameInDb));
+// 			R.Add(Col.TypeInDb);
+// 			R.AddRange(Col.AdditionalSqls??[]);
+// 			if(Col.NotNull){
+// 				R.Add("NOT NULL");
+// 			}
+// 			return string.Join(" ", R);
+// 		}
+
+// 		var Lines = new List<str>();
+// 		foreach(var (name, Col) in z.Columns){
+// 			Lines.Add(OneCol(z, Col));
+// 		}
+// var S =
+// $"""
+// CREATE TABLE {z.Quote(z.Name)}(
+
+// )
+// """;
+// 	}
 
 
 }

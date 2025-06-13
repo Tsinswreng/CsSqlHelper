@@ -1,5 +1,5 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface ITypeNameMapper{
+public interface ISqlTypeMapper{
 	str ToDbTypeName(Type Type);
 }
