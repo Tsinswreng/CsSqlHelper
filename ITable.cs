@@ -10,30 +10,37 @@ public interface ITable{
 	public IDictMapper DictMapper{get;set;}
 	public Type EntityType{get;set;}
 	public str Name{get;set;}
-	#if Impl
+#if Impl
 	= "";
-	#endif
+#endif
 	public IDictionary<str, IColumn> Columns{get;set;}
-	#if Impl
+#if Impl
 	= new Dictionary<str, I_Column>();
-	#endif
+#endif
 	public str CodeColId{get;set;}
-	#if Impl
+#if Impl
 	= "Id";
-	#endif
+#endif
 
 	public ISoftDeleteCol? SoftDeleteCol{get;set;}
 
 	public IDictionary<str, str> DbColName_CodeColName{get;set;}
-	#if Impl
+#if Impl
 	= new Dictionary<str, str>();
-	#endif
+#endif
 
-	public IStr_Any ExampleDict{get;set;}
-	#if Impl
-	= new Dictionary<str, object>();
-	#endif
-
+	public IDictionary<str, Type> Key_Type{get;set;}
+#if Impl
+	= new Dictionary<str, Type>();
+#endif
 	public ISqlMkr SqlMkr{get;set;}
+	/// <summary>
+	/// 在CREATE TABLE() 塊內
+	/// </summary>
+	public IList<str>? InnerAdditionalSqls{get;set;}
+	/// <summary>
+	/// 在CREATE TABLE() 塊外
+	/// </summary>
+	public IList<str>? OuterAdditionalSqls{get;set;}
 
 }

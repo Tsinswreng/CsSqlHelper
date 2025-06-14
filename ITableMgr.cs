@@ -1,16 +1,16 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface ITableMgr{
-	public IDictionary<Type, ITable> Type__Table{get;set;}
-	public str DbType{get;set;}
+public interface ITblMgr{
+	public IDictionary<Type, ITable> Type_Table{get;set;}
+	public str DbSrcType{get;set;}
 	public ISqlMkr SqlMkr{get;set;}
 
-	public void AddTable<T_Po>(ITable table){
+	public void AddTable<TPo>(ITable table){
 		table.SqlMkr = SqlMkr;
-		Type__Table.Add(typeof(T_Po), table);
+		Type_Table.Add(typeof(TPo), table);
 	}
 
 	public ITable GetTable<T_Po>(){
-		return Type__Table[typeof(T_Po)];
+		return Type_Table[typeof(T_Po)];
 	}
 }

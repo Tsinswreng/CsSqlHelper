@@ -15,11 +15,11 @@ public class Table:ITable{
 	public Table(
 		IDictMapper DictMapper
 		,str Name
-		,IStr_Any ExampleDict
+		,IDictionary<str, Type> ExampleDict
 	){
 		this.DictMapper = DictMapper;
 		this.Name = Name;
-		this.ExampleDict = ExampleDict;
+		this.Key_Type = ExampleDict;
 	}
 
 	bool _Inited = false;
@@ -27,11 +27,18 @@ public class Table:ITable{
 		if(_Inited){
 			return this;
 		}
-		foreach(var (k,v) in ExampleDict){
+		foreach(var (Key,Type) in Key_Type){
 			var Col = new Column();
-			Col.NameInDb = k;
-			Columns[k] = Col;
-			DbColName_CodeColName[k] = k;
+			Col.NameInDb = Key;
+			Columns[Key] = Col;
+			DbColName_CodeColName[Key] = Key;
+			Col.RawClrType = Type;
+			Col.UpperClrType = Type;
+			// if(v != null){
+			// 	Col.RawClrType = v.GetType();
+			// 	Col.UpperClrType = v.GetType();
+			// }
+
 		}
 		_Inited = true;
 		return this;
@@ -40,12 +47,12 @@ public class Table:ITable{
 	public static ITable Mk(
 		IDictMapper DictMapper
 		,str Name
-		,IStr_Any ExampleDict
+		,IDictionary<str, Type> Key_Type
 	){
 		ITable ans = new Table{
 			DictMapper = DictMapper
 			,Name = Name
-			,ExampleDict = ExampleDict
+			,Key_Type = Key_Type
 		}.Init();
 		return ans;
 	}
@@ -83,12 +90,14 @@ public class Table:ITable{
 	#if Impl
 	= new Dictionary<str, str>();
 	#endif
-	public IStr_Any ExampleDict{get;set;}
+	public IDictionary<str, Type> Key_Type{get;set;}
 	#if Impl
-	= new Str_Any();
+	= new Dictionary<str, Type>();
 	#endif
 
 	public ISqlMkr SqlMkr{get;set;}
+	public IList<str>? InnerAdditionalSqls{get;set;}
+	public IList<str>? OuterAdditionalSqls{get;set;}
 }
 
 
@@ -329,31 +338,54 @@ public static class ExtnITable{
 		return R;
 	}
 
-// 	public static str SqlMkTbl(
-// 		this ITable z
-// 	){
-// 		str OneCol(ITable Tbl, IColumn Col){
-// 			var R = new List<str>();
-// 			R.Add(Tbl.Quote(Col.NameInDb));
-// 			R.Add(Col.TypeInDb);
-// 			R.AddRange(Col.AdditionalSqls??[]);
-// 			if(Col.NotNull){
-// 				R.Add("NOT NULL");
-// 			}
-// 			return string.Join(" ", R);
-// 		}
+	public static str SqlMkTbl(
+		this ITable z
+	){
+		str OneCol(ITable Tbl, IColumn Col){
+			var R = new List<str>();
+			R.Add(Tbl.Quote(Col.NameInDb));
+			if(!str.IsNullOrEmpty(Col.TypeInDb)){
+				R.Add(Col.TypeInDb);
+			}else{
+				if(Col.RawClrType == null){
+					var Msg = $"{Col.NameInDb}:\nCol.RawClrType == null";
+					throw new Exception("Col.RawClrType == null");
+				}
+				try{
+					var DbTypeName = z.SqlMkr.SqlTypeMapper.ToDbTypeName(Col.RawClrType);
+					R.Add(DbTypeName);
+				}
+				catch (System.Exception e){
+					throw new Exception("Type Mapping Error for Colunm:"+ Col.NameInDb, e);
+				}
+			}
+			R.AddRange(Col.AdditionalSqls??[]);
+			if(Col.NotNull){
+				R.Add("NOT NULL");
+			}
+			return string.Join(" ", R);
+		}
 
-// 		var Lines = new List<str>();
-// 		foreach(var (name, Col) in z.Columns){
-// 			Lines.Add(OneCol(z, Col));
-// 		}
-// var S =
-// $"""
-// CREATE TABLE {z.Quote(z.Name)}(
+		str FmtInnerSqls(IList<str>? InnerAdditionalSqls){
+			if(InnerAdditionalSqls == null || InnerAdditionalSqls.Count == 0){
+				return "";
+			}
+			return $",\n\n{str.Join(",\n\t", z.InnerAdditionalSqls??[])}";
+		}
 
-// )
-// """;
-// 	}
+		var Lines = new List<str>();
+		foreach(var (name, Col) in z.Columns){
+			Lines.Add(OneCol(z, Col));
+		}
+var S =
+$"""
+CREATE TABLE IF NOT EXISTS {z.Quote(z.Name)}(
+	{string.Join(",\n\t", Lines)}{FmtInnerSqls(z.InnerAdditionalSqls)}
+);
+{str.Join(";\n\t", z.OuterAdditionalSqls??[])}
+""";
+		return S;
+	}
 
 
 }

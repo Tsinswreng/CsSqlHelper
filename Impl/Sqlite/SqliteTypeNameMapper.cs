@@ -33,11 +33,13 @@ public static class ERefType{
 	public static readonly Type ByteArr = typeof(u8[]);
 }
 
-public class SqliteTypeNameMapper : ISqlTypeMapper{
+public class SqliteTypeMapper : ISqlTypeMapper{
+protected static SqliteTypeMapper? _Inst = null;
+public static SqliteTypeMapper Inst => _Inst??= new SqliteTypeMapper();
+
 	public IDictionary<Type, str> ClrType_Name{get;set;} = new Dictionary<Type, str>();
-	public SqliteTypeNameMapper(){
-		var d = ClrType_Name;
-		d = new Dictionary<Type, str>(){
+	public SqliteTypeMapper(){
+		ClrType_Name = new Dictionary<Type, str>(){
 			{ EValueTypeNotNull.Byte, "INTEGER" }
 			,{ EValueTypeNotNull.SByte, "INTEGER" }
 			,{ EValueTypeNotNull.UInt16, "INTEGER" }
@@ -70,7 +72,7 @@ public class SqliteTypeNameMapper : ISqlTypeMapper{
 		if(ClrType_Name.TryGetValue(Type, out str? result)){
 			return result;
 		}
-		throw new NotImplementedException($"Type {Type.Name} is not supported.");
+		throw new NotImplementedException($"Type {Type.Name} is not supported and cannot be mapped to a Sqlite type name.");
 	}
 
 }

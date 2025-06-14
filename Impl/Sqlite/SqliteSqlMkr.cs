@@ -5,6 +5,7 @@ public class SqliteSqlMkr
 {
 	protected static SqliteSqlMkr? _Inst = null;
 	public static SqliteSqlMkr Inst => _Inst??= new SqliteSqlMkr();
+	public ISqlTypeMapper SqlTypeMapper{get;set;} = SqliteTypeMapper.Inst;
 
 	public str Quote(str Name){
 		return "\"" + Name + "\"";
