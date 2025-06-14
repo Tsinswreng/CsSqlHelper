@@ -9,6 +9,9 @@ using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 public interface ITable{
 	public IDictMapper DictMapper{get;set;}
 	public Type EntityType{get;set;}
+/// <summary>
+/// 表名
+/// </summary>
 	public str Name{get;set;}
 #if Impl
 	= "";
@@ -37,10 +40,15 @@ public interface ITable{
 	/// <summary>
 	/// 在CREATE TABLE() 塊內
 	/// </summary>
-	public IList<str>? InnerAdditionalSqls{get;set;}
+	public IList<str> InnerAdditionalSqls{get;set;}
+#if Impl
+	= new List<str>();
+#endif
 	/// <summary>
 	/// 在CREATE TABLE() 塊外
 	/// </summary>
-	public IList<str>? OuterAdditionalSqls{get;set;}
-
+	public IList<str> OuterAdditionalSqls{get;set;}
+#if Impl
+	= new List<str>();
+#endif
 }

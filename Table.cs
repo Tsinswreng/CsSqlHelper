@@ -96,8 +96,20 @@ public class Table:ITable{
 	#endif
 
 	public ISqlMkr SqlMkr{get;set;}
-	public IList<str>? InnerAdditionalSqls{get;set;}
-	public IList<str>? OuterAdditionalSqls{get;set;}
+/// <summary>
+	/// 在CREATE TABLE() 塊內
+	/// </summary>
+	public IList<str> InnerAdditionalSqls{get;set;}
+#if Impl
+	= new List<str>();
+#endif
+	/// <summary>
+	/// 在CREATE TABLE() 塊外
+	/// </summary>
+	public IList<str> OuterAdditionalSqls{get;set;}
+#if Impl
+	= new List<str>();
+#endif
 }
 
 
@@ -366,11 +378,23 @@ public static class ExtnITable{
 			return string.Join(" ", R);
 		}
 
-		str FmtInnerSqls(IList<str>? InnerAdditionalSqls){
-			if(InnerAdditionalSqls == null || InnerAdditionalSqls.Count == 0){
+		str FmtInnerSqls(IList<str>? Sqls){
+			if(Sqls == null || Sqls.Count == 0){
 				return "";
 			}
 			return $",\n\n{str.Join(",\n\t", z.InnerAdditionalSqls??[])}";
+		}
+
+		str FmtOuterSqls(IList<str>? Sqls){
+			if(Sqls == null || Sqls.Count == 0){
+				return "";
+			}
+			List<str> R = [];
+			foreach(var sql in Sqls){
+				R.Add(sql);
+				R.Add(";\n");
+			}
+			return str.Join("",R);
 		}
 
 		var Lines = new List<str>();
@@ -382,7 +406,7 @@ $"""
 CREATE TABLE IF NOT EXISTS {z.Quote(z.Name)}(
 	{string.Join(",\n\t", Lines)}{FmtInnerSqls(z.InnerAdditionalSqls)}
 );
-{str.Join(";\n\t", z.OuterAdditionalSqls??[])}
+{FmtOuterSqls(z.OuterAdditionalSqls)}
 """;
 		return S;
 	}

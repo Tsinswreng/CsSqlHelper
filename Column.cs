@@ -11,17 +11,20 @@ public class Column: IColumn{
 	public str TypeInDb{get;set;} = "";
 	public Type? RawClrType{get;set;}
 	public Type? UpperClrType{get;set;}
-	public IList<str>? AdditionalSqls{get;set;}
+	public IList<str> AdditionalSqls{get;set;}
+#if Impl
+	= new List<str>();
+#endif
 	public bool NotNull{get;set;}
 	public Func<object?,object?> UpperToRaw{get;set;}
-	#if Impl
+#if Impl
 	= (object? CodeType)=>{return CodeType;};
-	#endif
+#endif
 
 
 	public Func<object?,object?> RawToUpper{get;set;}
-	#if Impl
+#if Impl
 	= (object? DbType)=>{return DbType;};
-	#endif
+#endif
 
 }

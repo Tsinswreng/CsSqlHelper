@@ -147,6 +147,16 @@ public static class ExtnColBuilder{
 		return z;
 	}
 
+	public static Self AdditionalSqls(
+		this Self z
+		,IEnumerable<str> Sqls
+	){
+		foreach(var sql in Sqls){
+			z.Column.AdditionalSqls.Add(sql);
+		}
+		return z;
+	}
+
 
 
 

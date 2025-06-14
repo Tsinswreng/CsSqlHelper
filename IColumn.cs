@@ -17,7 +17,10 @@ public interface IColumn{
 	/// 自封裝ʹ類型
 	/// </summary>
 	public Type? UpperClrType{get;set;}
-	public IList<str>? AdditionalSqls{get;set;}
+	public IList<str> AdditionalSqls{get;set;}
+#if Impl
+	= new List<str>();
+#endif
 	public bool NotNull{get;set;}
 
 	// public object ToDbType(object CodeType){

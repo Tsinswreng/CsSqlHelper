@@ -14,22 +14,48 @@ public class SqliteCmdMkr
 	public SqliteCmdMkr(IDbConnection DbConnection){
 		this.DbConnection = DbConnection;
 	}
-	public async Task<ISqlCmd> Prepare(
+
+	public virtual async Task<ISqlCmd> MkCmd(
 		IBaseDbFnCtx? DbFnCtx
 		,str Sql
-		,CancellationToken ct
+		,CT ct
 	){
 		if(DbConnection is not SqliteConnection sqlConn){
 			throw new InvalidOperationException("DbConnection is not SqlConnection");
 		}
-		var Cmd = sqlConn.CreateCommand();
-		Cmd.CommandText = Sql;
-		Cmd.Prepare();
-		var ans = new SqliteCmd(Cmd);
+		var RawCmd = sqlConn.CreateCommand();
+		RawCmd.CommandText = Sql;
+		var ans = new SqliteCmd(RawCmd);
 		if(DbFnCtx!= null){
 			ans.WithCtx(DbFnCtx);
 		}
 		return ans;
+	}
+
+	public virtual async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
+		if(Cmd is not SqliteCmd SqlCmd){
+			throw new InvalidOperationException("ISqlCmd is not SqliteCmd");
+		}
+		SqlCmd.RawCmd.Prepare();
+		return Cmd;
+	}
+
+
+	/// <summary>
+	/// Prepare叵用于CREATE TABLE
+	/// </summary>
+	/// <param name="DbFnCtx"></param>
+	/// <param name="Sql"></param>
+	/// <param name="Ct"></param>
+	/// <returns></returns>
+	/// <exception cref="InvalidOperationException"></exception>
+	public async Task<ISqlCmd> Prepare(
+		IBaseDbFnCtx? DbFnCtx
+		,str Sql
+		,CancellationToken Ct
+	){
+		var Cmd = await MkCmd(DbFnCtx, Sql, Ct);
+		return await Prepare(Cmd, Ct);
 	}
 
 	public async Task<ITxn> GetTxn(){

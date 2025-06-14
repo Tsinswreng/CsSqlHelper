@@ -6,16 +6,16 @@ namespace Tsinswreng.CsSqlHelper.Cmd;
 
 
 public class SqliteCmd: ISqlCmd{
-	public SqliteCommand DbCmd{get;set;}
+	public SqliteCommand RawCmd{get;set;}
 	public str? Sql{get;set;}
 	public SqliteCmd(SqliteCommand DbCmd){
-		this.DbCmd = DbCmd;
+		this.RawCmd = DbCmd;
 	}
 
 
 	public ISqlCmd WithCtx(IBaseDbFnCtx? Ctx){
 		if(Ctx?.Txn?.RawTxn != null){
-			DbCmd.Transaction = (SqliteTransaction)Ctx.Txn.RawTxn;
+			RawCmd.Transaction = (SqliteTransaction)Ctx.Txn.RawTxn;
 		}
 		return this;
 	}
@@ -26,9 +26,9 @@ public class SqliteCmd: ISqlCmd{
 /// <param name="Params"></param>
 /// <returns></returns>
 	public ISqlCmd Args(IDictionary<str, object?> Params){
-		DbCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
+		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
 		foreach(var (k,v) in Params){
-			DbCmd.Parameters.AddWithValue("@"+k, CodeValToDbVal(v));
+			RawCmd.Parameters.AddWithValue("@"+k, CodeValToDbVal(v));
 		}
 		return this;
 	}
@@ -39,10 +39,10 @@ public class SqliteCmd: ISqlCmd{
 /// <param name="Params"></param>
 /// <returns></returns>
 	public ISqlCmd Args(IEnumerable<object?> Params){
-		DbCmd.Parameters.Clear();
+		RawCmd.Parameters.Clear();
 		var i = 0;
 		foreach(var v in Params){
-			DbCmd.Parameters.AddWithValue("@"+i, CodeValToDbVal(v));
+			RawCmd.Parameters.AddWithValue("@"+i, CodeValToDbVal(v));
 		i++;}
 		return this;
 	}
@@ -70,7 +70,7 @@ public class SqliteCmd: ISqlCmd{
 		[EnumeratorCancellation]
 		CancellationToken ct
 	){
-		using var Reader = await DbCmd.ExecuteReaderAsync(ct);
+		using var Reader = await RawCmd.ExecuteReaderAsync(ct);
 		while(await Reader.ReadAsync(ct)){
 			var RawDict = new Dictionary<str, object?>();
 			for(int i = 0; i < Reader.FieldCount; i++){
