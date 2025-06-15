@@ -10,7 +10,7 @@ using IDbFnCtx = IBaseDbFnCtx;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
-public class RepoSql<
+public class Repo<
 	TEntity, TId
 >
 	where TEntity: class, new()
@@ -23,7 +23,7 @@ public ITblMgr TblMgr{get;set;}
 public ISqlCmdMkr SqlCmdMkr{get;set;}
 public IDictMapper DictMapper{get;set;}
 
-	public RepoSql(
+	public Repo(
 		ITblMgr TblMgr
 		,ISqlCmdMkr SqlCmdMkr
 		,IDictMapper DictCtx

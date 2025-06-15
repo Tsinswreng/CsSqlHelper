@@ -1,6 +1,6 @@
 using System.Data;
-using Tsinswreng.CsSrcGen.Dict;
-using Tsinswreng.CsSrcGen.Dict.Attributes;
+using Tsinswreng.CsSrcGen.DictMapper;
+using Tsinswreng.CsSrcGen.DictMapper.Attributes;
 namespace Tsinswreng.CsSqlHelper;
 
 /// <summary>
@@ -20,23 +20,15 @@ public class SchemaHistory{
 
 [DictType(typeof(SchemaHistory))]
 public partial class SqlHelperDictCtx{
-	public static IDictMapper DictMapper{get;} = new DictMapper_();
-
-	public class DictMapper_:IDictMapper{
-		public IDictionary<str, object?> ToDictT<T>(T obj){
-			return SqlHelperDictCtx.ToDictT(obj);
-		}
-		public T AssignT<T> (T obj, IDictionary<str, object?> dict){
-			return SqlHelperDictCtx.AssignT(obj, dict);
-		}
-	}
+	protected static SqlHelperDictCtx? _Inst = null;
+	public static SqlHelperDictCtx Inst => _Inst??= new SqlHelperDictCtx();
 }
 
 public class SchemaHistoryTblMkr{
 	public str TblName = "__TsinswrengSchemaHistory";
 	public ITable MkTbl(){
-		var Key_Type = SqlHelperDictCtx.GetTypeDictT<SchemaHistory>();
-		ITable R = Table.Mk(SqlHelperDictCtx.DictMapper, TblName, Key_Type);
+		var Key_Type = SqlHelperDictCtx.Inst.GetTypeDictT<SchemaHistory>();
+		ITable R = Table.Mk(SqlHelperDictCtx.Inst, TblName, Key_Type);
 		R.SetCol(nameof(SchemaHistory.Id)).AdditionalSqls(["PRIMARY KEY"]);
 		return R;
 	}
