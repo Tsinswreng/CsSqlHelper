@@ -19,17 +19,18 @@ public class SchemaHistory{
 }
 
 [DictType(typeof(SchemaHistory))]
-public partial class SqlHelperDictCtx{
-	protected static SqlHelperDictCtx? _Inst = null;
-	public static SqlHelperDictCtx Inst => _Inst??= new SqlHelperDictCtx();
+public partial class SqlHelperDictMapper{
+	protected static SqlHelperDictMapper? _Inst = null;
+	public static SqlHelperDictMapper Inst => _Inst??= new SqlHelperDictMapper();
 }
 
 public class SchemaHistoryTblMkr{
 	public str TblName = "__TsinswrengSchemaHistory";
 	public ITable MkTbl(){
-		var Key_Type = SqlHelperDictCtx.Inst.GetTypeDictT<SchemaHistory>();
-		ITable R = Table.Mk(SqlHelperDictCtx.Inst, TblName, Key_Type);
+		var Key_Type = SqlHelperDictMapper.Inst.GetTypeDictShallowT<SchemaHistory>();
+		ITable R = Table.Mk(SqlHelperDictMapper.Inst, TblName, Key_Type);
 		R.SetCol(nameof(SchemaHistory.Id)).AdditionalSqls(["PRIMARY KEY"]);
 		return R;
 	}
+
 }

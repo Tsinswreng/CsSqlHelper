@@ -9,11 +9,11 @@ namespace Tsinswreng.CsSqlHelper;
 
 
 public class Table:ITable{
-	public IDictMapper DictMapper{get;set;}
+	public IDictMapperShallow DictMapper{get;set;}
 	public Type EntityType{get;set;}
 	public Table(){}
 	public Table(
-		IDictMapper DictMapper
+		IDictMapperShallow DictMapper
 		,str Name
 		,IDictionary<str, Type> ExampleDict
 	){
@@ -45,7 +45,7 @@ public class Table:ITable{
 	}
 
 	public static ITable Mk(
-		IDictMapper DictMapper
+		IDictMapperShallow DictMapper
 		,str Name
 		,IDictionary<str, Type> Key_Type
 	){
@@ -238,7 +238,7 @@ public static class ExtnITable{
 		,T ToBeAssigned
 	){
 		var CodeDict = z.ToCodeDict(DbDict);
-		z.DictMapper.AssignT(ToBeAssigned, CodeDict);
+		z.DictMapper.AssignShallowT(ToBeAssigned, CodeDict);
 		return ToBeAssigned;
 	}
 
@@ -248,7 +248,7 @@ public static class ExtnITable{
 	)where TPo:new(){
 		var CodeDict = z.ToCodeDict(DbDict);
 		var ans = new TPo();
-		z.DictMapper.AssignT(ans, CodeDict);
+		z.DictMapper.AssignShallowT(ans, CodeDict);
 		return ans;
 	}
 

@@ -4,7 +4,7 @@ using System.Data;
 using Tsinswreng.CsCore.Tools;
 using Tsinswreng.CsSqlHelper;
 using Tsinswreng.CsSqlHelper.Cmd;
-using Tsinswreng.CsSrcGen.Dict;
+using Tsinswreng.CsSrcGen.DictMapper;
 
 using IDbFnCtx = IBaseDbFnCtx;
 
@@ -21,20 +21,17 @@ public class Repo<
 
 public ITblMgr TblMgr{get;set;}
 public ISqlCmdMkr SqlCmdMkr{get;set;}
-public IDictMapper DictMapper{get;set;}
+public IDictMapperShallow DictMapper{get;set;}
 
 	public Repo(
 		ITblMgr TblMgr
 		,ISqlCmdMkr SqlCmdMkr
-		,IDictMapper DictCtx
+		,IDictMapperShallow DictMapper
 	){
-		this.DictMapper = DictCtx;
+		this.DictMapper = DictMapper;
 		this.TblMgr = TblMgr;
 		this.SqlCmdMkr = SqlCmdMkr;
 	}
-
-
-
 
 	public async Task<Func<
 		CT
@@ -89,7 +86,7 @@ $"INSERT INTO {T.Quote(T.Name)} {Clause}";
 		)=>{
 			var i = 0;
 			foreach(var entity in Entitys){
-				var CodeDict = DictMapper.ToDictT(entity);
+				var CodeDict = DictMapper.ToDictShallowT(entity);
 				var DbDict = T.ToDbDict(CodeDict);
 				await Cmd.Args(DbDict).Run(ct).FirstOrDefaultAsync(ct);
 				i++;
@@ -161,7 +158,7 @@ $"INSERT INTO {T.Quote(T.Name)} {Clause}";
 			}
 			var CodeDict = T.ToCodeDict(RawDict);
 			var Ans = new TEntity();
-			DictMapper.AssignT(Ans, CodeDict);
+			DictMapper.AssignShallowT(Ans, CodeDict);
 			return Ans;
 		};
 		return Fn;
