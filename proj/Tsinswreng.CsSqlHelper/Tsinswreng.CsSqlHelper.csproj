@@ -1,38 +1,3 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<TargetFramework>net9.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<!-- <PublishAot>true</PublishAot> -->
-		<!-- <PublishTrimmed>true</PublishTrimmed> -->
-		<NoWarn>CS1998</NoWarn>
-		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-		<CompilerGeneratedFilesOutputPath>obj/Generated</CompilerGeneratedFilesOutputPath>
-		<!-- <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath> -->
-	</PropertyGroup>
 
-	<ItemGroup>
-		<Compile Include="../Tsinswreng.CsTypeAlias/TypeAlias.cs"/>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="../Tsinswreng.CsSrcGen/proj/Tsinswreng.CsSrcGen/Tsinswreng.CsSrcGen.csproj"
-			OutputItemType="Analyzer" ReferenceOutputAssembly="true"
-		/>
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="../Tsinswreng.CsCore/Tsinswreng.CsCore.csproj" />
-	</ItemGroup>
-
-	<!-- <ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
-	</ItemGroup> -->
-
-	<ItemGroup>
-		<PackageReference Include="SQLite" Version="3.13.0" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
-		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
-	</ItemGroup>
 </Project>
