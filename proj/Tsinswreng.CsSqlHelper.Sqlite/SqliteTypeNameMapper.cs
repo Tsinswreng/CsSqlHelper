@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.Impl.Sqlite;
+namespace Tsinswreng.CsSqlHelper.Sqlite;
 
 public static class EValueTypeNullable{
 public static readonly Type Byte = typeof(u8?);

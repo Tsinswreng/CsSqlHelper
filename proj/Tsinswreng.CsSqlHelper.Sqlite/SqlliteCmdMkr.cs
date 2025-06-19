@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using Ngaq.Core.Infra.Db;
 using Tsinswreng.CsSqlHelper.Cmd;
 
-namespace Tsinswreng.CsSqlHelper.Impl.Sqlite;
+namespace Tsinswreng.CsSqlHelper.Sqlite;
 
 public class SqliteCmdMkr
 	:ISqlCmdMkr

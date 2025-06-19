@@ -1,13 +1,9 @@
 using Tsinswreng.CsSqlHelper.Impl.Sqlite;
 
-namespace Tsinswreng.CsSqlHelper;
-/// <summary>
-/// TODO 潙每種數據源 各建基類
-/// 使子類繼承㞢後 遷入Ngaq.Local
-/// </summary>
-public class AppTableMgr : ITblMgr{
-	protected static AppTableMgr? _Inst = null;
-	public static AppTableMgr Inst => _Inst??= new AppTableMgr();
+namespace Tsinswreng.CsSqlHelper.Sqlite;
+public class SqliteTblMgr : ITblMgr{
+	protected static SqliteTblMgr? _Inst = null;
+	public static SqliteTblMgr Inst => _Inst??= new SqliteTblMgr();
 	public str DbSrcType{get;set;} = "Sqlite";
 	public ISqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
 
