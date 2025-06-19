@@ -1,10 +1,8 @@
 using System.Data;
 using Microsoft.Data.Sqlite;
-using Ngaq.Core.Infra.Db;
+using Tsinswreng.CsSqlHelper.Cmd;
 
-namespace Tsinswreng.CsSqlHelper.Cmd;
-
-
+namespace Tsinswreng.CsSqlHelper.Impl.Sqlite;
 
 public class SqliteCmdMkr
 	:ISqlCmdMkr
@@ -52,7 +50,7 @@ public class SqliteCmdMkr
 	public async Task<ISqlCmd> Prepare(
 		IBaseDbFnCtx? DbFnCtx
 		,str Sql
-		,CancellationToken Ct
+		, CT Ct
 	){
 		var Cmd = await MkCmd(DbFnCtx, Sql, Ct);
 		return await Prepare(Cmd, Ct);

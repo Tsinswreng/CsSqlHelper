@@ -1,5 +1,5 @@
 using System.Collections;
-using Tsinswreng.CsSrcGen.DictMapper;
+using Tsinswreng.CsDictMapper.DictMapper;
 
 namespace Tsinswreng.CsSqlHelper;
 

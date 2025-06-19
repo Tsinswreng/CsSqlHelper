@@ -1,6 +1,6 @@
 using System.Data;
-using Tsinswreng.CsSrcGen.DictMapper;
-using Tsinswreng.CsSrcGen.DictMapper.Attributes;
+using Tsinswreng.CsDictMapper.DictMapper;
+using Tsinswreng.CsDictMapper.DictMapper.Attributes;
 namespace Tsinswreng.CsSqlHelper;
 
 /// <summary>

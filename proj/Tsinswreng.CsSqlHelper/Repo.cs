@@ -4,7 +4,7 @@ using System.Data;
 using Tsinswreng.CsCore.Tools;
 using Tsinswreng.CsSqlHelper;
 using Tsinswreng.CsSqlHelper.Cmd;
-using Tsinswreng.CsSrcGen.DictMapper;
+using Tsinswreng.CsDictMapper.DictMapper;
 
 using IDbFnCtx = IBaseDbFnCtx;
 
