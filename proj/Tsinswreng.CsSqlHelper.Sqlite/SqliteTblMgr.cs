@@ -1,5 +1,3 @@
-using Tsinswreng.CsSqlHelper.Impl.Sqlite;
-
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 public class SqliteTblMgr : ITblMgr{
 	protected static SqliteTblMgr? _Inst = null;

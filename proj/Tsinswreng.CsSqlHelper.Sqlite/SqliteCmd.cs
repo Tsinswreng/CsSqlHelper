@@ -1,15 +1,16 @@
 using System.Data;
 using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
+using Tsinswreng.CsSqlHelper.Cmd;
 
-namespace Tsinswreng.CsSqlHelper.Cmd;
+namespace Tsinswreng.CsSqlHelper.Sqlite;
 
 
 public class SqliteCmd: ISqlCmd{
 	public SqliteCommand RawCmd{get;set;}
 	public str? Sql{get;set;}
 	public SqliteCmd(SqliteCommand DbCmd){
-		this.RawCmd = DbCmd;
+		RawCmd = DbCmd;
 	}
 
 
@@ -68,7 +69,7 @@ public class SqliteCmd: ISqlCmd{
 
 	public async IAsyncEnumerable<IDictionary<str, object?>> Run(
 		[EnumeratorCancellation]
-		CancellationToken ct
+		CT ct
 	){
 		using var Reader = await RawCmd.ExecuteReaderAsync(ct);
 		while(await Reader.ReadAsync(ct)){

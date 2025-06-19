@@ -1,11 +1,9 @@
 using System.Data;
-using Microsoft.Data.Sqlite;
 using Ngaq.Core.Infra.Db;
+using Npgsql;
 using Tsinswreng.CsSqlHelper.Cmd;
 
-namespace Tsinswreng.CsSqlHelper.Impl.PostgreSql;
-
-
+namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
 public class PostgreSqlCmdMkr
 	:ISqlCmdMkr
@@ -19,14 +17,14 @@ public class PostgreSqlCmdMkr
 	public virtual async Task<ISqlCmd> MkCmd(
 		IBaseDbFnCtx? DbFnCtx
 		,str Sql
-		,CT Ct
+		,CT ct
 	){
-		if(DbConnection is not SqliteConnection sqlConn){
-			throw new InvalidOperationException("DbConnection is not SqlConnection");
+		if(DbConnection is not NpgsqlConnection sqlConn){
+			throw new InvalidOperationException("DbConnection is not NpgsqlConnection");
 		}
 		var RawCmd = sqlConn.CreateCommand();
 		RawCmd.CommandText = Sql;
-		var ans = new SqliteCmd(RawCmd);
+		var ans = new PostgreSqlCmd(RawCmd);
 		if(DbFnCtx!= null){
 			ans.WithCtx(DbFnCtx);
 		}
@@ -34,7 +32,7 @@ public class PostgreSqlCmdMkr
 	}
 
 	public virtual async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
-		if(Cmd is not SqliteCmd SqlCmd){
+		if(Cmd is not PostgreSqlCmd SqlCmd){
 			throw new InvalidOperationException("ISqlCmd is not SqliteCmd");
 		}
 		SqlCmd.RawCmd.Prepare();
@@ -53,7 +51,7 @@ public class PostgreSqlCmdMkr
 	public async Task<ISqlCmd> Prepare(
 		IBaseDbFnCtx? DbFnCtx
 		,str Sql
-		,CancellationToken Ct
+		, CT Ct
 	){
 		var Cmd = await MkCmd(DbFnCtx, Sql, Ct);
 		return await Prepare(Cmd, Ct);
