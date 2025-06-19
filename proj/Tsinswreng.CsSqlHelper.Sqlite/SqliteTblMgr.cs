@@ -1,7 +1,5 @@
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 public class SqliteTblMgr : ITblMgr{
-	protected static SqliteTblMgr? _Inst = null;
-	public static SqliteTblMgr Inst => _Inst??= new SqliteTblMgr();
 	public str DbSrcType{get;set;} = "Sqlite";
 	public ISqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
 
