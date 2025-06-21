@@ -1,9 +1,8 @@
 using System.Data;
-using Tsinswreng.CsSqlHelper;
 using Tsinswreng.CsSqlHelper.Cmd;
 using Tsinswreng.CsSqlHelper.Db;
 
-namespace Ngaq.Local.Db;
+namespace Tsinswreng.CsSqlHelper;
 public class SqlTxnRunner(
 	IDbConnection DbConnection
 )

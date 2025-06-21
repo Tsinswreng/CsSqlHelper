@@ -1,7 +1,5 @@
 //using Tsinswreng.CsSqlHelper;
 //using Tsinswreng.CsSqlHelper;
-using Tsinswreng.CsSqlHelper;
-
 namespace Tsinswreng.CsSqlHelper.Db;
 
 public interface IRunInTxn{
