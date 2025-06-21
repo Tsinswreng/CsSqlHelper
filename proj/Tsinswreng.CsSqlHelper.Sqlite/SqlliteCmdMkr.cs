@@ -1,7 +1,6 @@
 using System.Data;
 using Microsoft.Data.Sqlite;
 using Tsinswreng.CsSqlHelper.Cmd;
-using Tsinswreng.CsSqlHelper.Db;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 

@@ -1,6 +1,4 @@
-//using Tsinswreng.CsSqlHelper;
-//using Tsinswreng.CsSqlHelper;
-namespace Tsinswreng.CsSqlHelper.Db;
+namespace Tsinswreng.CsSqlHelper;
 
 public interface IRunInTxn{
 	public Task<TRet> RunInTxn<TRet>(

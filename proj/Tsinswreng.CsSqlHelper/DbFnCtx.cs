@@ -1,5 +1,3 @@
-using Tsinswreng.CsSqlHelper.Db;
-
 namespace Tsinswreng.CsSqlHelper;
 
 public class BaseDbFnCtx:IBaseDbFnCtx{

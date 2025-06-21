@@ -3,7 +3,7 @@ namespace Tsinswreng.CsSqlHelper.Cmd;
 public interface ISqlCmd{
 	public str? Sql{get;set;}
 	public IAsyncEnumerable<IDictionary<str, object?>> Run(
-		CancellationToken ct
+		CT ct
 	);
 
 	public ISqlCmd Args(IDictionary<str, object?> Args);

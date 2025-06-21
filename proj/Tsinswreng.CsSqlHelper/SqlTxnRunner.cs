@@ -1,6 +1,5 @@
 using System.Data;
 using Tsinswreng.CsSqlHelper.Cmd;
-using Tsinswreng.CsSqlHelper.Db;
 
 namespace Tsinswreng.CsSqlHelper;
 public class SqlTxnRunner(
@@ -29,6 +28,7 @@ public class SqlTxnRunner(
 		}
 	}
 
+	[Obsolete]
 	public async Task<TRet> RunTxn<TRet>(
 		ITxn Txn
 		,Func<

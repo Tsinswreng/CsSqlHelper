@@ -1,5 +1,4 @@
 using System.Data;
-using Tsinswreng.CsSqlHelper.Db;
 
 namespace Tsinswreng.CsSqlHelper.Cmd;
 
