@@ -1,7 +1,7 @@
 using System.Data;
-using Ngaq.Core.Infra.Db;
 using Npgsql;
 using Tsinswreng.CsSqlHelper.Cmd;
+using Tsinswreng.CsSqlHelper.Db;
 
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
@@ -17,7 +17,7 @@ public class PostgreSqlCmdMkr
 	public virtual async Task<ISqlCmd> MkCmd(
 		IBaseDbFnCtx? DbFnCtx
 		,str Sql
-		,CT ct
+		,CT Ct
 	){
 		if(DbConnection is not NpgsqlConnection sqlConn){
 			throw new InvalidOperationException("DbConnection is not NpgsqlConnection");

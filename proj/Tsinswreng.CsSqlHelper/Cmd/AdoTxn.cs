@@ -1,5 +1,5 @@
 using System.Data;
-using Ngaq.Core.Infra.Db;
+using Tsinswreng.CsSqlHelper.Db;
 
 namespace Tsinswreng.CsSqlHelper.Cmd;
 

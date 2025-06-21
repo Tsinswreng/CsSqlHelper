@@ -1,22 +1,23 @@
 //using Tsinswreng.CsSqlHelper;
+//using Tsinswreng.CsSqlHelper;
 using Tsinswreng.CsSqlHelper;
 
-namespace Ngaq.Core.Infra.Db;
+namespace Tsinswreng.CsSqlHelper.Db;
 
 public interface IRunInTxn{
-	public Task<T_Ret> RunInTxn<T_Ret>(
-		Func<CancellationToken, Task<T_Ret>> FnAsy
-		,CancellationToken ct
+	public Task<TRet> RunInTxn<TRet>(
+		Func<CT, Task<TRet>> FnAsy
+		, CT ct
 	);
 }
 
 
 public interface ITxnRunner{
-	public Task<T_Ret> RunTxn<T_Ret>(
+	public Task<TRet> RunTxn<TRet>(
 		ITxn Txn
 		,Func<
-			CancellationToken, Task<T_Ret>
+			CT, Task<TRet>
 		> FnAsy
-		,CancellationToken ct
+		, CT ct
 	);
 }

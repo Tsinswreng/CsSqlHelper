@@ -1,7 +1,7 @@
 using System.Data;
 using Microsoft.Data.Sqlite;
-using Ngaq.Core.Infra.Db;
 using Tsinswreng.CsSqlHelper.Cmd;
+using Tsinswreng.CsSqlHelper.Db;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 

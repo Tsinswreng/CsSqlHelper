@@ -262,7 +262,7 @@ AND {T.Field(KeyNameInCode)} IS NOT NULL
 			IEnumerable<object?> Keys
 			,CT Ct
 		)=>{
-			using BatchListAsy<object?, nil> BatchList = new(async (x, Ct)=>{
+			await using BatchListAsy<object?, nil> BatchList = new(async (x, Ct)=>{
 				IList<object?> Args = [ValToSet, ..x];
 				Args = Args.FillUpTo(InClauseParamNum, null);
 				await Cmd.Args(Args).Run(Ct).FirstOrDefaultAsync(Ct);
