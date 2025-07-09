@@ -23,6 +23,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="../../../Tsinswreng.CsCore/proj/Tsinswreng.CsCore/Tsinswreng.CsCore.csproj" />
+		<ProjectReference Include="../../../Tsinswreng.CsTools/proj/Tsinswreng.CsTools/Tsinswreng.CsTools.csproj" />
 		<ProjectReference Include="../../../Tsinswreng.CsPage/proj/Tsinswreng.CsPage/Tsinswreng.CsPage.csproj" />
 	</ItemGroup>
 

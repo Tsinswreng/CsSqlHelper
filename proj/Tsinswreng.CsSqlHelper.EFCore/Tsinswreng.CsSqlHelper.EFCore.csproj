@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="../Tsinswreng.CsSqlHelper/Tsinswreng.CsSqlHelper.csproj" />
+
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+	</ItemGroup>
+
+</Project>

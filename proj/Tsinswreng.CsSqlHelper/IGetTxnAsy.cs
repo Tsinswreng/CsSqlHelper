@@ -1,5 +1,6 @@
-namespace Tsinswreng.CsSqlHelper.Cmd;
+namespace Tsinswreng.CsSqlHelper;
 
-public interface IGetTxn{
-	public Task<ITxn> GetTxn();
+public interface I_GetTxnAsy{
+	public Task<ITxn> GetTxnAsy(CT Ct);
+	
 }

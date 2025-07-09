@@ -1,6 +1,7 @@
 namespace Tsinswreng.CsSqlHelper;
 
 public interface IRunInTxn{
+	[Obsolete]
 	public Task<TRet> RunInTxn<TRet>(
 		Func<CT, Task<TRet>> FnAsy
 		, CT ct

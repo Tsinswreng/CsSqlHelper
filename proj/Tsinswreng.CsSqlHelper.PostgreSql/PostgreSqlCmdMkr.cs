@@ -1,12 +1,11 @@
 using System.Data;
 using Npgsql;
-using Tsinswreng.CsSqlHelper.Cmd;
-
+using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
 public class PostgreSqlCmdMkr
 	:ISqlCmdMkr
-	,IGetTxn
+	,I_GetTxnAsy
 {
 	public IDbConnection DbConnection{get;set;}
 	public PostgreSqlCmdMkr(IDbConnection DbConnection){
@@ -14,7 +13,7 @@ public class PostgreSqlCmdMkr
 	}
 
 	public virtual async Task<ISqlCmd> MkCmd(
-		IBaseDbFnCtx? DbFnCtx
+		IDbFnCtx? DbFnCtx
 		,str Sql
 		,CT Ct
 	){
@@ -48,7 +47,7 @@ public class PostgreSqlCmdMkr
 	/// <returns></returns>
 	/// <exception cref="InvalidOperationException"></exception>
 	public async Task<ISqlCmd> Prepare(
-		IBaseDbFnCtx? DbFnCtx
+		IDbFnCtx? DbFnCtx
 		,str Sql
 		, CT Ct
 	){
@@ -56,7 +55,7 @@ public class PostgreSqlCmdMkr
 		return await Prepare(Cmd, Ct);
 	}
 
-	public async Task<ITxn> GetTxn(){
+	public async Task<ITxn> GetTxnAsy(CT Ct){
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
 		return Ans;

@@ -1,18 +1,18 @@
 namespace Tsinswreng.CsSqlHelper;
 
 using System.Data;
-using Tsinswreng.CsCore.Tools;
-using Tsinswreng.CsSqlHelper;
-using Tsinswreng.CsSqlHelper.Cmd;
+using Tsinswreng.CsTools.Tools;
 using Tsinswreng.CsDictMapper.DictMapper;
 
 using IDbFnCtx = IBaseDbFnCtx;
+using Tsinswreng.CsCore;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
 public class Repo<
 	TEntity, TId
 >
+	:IRepo<TEntity, TId>
 	where TEntity: class, new()
 	// where TEntity: class, I_Id<TId>, new()
 	// where TId : IEquatable<TId>
@@ -96,15 +96,16 @@ $"INSERT INTO {T.Quote(T.Name)} {Clause}";
 		return Fn;
 	}
 
+	[Impl]
 	public async Task<Func<
 		IEnumerable<TEntity>
 		,CT
 		,Task<nil>
 	>> FnInsertMany(
 		IDbFnCtx? Ctx
-		,CT ct
+		,CT Ct
 	){
-		return await _FnInsertMany(Ctx, true, ct);
+		return await _FnInsertMany(Ctx, true, Ct);
 	}
 
 
@@ -126,7 +127,7 @@ $"INSERT INTO {T.Quote(T.Name)} {Clause}";
 	}
 
 
-
+	[Impl]
 	public async Task<Func<
 		TId
 		,CT
@@ -164,6 +165,7 @@ $"INSERT INTO {T.Quote(T.Name)} {Clause}";
 		return Fn;
 	}
 
+	[Impl]
 	public async Task<Func<
 		IEnumerable<Id_Dict<TId>>
 		,CT

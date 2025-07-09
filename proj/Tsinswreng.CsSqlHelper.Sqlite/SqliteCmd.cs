@@ -1,10 +1,9 @@
 using System.Data;
 using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
-using Tsinswreng.CsSqlHelper.Cmd;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
-
+using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 
 public class SqliteCmd: ISqlCmd{
 	public SqliteCommand RawCmd{get;set;}
@@ -14,7 +13,7 @@ public class SqliteCmd: ISqlCmd{
 	}
 
 
-	public ISqlCmd WithCtx(IBaseDbFnCtx? Ctx){
+	public ISqlCmd WithCtx(IDbFnCtx? Ctx){
 		if(Ctx?.Txn?.RawTxn != null){
 			RawCmd.Transaction = (SqliteTransaction)Ctx.Txn.RawTxn;
 		}

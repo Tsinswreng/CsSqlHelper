@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.Cmd;
+namespace Tsinswreng.CsSqlHelper;
 
 public interface ISqlCmd{
 	public str? Sql{get;set;}

@@ -1,12 +1,11 @@
 using System.Data;
 using Microsoft.Data.Sqlite;
-using Tsinswreng.CsSqlHelper.Cmd;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
-
+using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 public class SqliteCmdMkr
 	:ISqlCmdMkr
-	,IGetTxn
+	,I_GetTxnAsy
 {
 	public IDbConnection DbConnection{get;set;}
 	public SqliteCmdMkr(IDbConnection DbConnection){
@@ -14,7 +13,7 @@ public class SqliteCmdMkr
 	}
 
 	public virtual async Task<ISqlCmd> MkCmd(
-		IBaseDbFnCtx? DbFnCtx
+		IDbFnCtx? DbFnCtx
 		,str Sql
 		,CT ct
 	){
@@ -48,7 +47,7 @@ public class SqliteCmdMkr
 	/// <returns></returns>
 	/// <exception cref="InvalidOperationException"></exception>
 	public async Task<ISqlCmd> Prepare(
-		IBaseDbFnCtx? DbFnCtx
+		IDbFnCtx? DbFnCtx
 		,str Sql
 		, CT Ct
 	){
@@ -56,7 +55,7 @@ public class SqliteCmdMkr
 		return await Prepare(Cmd, Ct);
 	}
 
-	public async Task<ITxn> GetTxn(){
+	public async Task<ITxn> GetTxnAsy(CT Ct){
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
 		return Ans;

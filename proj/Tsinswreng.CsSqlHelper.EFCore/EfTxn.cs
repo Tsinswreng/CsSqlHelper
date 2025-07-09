@@ -1,25 +1,28 @@
 using System.Data;
+using Microsoft.EntityFrameworkCore.Storage;
+namespace Tsinswreng.CsSqlHelper.EFCore;
 
-namespace Tsinswreng.CsSqlHelper;
 
-public class AdoTxn:ITxn{
-	public AdoTxn(IDbTransaction _RawTxn){
+public class EfTxn:ITxn{
+	public EfTxn(IDbContextTransaction _RawTxn){
 		this._RawTxn = _RawTxn;
 	}
 	public object? RawTxn{get;}
-	IDbTransaction _RawTxn;
+	IDbContextTransaction _RawTxn;
 	public async Task<nil> Begin(CT Ct){
 		return NIL;
 	}
 	public async Task<nil> Commit(CT Ct){
-		_RawTxn.Commit();
+		await _RawTxn.CommitAsync();
 		return NIL;
 	}
 	public async Task<nil> Rollback(CT Ct){
-		_RawTxn.Rollback();
+		await _RawTxn.RollbackAsync();
 		return NIL;
 	}
 	public void Dispose(){
 		_RawTxn.Dispose();
 	}
+
+
 }

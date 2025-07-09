@@ -1,7 +1,6 @@
 using System.Data;
 using System.Runtime.CompilerServices;
 using Npgsql;
-using Tsinswreng.CsSqlHelper.Cmd;
 
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
