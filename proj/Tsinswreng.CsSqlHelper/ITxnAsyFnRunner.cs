@@ -11,10 +11,11 @@ public interface IRunInTxn{
 
 public interface ITxnRunner{
 	public Task<TRet> RunTxn<TRet>(
-		ITxn Txn
+		ITxn? Txn
 		,Func<
 			CT, Task<TRet>
 		> FnAsy
 		, CT ct
 	);
 }
+

@@ -14,23 +14,22 @@ public interface ITxn : IDisposable{
 }
 
 
-
 public static class ExtnITxn{
 	public static async Task<TRet> RunTxn<TRet>(
 		this ITxn Txn
 		,Func<
 			CT, Task<TRet>
 		> FnAsy
-		,CT ct
+		,CT Ct
 	){
 		try{
-			await Txn.Begin(ct);
-			TRet ans = await FnAsy(ct);
-			await Txn.Commit(ct);
-			return ans;
+			await Txn.Begin(Ct);
+			TRet R = await FnAsy(Ct);
+			await Txn.Commit(Ct);
+			return R;
 		}
 		catch (Exception) {
-			await Txn.Rollback(ct);
+			await Txn.Rollback(Ct);
 			throw;
 		}
 	}

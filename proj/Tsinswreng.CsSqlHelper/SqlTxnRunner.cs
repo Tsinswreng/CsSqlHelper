@@ -32,20 +32,24 @@ public class AdoTxnRunner(
 	[Impl]
 
 	public async Task<TRet> RunTxn<TRet>(
-		ITxn Txn
+		ITxn? Txn
 		,Func<
 			CT, Task<TRet>
 		> FnAsy
-		,CT ct
+		,CT Ct
 	){
+		if(Txn == null){
+			TRet R = await FnAsy(Ct);
+			return R;
+		}
 		try{
-			await Txn.Begin(ct);
-			TRet ans = await FnAsy(ct);
-			await Txn.Commit(ct);
-			return ans;
+			await Txn.Begin(Ct);
+			TRet R = await FnAsy(Ct);
+			await Txn.Commit(Ct);
+			return R;
 		}
 		catch (Exception) {
-			await Txn.Rollback(ct);
+			await Txn.Rollback(Ct);
 			throw;
 		}
 
