@@ -15,7 +15,7 @@ public class TxnWrapper<TDbFnCtx>
 	}
 	//無參(除末ʹCt外)
 	//delegate Task<TRet> _0Arg<TRet>(out TDbFnCtx DbFnCtx, CT Ct, );
-	public async Task<nil> Wrap<TRet>(
+	public async Task<TRet> Wrap<TRet>(
 		Func<TDbFnCtx, CT, Task<Func<
 			CT
 			,Task<TRet>
@@ -24,13 +24,13 @@ public class TxnWrapper<TDbFnCtx>
 	){
 		var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
 		var Xxx = await FnXxx(Ctx, Ct);
-		await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
 			return await Xxx(Ct);
 		}, Ct);
-		return NIL;
+		return R;
 	}
 	//1
-	public async Task<nil> Wrap<TArg0, TRet>(
+	public async Task<TRet> Wrap<TArg0, TRet>(
 		Func<TDbFnCtx, CT, Task<Func<
 			TArg0
 			,CT
@@ -41,13 +41,13 @@ public class TxnWrapper<TDbFnCtx>
 	){
 		var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
 		var Xxx = await FnXxx(Ctx, Ct);
-		await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
 			return await Xxx(Arg0, Ct);
 		}, Ct);
-		return NIL;
+		return R;
 	}
 	//2
-	public async Task<nil> Wrap<TArg0, TArg1, TRet>(
+	public async Task<TRet> Wrap<TArg0, TArg1, TRet>(
 		Func<TDbFnCtx, CT, Task<Func<
 			TArg0
 			,TArg1
@@ -60,10 +60,10 @@ public class TxnWrapper<TDbFnCtx>
 	){
 		var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
 		var Xxx = await FnXxx(Ctx, Ct);
-		await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
 			return await Xxx(Arg0, Arg1, Ct);
 		}, Ct);
-		return NIL;
+		return R;
 	}
 
 
