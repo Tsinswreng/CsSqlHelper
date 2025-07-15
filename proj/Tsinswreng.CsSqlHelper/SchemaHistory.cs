@@ -1,6 +1,6 @@
-using System.Data;
-using Tsinswreng.CsDictMapper.DictMapper;
-using Tsinswreng.CsDictMapper.DictMapper.Attributes;
+
+using Tsinswreng.CsDictMapper;
+
 namespace Tsinswreng.CsSqlHelper;
 
 /// <summary>
@@ -28,7 +28,7 @@ public class SchemaHistoryTblMkr{
 	public str TblName = "__TsinswrengSchemaHistory";
 	public ITable MkTbl(){
 		var Key_Type = SqlHelperDictMapper.Inst.GetTypeDictShallowT<SchemaHistory>();
-		ITable R = Table.Mk(SqlHelperDictMapper.Inst, TblName, Key_Type);
+		ITable R = Table.Mk<SchemaHistory>(SqlHelperDictMapper.Inst, TblName, Key_Type);
 		R.SetCol(nameof(SchemaHistory.Id)).AdditionalSqls(["PRIMARY KEY"]);
 		return R;
 	}

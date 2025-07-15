@@ -2,10 +2,10 @@ namespace Tsinswreng.CsSqlHelper;
 
 using System.Data;
 using Tsinswreng.CsTools.Tools;
-using Tsinswreng.CsDictMapper.DictMapper;
 
 using IDbFnCtx = IBaseDbFnCtx;
 using Tsinswreng.CsCore;
+using Tsinswreng.CsDictMapper;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
@@ -14,9 +14,6 @@ public class Repo<
 >
 	:IRepo<TEntity, TId>
 	where TEntity: class, new()
-	// where TEntity: class, I_Id<TId>, new()
-	// where TId : IEquatable<TId>
-
 {
 
 public ITblMgr TblMgr{get;set;}
@@ -43,7 +40,7 @@ public IDictMapperShallow DictMapper{get;set;}
 		var T = TblMgr.GetTable<TEntity>();
 		var NCnt = "Cnt";
 		var Sql =
-$"SELECT COUNT(*) AS {T.Quote(NCnt)} FROM {T.Quote(T.Name)}";
+$"SELECT COUNT(*) AS {T.Quote(NCnt)} FROM {T.Quote(T.DbTblName)}";
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		var Fn = async(
 			CT Ct
@@ -75,7 +72,7 @@ $"SELECT COUNT(*) AS {T.Quote(NCnt)} FROM {T.Quote(T.Name)}";
 		var T = TblMgr.GetTable<TEntity>();
 		var Clause = T.InsertClause(T.Columns.Keys);
 		var Sql =
-$"INSERT INTO {T.Quote(T.Name)} {Clause}";
+$"INSERT INTO {T.Quote(T.DbTblName)} {Clause}";
 		var Cmd = await SqlCmdMkr.MkCmd(Ctx, Sql, Ct);
 		if(Prepare){
 			Cmd = await SqlCmdMkr.Prepare(Cmd, Ct);
@@ -134,33 +131,30 @@ $"INSERT INTO {T.Quote(T.Name)} {Clause}";
 		,Task<TEntity?>
 	>> FnSelectById(
 		IDbFnCtx? Ctx
-		,CT ct
+		,CT Ct
 	){
 		var T = TblMgr.GetTable<TEntity>();
-		var Params = T.MkUnnamedParam(0,0);
-		var Sql = $"SELECT * FROM {T.Quote(T.Name)} WHERE {T.Field(T.CodeColId)} = {Params[0]}" ;
-		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
+		var Params = T.MkParams(0,0);
+		var Sql = $"SELECT * FROM {T.Quote(T.DbTblName)} WHERE {T.Field(T.CodeIdName)} = {Params[0]}" ;
+		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 
 		var Fn = async(
 			TId Id
-			,CT ct
+			,CT Ct
 		)=>{
-			if(Id is not TId id){
-				throw new Exception("Id is not TId id");
-			}
-			var IdCol = T.Columns[T.CodeColId];
-			var ConvertedId = IdCol.UpperToRaw(Id);
+			var IdCol = T.Columns[T.CodeIdName];
+			var ConvertedId = IdCol.UpperToRaw?.Invoke(Id)??Id;
 			var RawDict = await Cmd
 				.Args([ConvertedId])
-				.Run(ct).FirstOrDefaultAsync(ct)
+				.Run(Ct).FirstOrDefaultAsync(Ct)
 			;
 			if(RawDict == null){
 				return null;
 			}
 			var CodeDict = T.ToCodeDict(RawDict);
-			var Ans = new TEntity();
-			DictMapper.AssignShallowT(Ans, CodeDict);
-			return Ans;
+			var R = new TEntity();
+			DictMapper.AssignShallowT(R, CodeDict);
+			return R;
 		};
 		return Fn;
 	}
@@ -177,12 +171,12 @@ $"INSERT INTO {T.Quote(T.Name)} {Clause}";
 	){
 		var T = TblMgr.GetTable<TEntity>();
 		ModelDict = new Dictionary<str, object?>(ModelDict);
-		var NId = T.CodeColId;
+		var NId = T.CodeIdName;
 		ModelDict.Remove(NId);
 		var Clause = T.UpdateClause(ModelDict.Keys);
 
 		var Sql =
-$"UPDATE {T.Quote(T.Name)} SET ${Clause} WHERE {T.Field(NId)} = {T.Param(NId)}";
+$"UPDATE {T.Quote(T.DbTblName)} SET ${Clause} WHERE {T.Field(NId)} = {T.Param(NId)}";
 
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
 		var Fn = async(
@@ -245,19 +239,19 @@ $"UPDATE {T.Quote(T.Name)} SET ${Clause} WHERE {T.Field(NId)} = {T.Param(NId)}";
 		,CT Ct
 	){
 		var T = TblMgr.GetTable<TEntity>();
-		if(T.SoftDeleteCol == null){
+		if(T.SoftDelCol == null){
 			throw new Exception("SoftDeleteCol is null");
 		}
-		var ParamList = T.MkUnnamedParam(1, InClauseParamNum);
+		var ParamList = T.MkParams(1, InClauseParamNum);
 		var Sql =
 $"""
-UPDATE {T.Quote(T.Name)}
-SET {T.Field(T.SoftDeleteCol.CodeColName)} = {T.MkUnnamedParam(0,0)[0]}
+UPDATE {T.Quote(T.DbTblName)}
+SET {T.Field(T.SoftDelCol.CodeColName)} = {T.MkParams(0,0)[0]}
 WHERE {T.Field(KeyNameInCode)} IN ({str.Join(",", ParamList)})
 AND {T.Field(KeyNameInCode)} IS NOT NULL
 ;
 """;
-		var ValToSet = T.SoftDeleteCol.FnDelete(null);
+		var ValToSet = T.SoftDelCol.FnDelete(null);
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 
 		var Fn = async(
@@ -313,7 +307,7 @@ AND {T.Field(KeyNameInCode)} IS NOT NULL
 		,CT ct
 	){
 		var T = TblMgr.GetTable<TEntity>();
-var Sql = $"DELETE FROM {T.Name} WHERE {T.Field(T.CodeColId)} = ?";
+var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.Field(T.CodeIdName)} = ?";
 
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
 		async Task<nil> Fn(
@@ -323,8 +317,8 @@ var Sql = $"DELETE FROM {T.Name} WHERE {T.Field(T.CodeColId)} = ?";
 			if (Id is not TId id) {
 				throw new Exception("Id is not T_Id id");
 			}
-			var IdCol = T.Columns[T.CodeColId];
-			var ConvertedId = IdCol.UpperToRaw(Id);
+			var IdCol = T.Columns[T.CodeIdName];
+			var ConvertedId = IdCol.UpperToRaw?.Invoke(Id);
 			await Cmd.Args([ConvertedId]).Run(ct).FirstOrDefaultAsync(ct);
 			return NIL;
 		}
@@ -348,7 +342,7 @@ var Sql = $"DELETE FROM {T.Name} WHERE {T.Field(T.CodeColId)} = ?";
 		var Clause = T.NumParamClause(ParamNum-1);
 		var Sql =
 $"""
-DELETE FROM {T.Quote(T.Name)} WHERE {T.Field(KeyNameInCode)} IN ${Clause}
+DELETE FROM {T.Quote(T.DbTblName)} WHERE {T.Field(KeyNameInCode)} IN ${Clause}
 AND {T.Quote(KeyNameInCode)} IS NOT NULL;
 """;
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);

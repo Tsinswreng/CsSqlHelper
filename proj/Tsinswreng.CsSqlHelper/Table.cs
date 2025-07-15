@@ -1,6 +1,6 @@
 #define Impl
 using System.Net;
-using Tsinswreng.CsDictMapper.DictMapper;
+using Tsinswreng.CsDictMapper;
 using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
 using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 namespace Tsinswreng.CsSqlHelper;
@@ -9,7 +9,7 @@ namespace Tsinswreng.CsSqlHelper;
 
 public class Table:ITable{
 	public IDictMapperShallow DictMapper{get;set;}
-	public Type EntityType{get;set;}
+	public Type EntityClrType{get;set;}
 	public Table(){}
 	public Table(
 		IDictMapperShallow DictMapper
@@ -17,7 +17,7 @@ public class Table:ITable{
 		,IDictionary<str, Type> ExampleDict
 	){
 		this.DictMapper = DictMapper;
-		this.Name = Name;
+		this.DbTblName = Name;
 		this.Key_Type = ExampleDict;
 	}
 
@@ -43,32 +43,49 @@ public class Table:ITable{
 		return this;
 	}
 
-	public static ITable Mk(
+/// <summary>
+/// 建構一個Table實體
+/// </summary>
+/// <param name="DictMapper"></param>
+/// <param name="DbTblName">table name in db</param>
+/// <param name="Key_Type"></param>
+/// <returns></returns>
+	public static ITable Mk<TEntity>(
 		IDictMapperShallow DictMapper
-		,str Name
+		,str DbTblName
+		,IDictionary<str, Type> Key_Type
+	){
+		return Mk(typeof(TEntity), DictMapper, DbTblName, Key_Type);
+	}
+
+	public static ITable Mk(
+		Type EntityClrType
+		,IDictMapperShallow DictMapper
+		,str DbTblName
 		,IDictionary<str, Type> Key_Type
 	){
 		ITable ans = new Table{
 			DictMapper = DictMapper
-			,Name = Name
+			,DbTblName = DbTblName
 			,Key_Type = Key_Type
+			,EntityClrType = EntityClrType
 		}.Init();
 		return ans;
 	}
 
-	// [Obsolete()]
-	// public static I_Table Mk<TPo>(
-	// 	IDictMapper DictMapper
-	// 	,str Name, TPo ExamplePo
-	// ){
-	// 	I_Table ans = new Table{
-	// 		Name = Name
-	// 		,ExampleDict = DictMapper.ToDictT(ExamplePo)
-	// 	}.Init();
-	// 	return ans;
-	// }
+	public static Func<str, ITable> FnMkTbl<T>(IDictMapperShallow DictMapper){
+ 		ITable Mk<T2>(str DbTblName){
+			var TypeDict = DictMapper.GetTypeDictShallowT<T2>();
+			return Table.Mk<T2>(
+				DictMapper
+				,DbTblName
+				,TypeDict
+			);
+		}
+		return Mk<T>;
+	}
 
-	public str Name{get;set;}
+	public str DbTblName{get;set;}
 	#if Impl
 	= "";
 	#endif
@@ -76,15 +93,13 @@ public class Table:ITable{
 	#if Impl
 	= new Dictionary<str, IColumn>();
 	#endif
-	/// <summary>
-	/// 編程代碼中實體主鍵字段名
-	/// </summary>
-	public str CodeColId{get;set;}
+
+	public str CodeIdName{get;set;}
 	#if Impl
 	= "Id";
 	#endif
 
-	public ISoftDeleteCol? SoftDeleteCol{get;set;}
+	public ISoftDeleteCol? SoftDelCol{get;set;}
 	public IDictionary<str, str> DbColName_CodeColName{get;set;}
 	#if Impl
 	= new Dictionary<str, str>();
@@ -115,71 +130,12 @@ public class Table:ITable{
 #pragma warning disable CS8601
 public static class ExtnITable{
 
-	[Obsolete("用ColBuilder")]
-	public static IColumn OldSetCol(
-		this ITable z
-		,str NameInCode
-		,str? NameInDb = null
-		,Type? Type = null
-	){
-		// System.Console.WriteLine("一睡眠");
-		// System.Console.WriteLine(
-		// 	str.Join("\n", z.Columns.Keys)//t
-		// );
-		var col = z.Columns[NameInCode];
-		if(NameInDb != null){
-			col.NameInDb = NameInDb;
-			z.DbColName_CodeColName[NameInDb] = NameInCode;
-		}
-		col.RawClrType = Type;
-		return col;
-	}
-
-
-
-	[Obsolete("用泛型版本")]
-	public static IColumn OldHasConversion(
-		this IColumn z
-		,Func<object?,object?> ToDbType
-		,Func<object?,object?> ToCodeType
-	){
-		z.UpperToRaw = ToDbType;
-		z.RawToUpper = ToCodeType;
-		return z;
-	}
-
-	static i32 debug = 0;
-	[Obsolete("用ColBuilder")]
-	public static IColumn OldHasConversion<TCode,TDb>(
-		this IColumn z
-		,Func<TCode,TDb> ToDbType
-		,Func<TDb,TCode> ToCodeType
-	){
-
-		z.UpperToRaw = (x)=>{
-			try{
-				return ToDbType((TCode)x!);
-			}
-			catch (System.Exception){
-				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ z.NameInDb);
-				throw;
-			}
-		};
-		z.RawToUpper = (x)=>{
-			try{
-				return ToCodeType((TDb)x!);
-			}
-			catch (System.Exception){
-				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ z.NameInDb);
-				throw;
-			}
-		};
-
-		// z.ToDbType = ToDbType;
-		// z.ToCodeType = ToCodeType;
-		return z;
-	}
-
+/// <summary>
+/// quote field name for SQL, e.g. in sqlite: "field_name"; in mysql: `field_name`;
+/// </summary>
+/// <param name="z"></param>
+/// <param name="s"></param>
+/// <returns></returns>
 	public static str Quote(
 		this ITable z
 		,str s
@@ -187,6 +143,9 @@ public static class ExtnITable{
 		return z.SqlMkr.Quote(s);
 	}
 
+/// <summary>
+/// 映射到數據庫表ʹ字段名
+/// </summary>
 	public static str ToDbName(
 		this ITable z
 		,str CodeColName
@@ -198,9 +157,6 @@ public static class ExtnITable{
 /// <summary>
 /// 映射到數據庫表ʹ字段名 並加引號/括號
 /// </summary>
-/// <param name="z"></param>
-/// <param name="CodeColName"></param>
-/// <returns></returns>
 	public static str Field(
 		this ITable z
 		,str CodeColName
@@ -209,6 +165,9 @@ public static class ExtnITable{
 		return z.SqlMkr.Quote(DbColName);
 	}
 
+/// <summary>
+///
+/// </summary>
 	public static str Param(
 		this ITable z
 		,str CodeColName
@@ -225,7 +184,7 @@ public static class ExtnITable{
 		foreach(var (kDb, vDb) in DbDict){
 			var kCode = z.DbColName_CodeColName[kDb];
 			var colCode = z.Columns[kCode];
-			var vCode = colCode.RawToUpper(vDb);
+			var vCode = colCode.RawToUpper?.Invoke(vDb)??vDb;
 			ans[kCode] = vCode;
 		}
 		return ans;
@@ -260,7 +219,7 @@ public static class ExtnITable{
 		var ans = new Str_Any();
 		foreach(var (kCode, vCode) in CodeDict){
 			var Col = z.Columns[kCode];
-			var vDb = Col.UpperToRaw(vCode);//-
+			var vDb = Col.UpperToRaw?.Invoke(vCode);//-
 			ans[Col.NameInDb] = vDb;
 		}
 		return ans;
@@ -272,7 +231,7 @@ public static class ExtnITable{
 		,str CodeColName
 		,object? CodeValue
 	){
-		return z.Columns[CodeColName].UpperToRaw(CodeValue);
+		return z.Columns[CodeColName].UpperToRaw?.Invoke(CodeValue);
 	}
 
 	public static str UpdateClause(
@@ -336,7 +295,7 @@ public static class ExtnITable{
 /// <param name="Start">含</param>
 /// <param name="End">含</param>
 /// <returns></returns>
-	public static IList<str> MkUnnamedParam(
+	public static IList<str> MkParams(
 		this ITable z
 		,u64 Start
 		,u64 End
@@ -402,7 +361,7 @@ public static class ExtnITable{
 		}
 var S =
 $"""
-CREATE TABLE IF NOT EXISTS {z.Quote(z.Name)}(
+CREATE TABLE IF NOT EXISTS {z.Quote(z.DbTblName)}(
 	{string.Join(",\n\t", Lines)}{FmtInnerSqls(z.InnerAdditionalSqls)}
 );
 {FmtOuterSqls(z.OuterAdditionalSqls)}

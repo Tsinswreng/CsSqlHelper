@@ -1,6 +1,9 @@
 namespace Tsinswreng.CsSqlHelper;
 
 using Self = ColBuilder;
+/// <summary>
+/// A helper class to build a `IColumn` object.
+/// </summary>
 public class ColBuilder{
 	public ITable Table{get;set;}
 	public IColumn Column { get; set; }
@@ -26,20 +29,9 @@ public static class ExtnColBuilder{
 	public static Self SetCol(
 		this ITable z
 		,str NameInCode
-		// ,str? NameInDb = null
-		// ,Type? Type = null
 	){
-		// System.Console.WriteLine("一睡眠");
-		// System.Console.WriteLine(
-		// 	str.Join("\n", z.Columns.Keys)//t
-		// );
 		var col = z.Columns[NameInCode];
 		var R = new ColBuilder(z, col);
-		// if(NameInDb != null){
-		// 	col.NameInDb = NameInDb;
-		// 	z.DbColName_CodeColName[NameInDb] = NameInCode;
-		// }
-		// col.RawTypeInCode = Type;
 		return R;
 	}
 
@@ -89,10 +81,56 @@ public static class ExtnColBuilder{
 		,Func<object?, TRaw>? ObjToRaw = null
 		,Func<object?, TUpper>? ObjToUpper = null
 	){
+		var Fns = DbTypeConvFns<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
+		return HasConversionEtMapType(z, Fns);
+	}
+
+	public static Self HasConversionEtMapType<TRaw, TUpper>(
+		this Self z
+		,IDbTypeConvFns<TRaw, TUpper> Fns
+	){
 		var col = z.Column;
 		col.RawClrType = typeof(TRaw);
 		col.UpperClrType = typeof(TUpper);
-		return HasConversion<TRaw, TUpper>(z, UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
+		return HasConversion(z, Fns);
+	}
+
+	public static Self HasConversion<TRaw, TUpper>(
+		this Self z
+		,IDbTypeConvFns<TRaw, TUpper> Fns
+	){
+		var col = z.Column;
+		var UpperToRaw = Fns.UpperToRaw;
+		var RawToUpper = Fns.RawToUpper;
+		var ObjToRaw = Fns.ObjToRaw;
+		var ObjToUpper = Fns.ObjToUpper;
+		col.UpperToRaw = (x)=>{
+			try{
+				if(UpperToRaw == null){return x;}
+				if(ObjToUpper != null){
+					return UpperToRaw(ObjToUpper(x));
+				}
+				return UpperToRaw((TUpper)x!);
+			}
+			catch (System.Exception){
+				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ col.NameInDb);
+				throw;
+			}
+		};
+		col.RawToUpper = (x)=>{
+			try{
+				if(RawToUpper == null){return x;}
+				if(ObjToRaw != null){
+					return RawToUpper(ObjToRaw(x));
+				}
+				return RawToUpper((TRaw)x!);
+			}
+			catch (System.Exception){
+				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ col.NameInDb);
+				throw;
+			}
+		};
+		return z;
 	}
 
 /// <summary>
@@ -118,33 +156,8 @@ public static class ExtnColBuilder{
 		,Func<object?, TRaw>? ObjToRaw = null
 		,Func<object?, TUpper>? ObjToUpper = null
 	){
-		var col = z.Column;
-		//col.ToRawType = ToRawType;
-		col.UpperToRaw = (x)=>{
-			try{
-				if(ObjToUpper != null){
-					return UpperToRaw(ObjToUpper(x));
-				}
-				return UpperToRaw((TUpper)x!);
-			}
-			catch (System.Exception){
-				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ col.NameInDb);
-				throw;
-			}
-		};
-		col.RawToUpper = (x)=>{
-			try{
-				if(ObjToRaw != null){
-					return RawToUpper(ObjToRaw(x));
-				}
-				return RawToUpper((TRaw)x!);
-			}
-			catch (System.Exception){
-				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ col.NameInDb);
-				throw;
-			}
-		};
-		return z;
+		var Fns = DbTypeConvFns<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
+		return HasConversion(z, Fns);
 	}
 
 	public static Self AdditionalSqls(

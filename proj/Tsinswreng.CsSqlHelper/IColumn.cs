@@ -1,41 +1,61 @@
 namespace Tsinswreng.CsSqlHelper;
-//類型映射與字段映射
+
+/// <summary>
+/// Stands for a column in a table or a property in an entity
+/// </summary>
 public interface IColumn{
 	/// <summary>
-	/// 在數據庫中 字段ʹ名
+	/// Column name in database table
 	/// </summary>
 	public string NameInDb { get; set; }
 	/// <summary>
-	/// 完整ʹ類型 如 TEXT  VARCHAR(64)。 不當獨VARCHAR洏缺後ʹ(n)
+	/// Should be full type name like `TEXT`, `VARCHAR(64)`; only `VARCHAR` is unsupported
 	/// </summary>
 	public str TypeInDb{get;set;}
 	/// <summary>
 	/// 有自封裝ʹ類型旹 即其內ʹ原始類型
+	/// Type of the data that is retrieved from the database
 	/// </summary>
 	public Type? RawClrType{get;set;}
 	/// <summary>
 	/// 自封裝ʹ類型
+	/// Type defined in entity
+	/// e.g, when you use strongly typed id struct encapsulating an int64,
+	/// in this way `RawClrType` is `long` and `UpperClrType` is your custom struct
+	///
 	/// </summary>
 	public Type? UpperClrType{get;set;}
+	/// <summary>
+	/// Additional SQL statements to be executed when creating the column
+	/// e.g `UNIQUE(Email)`
+	/// </summary>
 	public IList<str> AdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();
 #endif
+
+	/// <summary>
+	/// if set true, the column will be marked as `NOT NULL` in the database
+	/// </summary>
 	public bool NotNull{get;set;}
 
-	// public object ToDbType(object CodeType){
-	// 	return CodeType;
-	// }
-	public Func<object?,object?> UpperToRaw{get;set;}
-	#if Impl
-	= (object? CodeType)=>{return CodeType;};
-	#endif
+	/// <summary>
+	/// Convert from `UpperClrType` to `RawClrType`
+	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
+	/// </summary>
+	public Func<object?,object?>? UpperToRaw{get;set;}
+#if Impl
+	= (x)=>x;
+#endif
 
-
-	public Func<object?,object?> RawToUpper{get;set;}
-	#if Impl
-	= (object? DbType)=>{return DbType;};
-	#endif
+	/// <summary>
+	/// Convert from `RawClrType` to `UpperClrType`
+	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
+	/// </summary>
+	public Func<object?,object?>? RawToUpper{get;set;}
+#if Impl
+	= (x)=>x;
+#endif
 
 }
 

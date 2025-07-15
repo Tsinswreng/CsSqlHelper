@@ -1,32 +1,50 @@
 using System.Collections;
-using Tsinswreng.CsDictMapper.DictMapper;
+using Tsinswreng.CsDictMapper;
 
 namespace Tsinswreng.CsSqlHelper;
 
 using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
 using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 
-public interface ITable{
-	public IDictMapperShallow DictMapper{get;set;}
-	public Type EntityType{get;set;}
 /// <summary>
-/// 表名
+/// Table in database
 /// </summary>
-	public str Name{get;set;}
+public interface ITable{
+	/// <summary>
+	/// mapper to convert between object and dictionary
+	/// </summary>
+	public IDictMapperShallow DictMapper{get;set;}
+	public Type EntityClrType{get;set;}
+	/// <summary>
+	/// table name in database
+	/// </summary>
+	public str DbTblName{get;set;}
 #if Impl
 	= "";
 #endif
+/// <summary>
+/// Key: property name in entity class
+/// value: IColumn object
+/// </summary>
 	public IDictionary<str, IColumn> Columns{get;set;}
 #if Impl
 	= new Dictionary<str, I_Column>();
 #endif
-	public str CodeColId{get;set;}
+	/// <summary>
+	/// 編程代碼中實體主鍵字段名
+	/// </summary>
+	public str CodeIdName{get;set;}
 #if Impl
 	= "Id";
 #endif
 
-	public ISoftDeleteCol? SoftDeleteCol{get;set;}
-
+/// <summary>
+/// 軟刪除欄位
+/// </summary>
+	public ISoftDeleteCol? SoftDelCol{get;set;}
+/// <summary>
+/// 資料庫欄位名稱_代碼欄位名稱
+/// </summary>
 	public IDictionary<str, str> DbColName_CodeColName{get;set;}
 #if Impl
 	= new Dictionary<str, str>();
@@ -38,14 +56,14 @@ public interface ITable{
 #endif
 	public ISqlMkr SqlMkr{get;set;}
 	/// <summary>
-	/// 在CREATE TABLE() 塊內
+	/// 在CREATE TABLE() 塊內 如 `DEFAULT 0`
 	/// </summary>
 	public IList<str> InnerAdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();
 #endif
 	/// <summary>
-	/// 在CREATE TABLE() 塊外
+	/// 在CREATE TABLE() 塊外 如 `CREATE INDEX ...`
 	/// </summary>
 	public IList<str> OuterAdditionalSqls{get;set;}
 #if Impl

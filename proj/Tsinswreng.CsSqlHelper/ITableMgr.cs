@@ -6,9 +6,14 @@ public interface ITblMgr{
 	public str DbSrcType{get;set;}
 	public ISqlMkr SqlMkr{get;set;}
 
-	public void AddTable<TPo>(ITable table){
-		table.SqlMkr = SqlMkr;
-		Type_Table.Add(typeof(TPo), table);
+	[Obsolete("用AddTable(ITable Tbl)、少寫一遍類型")]
+	public void AddTable<TPo>(ITable Tbl){
+		Tbl.SqlMkr = SqlMkr;
+		Type_Table.Add(typeof(TPo), Tbl);
+	}
+	public void AddTable(ITable Tbl){
+		Tbl.SqlMkr = SqlMkr;
+		Type_Table.Add(Tbl.EntityClrType, Tbl);
 	}
 
 	public ITable GetTable<T_Po>(){

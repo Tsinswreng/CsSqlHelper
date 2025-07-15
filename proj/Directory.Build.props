@@ -18,8 +18,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="../../../Tsinswreng.CsDictMapper/proj/Tsinswreng.CsDictMapper/Tsinswreng.CsDictMapper.csproj"
-		OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+		<ProjectReference Include="../../../Tsinswreng.CsDictMapper/proj/Tsinswreng.CsDictMapper.SrcGen/Tsinswreng.CsDictMapper.SrcGen.csproj"
+			OutputItemType="Analyzer" ReferenceOutputAssembly="false"
+		/>
+		<ProjectReference Include="../../../Tsinswreng.CsDictMapper/proj/Tsinswreng.CsDictMapper/Tsinswreng.CsDictMapper.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="../../../Tsinswreng.CsCore/proj/Tsinswreng.CsCore/Tsinswreng.CsCore.csproj" />

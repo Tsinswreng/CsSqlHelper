@@ -1,6 +1,9 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public class SoftDeleteCol: ISoftDeleteCol{
+public class SoftDelol: ISoftDeleteCol{
+	/// <summary>
+	/// name in database of the soft delete column
+	/// </summary>
 	public str CodeColName{get;set;} = "";
 	/// <summary>
 	/// FnDelete(舊值)=>新值
