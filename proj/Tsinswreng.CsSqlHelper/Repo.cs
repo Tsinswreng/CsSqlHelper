@@ -9,6 +9,7 @@ using Tsinswreng.CsDictMapper;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
+//TODO 分頁
 public class Repo<
 	TEntity, TId
 >

@@ -8,11 +8,13 @@ recommand you to clone the code and reference the source code directly
 CsSqlHelper is a tiny ORM
 
 -   AOT-compatible using
-    CsSqlHelper\[`https://github.com/Tsinswreng/CsSqlHelper`\]
+    [CsDictMapper](https://github.com/Tsinswreng/CsDictMapper)
+
+-   Functional Crud
 
 -   Make your sql string portable(database independent)
 
--   Abstact interfaces to adapte to different database or ORM
+-   Abstact interfaces to adapt to different database or ORM
 
 -   Adapted Sqlite, PostgreSql, EFCore by now
 
@@ -22,7 +24,7 @@ CsSqlHelper is a tiny ORM
 
 -   Transaction support
 
--   Page query
+-   [Page query](https://github.com/Tsinswreng/CsPage)
 
 -   Especially suitable for client app with sqlite
 
@@ -92,7 +94,9 @@ public class AppSchemaCfg{
             // set the primary key column
             o.CodeIdName = nameof(User.Id);
             // config type mapping and conversion for Id column
-            o.SetCol("id").HasConversionEtMapType(
+            o.SetCol("id")
+            .AddtitionalSqls(["PRIMARY KEY"])
+            .HasConversionEtMapType(
                 DbTypeConvFns<long, IdUser>.Mk(
                     (id)=>id.Value
                     ,(val)=>IdUser.FromRaw(val)
@@ -100,11 +104,24 @@ public class AppSchemaCfg{
             )
             #if false
             //you can also directly pass lambdas:
-            o.SetCol("id").HasConversionEtMapType<long, IdUser>(
+            o.SetCol("id")
+            .AddtitionalSqls(["PRIMARY KEY"])
+            .HasConversionEtMapType<long, IdUser>(
                 (id)=>id.Value
                 ,(val)=>IdUser.FromRaw(val)
             )
             #endif
+
+            // add addtional sql which will be placed inside the `CREATE TABLE()` statement, e.g. add constrain
+            o.InnerAdditionalSqls.AddRange([
+                $"UNIQUE({o.Field(nameof(User.Email))})"
+            ]);
+
+            // add addtional sql which will be placed outside the `CREATE TABLE()` statement, e.g create index
+            o.OuterAdditionalSqls.AddRange([
+                $"CREATE INDEX {0.Quote("Idx_Email")} ON {o.Quote(o.DbTblName) ({o.Field(nameof(User.Email))}) }"
+            ])
+
             // config the column for logic delete
             o.SoftDelCol = new SoftDelCol{
                 CodeColName = nameof(User.Status)
