@@ -7,15 +7,15 @@ public class SqliteSqlMkr
 	public static SqliteSqlMkr Inst => _Inst??= new SqliteSqlMkr();
 	public ISqlTypeMapper SqlTypeMapper{get;set;} = SqliteTypeMapper.Inst;
 
-	public str Quote(str Name){
+	public str Qt(str Name){
 		return "\"" + Name + "\"";
 	}
 
-	public str Param(str Name){
+	public str Prm(str Name){
 		return "@" + Name;
 	}
 
-	public str LimitOffset(str Limit, str Offset){
-		return $"LIMIT {Param(Limit)} OFFSET {Param(Offset)}";
+	public str PrmLmtOfst(str Limit, str Offset){
+		return $"LIMIT {Prm(Limit)} OFFSET {Prm(Offset)}";
 	}
 }

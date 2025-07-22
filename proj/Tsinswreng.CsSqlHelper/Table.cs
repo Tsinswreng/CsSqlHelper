@@ -136,11 +136,11 @@ public static class ExtnITable{
 /// <param name="z"></param>
 /// <param name="s"></param>
 /// <returns></returns>
-	public static str Quote(
+	public static str Qt(
 		this ITable z
 		,str s
 	){
-		return z.SqlMkr.Quote(s);
+		return z.SqlMkr.Qt(s);
 	}
 
 /// <summary>
@@ -157,22 +157,22 @@ public static class ExtnITable{
 /// <summary>
 /// 映射到數據庫表ʹ字段名 並加引號/括號
 /// </summary>
-	public static str Field(
+	public static str Fld(
 		this ITable z
 		,str CodeColName
 	){
 		var DbColName = z.Columns[CodeColName].NameInDb;
-		return z.SqlMkr.Quote(DbColName);
+		return z.SqlMkr.Qt(DbColName);
 	}
 
 /// <summary>
 ///
 /// </summary>
-	public static str Param(
+	public static str Prm(
 		this ITable z
 		,str CodeColName
 	){
-		return z.SqlMkr.Param(CodeColName);
+		return z.SqlMkr.Prm(CodeColName);
 	}
 
 
@@ -226,12 +226,28 @@ public static class ExtnITable{
 
 	}
 
-	public static object? ToDbType(
+	public static object? UpperToRaw(
 		this ITable z
 		,str CodeColName
 		,object? CodeValue
 	){
-		return z.Columns[CodeColName].UpperToRaw?.Invoke(CodeValue);
+		return z.Columns[CodeColName].UpperToRaw?.Invoke(CodeValue)??CodeValue;
+	}
+
+	public static obj? RawToUpper(
+		this ITable z
+		,str CodeColName
+		,obj? RawValue
+	){
+		return z.Columns[CodeColName].RawToUpper?.Invoke(RawValue)??RawValue;
+	}
+
+	public static T RawToUpper<T>(
+		this ITable z
+		,str CodeColName
+		,obj? RawValue
+	){
+		return (T)(z.Columns[CodeColName].RawToUpper?.Invoke(RawValue)??RawValue)!;
 	}
 
 	public static str UpdateClause(
@@ -240,8 +256,8 @@ public static class ExtnITable{
 	){
 		List<str> segs = [];
 		foreach(var rawField in RawFields){
-			var field = z.Field(rawField);
-			var param = z.Param(rawField);
+			var field = z.Fld(rawField);
+			var param = z.Prm(rawField);
 			segs.Add(field + " = " + param);
 		}
 		return string.Join(", ", segs);
@@ -254,8 +270,8 @@ public static class ExtnITable{
 		List<str> Fields = [];
 		List<str> Params = [];
 		foreach(var rawField in RawFields){
-			var field = z.Field(rawField);
-			var param = z.Param(rawField);
+			var field = z.Fld(rawField);
+			var param = z.Prm(rawField);
 			Fields.Add(field);
 			Params.Add(param);
 		}
@@ -278,7 +294,7 @@ public static class ExtnITable{
 		List<str> R = [];
 		R.Add("(");
 		for(u64 i = StartPos; i <= EndPos; i++){
-			var Param = z.Param(i+"");
+			var Param = z.Prm(i+"");
 			R.Add(Param);
 			if(i == EndPos){
 				R.Add(", ");
@@ -302,7 +318,7 @@ public static class ExtnITable{
 	){
 		var R = new List<str>();
 		for(u64 i = Start; i <= End; i++){
-			var Param = z.Param(i+"");
+			var Param = z.Prm(i+"");
 			R.Add(Param);
 		}
 		return R;
@@ -313,7 +329,7 @@ public static class ExtnITable{
 	){
 		str OneCol(ITable Tbl, IColumn Col){
 			var R = new List<str>();
-			R.Add(Tbl.Quote(Col.NameInDb));
+			R.Add(Tbl.Qt(Col.NameInDb));
 			if(!str.IsNullOrEmpty(Col.TypeInDb)){
 				R.Add(Col.TypeInDb);
 			}else{
@@ -361,7 +377,7 @@ public static class ExtnITable{
 		}
 var S =
 $"""
-CREATE TABLE IF NOT EXISTS {z.Quote(z.DbTblName)}(
+CREATE TABLE IF NOT EXISTS {z.Qt(z.DbTblName)}(
 	{string.Join(",\n\t", Lines)}{FmtInnerSqls(z.InnerAdditionalSqls)}
 );
 {FmtOuterSqls(z.OuterAdditionalSqls)}

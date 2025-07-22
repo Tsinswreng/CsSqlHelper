@@ -66,6 +66,28 @@ public class TxnWrapper<TDbFnCtx>
 		return R;
 	}
 
+	//3
+	public async Task<TRet> Wrap<TArg0, TArg1, TArg2, TRet>(
+		Func<TDbFnCtx, CT, Task<Func<
+			TArg0
+			,TArg1
+			,TArg2
+			,CT
+			,Task<TRet>
+		>>> FnXxx
+		,TArg0 Arg0
+		,TArg1 Arg1
+		,TArg2 Arg2
+		,CT Ct
+	){
+		var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+		var Xxx = await FnXxx(Ctx, Ct);
+		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+			return await Xxx(Arg0, Arg1, Arg2, Ct);
+		}, Ct);
+		return R;
+	}
+
 
 
 }
