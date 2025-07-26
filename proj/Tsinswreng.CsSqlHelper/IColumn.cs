@@ -3,7 +3,7 @@ namespace Tsinswreng.CsSqlHelper;
 /// <summary>
 /// Stands for a column in a table or a property in an entity
 /// </summary>
-public interface IColumn{
+public  partial interface IColumn{
 	/// <summary>
 	/// Column name in database table
 	/// </summary>

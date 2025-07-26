@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface IDbTypeConvFns<TRaw, TUpper>{
+public  partial interface IDbTypeConvFns<TRaw, TUpper>{
 	public Func<TUpper,TRaw>? UpperToRaw{get;set;}
 	public Func<TRaw,TUpper>? RawToUpper{get;set;}
 	public Func<object?, TRaw>? ObjToRaw{get;set;}

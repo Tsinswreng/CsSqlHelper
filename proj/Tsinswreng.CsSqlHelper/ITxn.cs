@@ -4,7 +4,7 @@ namespace Tsinswreng.CsSqlHelper;
 /// 事務
 /// Transaction
 /// </summary>
-public interface ITxn : IDisposable{
+public  partial interface ITxn : IDisposable{
 /// <summary>
 /// 原始事務對象
 /// Raw transaction object

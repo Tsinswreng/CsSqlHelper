@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface ISqlMkr{
+public  partial interface ISqlMkr{
 
 	public ISqlTypeMapper SqlTypeMapper{get;set;}
 

@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface ISoftDeleteCol{
+public  partial interface ISoftDeleteCol{
 	public str CodeColName{get;set;}
 	/// <summary>
 	/// FnDelete(舊值)=>新值

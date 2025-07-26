@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface IMigration{
+public  partial interface IMigration{
 	public i64 CreatedAt{get;set;}
 	/// <summary>
 	/// version after ran this migration

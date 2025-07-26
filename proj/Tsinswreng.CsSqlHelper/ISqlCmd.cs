@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface ISqlCmd{
+public  partial interface ISqlCmd{
 	public str? Sql{get;set;}
 	public IAsyncEnumerable<IDictionary<str, object?>> Run(CT Ct);
 	public ISqlCmd Args(IDictionary<str, object?> Args);

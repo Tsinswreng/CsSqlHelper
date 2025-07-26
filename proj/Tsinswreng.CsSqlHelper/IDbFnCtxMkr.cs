@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface IDbFnCtxMkr<TDbFnCtx>
+public  partial interface IDbFnCtxMkr<TDbFnCtx>
 	where TDbFnCtx: IBaseDbFnCtx, new()
 {
 	public I_GetTxnAsy TxnGetter{get;set;}

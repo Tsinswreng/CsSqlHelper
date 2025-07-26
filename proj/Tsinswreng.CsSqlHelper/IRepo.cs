@@ -1,7 +1,7 @@
 namespace Tsinswreng.CsSqlHelper;
 
 using IDbFnCtx = IBaseDbFnCtx;
-public interface IRepo<TEntity, TId>{
+public  partial interface IRepo<TEntity, TId>{
 
 
 	public Task<Func<

@@ -23,7 +23,7 @@ CsSqlHelper is a tiny ORM
 === Define Entities
 suppose you use strongly typed Id type like this:
 ```cs
-public struct UserId{
+public  partial struct UserId{
 	public long Value;
 	//......
 }

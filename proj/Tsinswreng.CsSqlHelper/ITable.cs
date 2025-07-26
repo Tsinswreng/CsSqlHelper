@@ -9,7 +9,7 @@ using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 /// <summary>
 /// Table in database
 /// </summary>
-public interface ITable{
+public  partial interface ITable{
 	/// <summary>
 	/// mapper to convert between object and dictionary
 	/// </summary>

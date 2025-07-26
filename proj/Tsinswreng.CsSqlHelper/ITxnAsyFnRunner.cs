@@ -1,7 +1,7 @@
 namespace Tsinswreng.CsSqlHelper;
 
 // [Obsolete]
-// public interface IRunInTxn{
+// public  partial interface IRunInTxn{
 // 	// [Obsolete]
 // 	// public Task<TRet> RunInTxn<TRet>(
 // 	// 	Func<CT, Task<TRet>> FnAsy
@@ -10,7 +10,7 @@ namespace Tsinswreng.CsSqlHelper;
 // }
 
 
-public interface ITxnRunner{
+public  partial interface ITxnRunner{
 	public Task<TRet> RunTxn<TRet>(
 		ITxn? Txn
 		,Func<
