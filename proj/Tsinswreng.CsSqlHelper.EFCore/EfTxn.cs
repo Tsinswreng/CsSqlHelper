@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace Tsinswreng.CsSqlHelper.EFCore;
 
 
-public class EfTxn:ITxn{
+public  partial class EfTxn:ITxn{
 	public EfTxn(IDbContextTransaction _RawTxn){
 		this._RawTxn = _RawTxn;
 	}

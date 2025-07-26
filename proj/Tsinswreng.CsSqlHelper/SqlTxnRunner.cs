@@ -2,7 +2,7 @@ using System.Data;
 using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsSqlHelper;
-public class AdoTxnRunner(
+public  partial class AdoTxnRunner(
 	//IDbConnection DbConnection
 )
 	//:IRunInTxn

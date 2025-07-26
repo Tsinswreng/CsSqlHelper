@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Tsinswreng.CsSqlHelper;
 
-public class SqlExpr{
+public  partial class SqlExpr{
 	public SqlExpr Select<T>(
 		Expression<Func<T, object>> expr
 	){

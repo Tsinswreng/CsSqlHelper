@@ -1,16 +1,16 @@
 namespace Tsinswreng.CsSqlHelper;
 
 using System.Data;
-using Tsinswreng.CsTools.Tools;
 
 using IDbFnCtx = IBaseDbFnCtx;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
+using Tsinswreng.CsTools;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
 //TODO 分頁
-public class Repo<
+public  partial class Repo<
 	TEntity, TId
 >
 	:IRepo<TEntity, TId>

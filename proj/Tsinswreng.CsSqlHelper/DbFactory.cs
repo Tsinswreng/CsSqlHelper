@@ -1,6 +1,6 @@
 // namespace Tsinswreng.CsSqlHelper;
 
-// public class DbFactory{
+// public  partial class DbFactory{
 // 	protected static DbFactory? _Inst = null;
 // 	public static DbFactory Inst => _Inst??= new DbFactory();
 

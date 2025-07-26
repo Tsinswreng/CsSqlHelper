@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Tsinswreng.CsSqlHelper.EFCore;
 
-public class EfRepo<TEntity, TId>
+public  partial class EfRepo<TEntity, TId>
 	: IRepo<TEntity, TId>
 	where TEntity:class
 {

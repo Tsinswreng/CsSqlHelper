@@ -5,7 +5,7 @@ namespace Tsinswreng.CsSqlHelper;
 /// <summary>
 /// ADO.NET 事務
 /// </summary>
-public class AdoTxn:ITxn{
+public  partial class AdoTxn:ITxn{
 	public AdoTxn(IDbTransaction _RawTxn){
 		this._RawTxn = _RawTxn;
 	}

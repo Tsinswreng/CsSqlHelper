@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 
-public class SqliteTypeMapper : ISqlTypeMapper{
+public  partial class SqliteTypeMapper : ISqlTypeMapper{
 protected static SqliteTypeMapper? _Inst = null;
 public static SqliteTypeMapper Inst => _Inst??= new SqliteTypeMapper();
 

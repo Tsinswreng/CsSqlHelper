@@ -6,7 +6,7 @@ namespace Tsinswreng.CsSqlHelper;
 /// <summary>
 /// 遷移表實體類
 /// </summary>
-public class SchemaHistory{
+public  partial class SchemaHistory{
 	public static SchemaHistory Sample = new();
 	/// <summary>
 	/// 主鍵。用插入旹之毫秒時間戳
@@ -24,7 +24,7 @@ public partial class SqlHelperDictMapper{
 	public static SqlHelperDictMapper Inst => _Inst??= new SqlHelperDictMapper();
 }
 
-public class SchemaHistoryTblMkr{
+public  partial class SchemaHistoryTblMkr{
 	public str TblName = "__TsinswrengSchemaHistory";
 	public ITable MkTbl(){
 		var Key_Type = SqlHelperDictMapper.Inst.GetTypeDictShallowT<SchemaHistory>();

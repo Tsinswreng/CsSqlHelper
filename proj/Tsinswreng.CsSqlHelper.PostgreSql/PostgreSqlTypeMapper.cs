@@ -1,7 +1,7 @@
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
 
-public class PostgreSqlTypeMapper : ISqlTypeMapper {
+public  partial class PostgreSqlTypeMapper : ISqlTypeMapper {
 	protected static PostgreSqlTypeMapper? _Inst = null;
 
 	public static PostgreSqlTypeMapper Inst => _Inst ??= new PostgreSqlTypeMapper();

@@ -5,7 +5,7 @@ using Npgsql;
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
 
-public class PostgreSqlCmd: ISqlCmd{
+public  partial class PostgreSqlCmd: ISqlCmd{
 	public NpgsqlCommand RawCmd{get;set;}
 	public str? Sql{get;set;}
 	public PostgreSqlCmd(NpgsqlCommand DbCmd){

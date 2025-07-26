@@ -43,7 +43,7 @@ public struct UserId{
 ```
 
 ``` cs
-public class User{
+public  partial class User{
     public UserId Id{get;set;}
     public string Email{get;set;}
     public long CreatedAt{get;set;}
@@ -72,11 +72,11 @@ public partial class AppDictMapper{
 We use sqlite as an example:
 
 ``` cs
-public class AppTblMgr:SqliteTblMgr{
+public  partial class AppTblMgr:SqliteTblMgr{
     protected static LocalTblMgr Inst = new();
 }
 
-public class AppSchemaCfg{
+public  partial class AppSchemaCfg{
     protected ITblMgr Mgr{get;set;} //should be injected with `AppTblMgr`
 
     /// define a helper function for simplify the code to create table object
@@ -176,7 +176,7 @@ We use inner function and closure. It has the following advantages:
 ``` cs
 using CT = CancellationToken;
 /// TId: The type of the primary key of the entity. It can be any type, including self-encapsulated strongly typed Id type
-public class Repo<TEntity, TId>:IRepo<TEntity, TId>
+public  partial class Repo<TEntity, TId>:IRepo<TEntity, TId>
     where TEntity: class, new()
 {
     // the below properties will be injected by DI container
@@ -230,7 +230,7 @@ public class Repo<TEntity, TId>:IRepo<TEntity, TId>
 ## Combine Db Functions and run in transaction
 
 ``` cs
-public class UserService(
+public  partial class UserService(
     TxnWrapper<DbFnCtx> TxnWrapper
     ,IRepo<PoUser, IdUser> UserRepo
 ){

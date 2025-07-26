@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Tsinswreng.CsSqlHelper.EFCore;
 
-public class EfTxnMkr(
+public  partial class EfTxnMkr(
 	DbContext DbContext
 )
 

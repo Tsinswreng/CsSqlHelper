@@ -7,7 +7,7 @@ public interface IDbTypeConvFns<TRaw, TUpper>{
 	public Func<object?, TUpper>? ObjToUpper{get;set;}
 }
 
-public class DbTypeConvFns<TRaw, TUpper>
+public  partial class DbTypeConvFns<TRaw, TUpper>
 	:IDbTypeConvFns<TRaw, TUpper>
 {
 	public Func<TUpper,TRaw>? UpperToRaw{get;set;}

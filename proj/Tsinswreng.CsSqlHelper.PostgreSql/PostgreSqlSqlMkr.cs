@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
-public class PostgreSqlSqlMkr
+public  partial class PostgreSqlSqlMkr
 	:ISqlMkr
 {
 	protected static PostgreSqlSqlMkr? _Inst = null;

@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public class SoftDelol: ISoftDeleteCol{
+public  partial class SoftDelol: ISoftDeleteCol{
 	/// <summary>
 	/// name in database of the soft delete column
 	/// </summary>

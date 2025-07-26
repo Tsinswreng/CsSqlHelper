@@ -1,5 +1,5 @@
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
-public class PostgreSqlTblMgr : ITblMgr{
+public  partial class PostgreSqlTblMgr : ITblMgr{
 	public str DbSrcType{get;set;} = "PostgreSql";
 	public ISqlMkr SqlMkr{get;set;} = new PostgreSqlSqlMkr();
 

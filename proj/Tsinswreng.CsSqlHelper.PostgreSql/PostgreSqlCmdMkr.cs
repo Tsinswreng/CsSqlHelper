@@ -3,7 +3,7 @@ using Npgsql;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
-public class PostgreSqlCmdMkr
+public  partial class PostgreSqlCmdMkr
 	:ISqlCmdMkr
 	,I_GetTxnAsy
 {

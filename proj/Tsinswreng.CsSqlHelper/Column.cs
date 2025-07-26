@@ -3,7 +3,7 @@ namespace Tsinswreng.CsSqlHelper;
 
 
 //類型映射與字段映射
-public class Column: IColumn{
+public  partial class Column: IColumn{
 	/// <summary>
 	/// 在數據庫中 字段ʹ名
 	/// </summary>

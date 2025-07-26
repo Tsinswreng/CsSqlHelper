@@ -1,5 +1,5 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public class ServiceSchemaHistory{
+public  partial class ServiceSchemaHistory{
 
 }

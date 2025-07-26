@@ -7,7 +7,7 @@ namespace Tsinswreng.CsSqlHelper;
 
 
 
-public class Table:ITable{
+public  partial class Table:ITable{
 	public IDictMapperShallow DictMapper{get;set;}
 	public Type EntityClrType{get;set;}
 	public Table(){}

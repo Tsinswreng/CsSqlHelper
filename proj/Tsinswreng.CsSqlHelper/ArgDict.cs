@@ -4,7 +4,7 @@ using Tsinswreng.CsPage;
 
 namespace Tsinswreng.CsSqlHelper;
 
-public class ArgDict: IArgDict{
+public  partial class ArgDict: IArgDict{
 	public static IArgDict Mk(){
 		return new ArgDict();
 	}

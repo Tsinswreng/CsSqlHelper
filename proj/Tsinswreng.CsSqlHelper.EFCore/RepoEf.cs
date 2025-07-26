@@ -17,7 +17,7 @@ namespace Ngaq.Local.Db;
 
 using DbCtx = DbContext;
 
-public class RepoEf
+public  partial class RepoEf
 <
 [DynamicallyAccessedMembers(
 	DynamicallyAccessedMemberTypes.PublicConstructors |

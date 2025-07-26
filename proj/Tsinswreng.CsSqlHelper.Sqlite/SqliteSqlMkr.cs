@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 
-public class SqliteSqlMkr
+public  partial class SqliteSqlMkr
 	:ISqlMkr
 {
 	protected static SqliteSqlMkr? _Inst = null;

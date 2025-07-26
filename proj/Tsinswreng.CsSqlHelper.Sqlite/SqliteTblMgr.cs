@@ -1,5 +1,5 @@
 namespace Tsinswreng.CsSqlHelper.Sqlite;
-public class SqliteTblMgr : ITblMgr{
+public  partial class SqliteTblMgr : ITblMgr{
 	public str DbSrcType{get;set;} = "Sqlite";
 	public ISqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
 

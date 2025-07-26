@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 
-public class SqliteCmd: ISqlCmd{
+public  partial class SqliteCmd: ISqlCmd{
 	public SqliteCommand RawCmd{get;set;}
 	public str? Sql{get;set;}
 	public SqliteCmd(SqliteCommand DbCmd){

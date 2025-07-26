@@ -11,7 +11,7 @@ public interface IDbFnCtxMkr<TDbFnCtx>
 	}
 }
 
-public class BaseDbFnCtxMkr<TDbFnCtx>
+public  partial class BaseDbFnCtxMkr<TDbFnCtx>
 	:IDbFnCtxMkr<TDbFnCtx>
 	where TDbFnCtx: IBaseDbFnCtx, new()
 {

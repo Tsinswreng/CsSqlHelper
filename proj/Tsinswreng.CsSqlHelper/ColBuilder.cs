@@ -4,7 +4,7 @@ using Self = ColBuilder;
 /// <summary>
 /// A helper class to build a `IColumn` object.
 /// </summary>
-public class ColBuilder{
+public  partial class ColBuilder{
 	public ITable Table{get;set;}
 	public IColumn Column { get; set; }
 	public ColBuilder(

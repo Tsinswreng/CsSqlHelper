@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper.EFCore;
 
-public class EfTxnRunner:ITxnRunner{
+public  partial class EfTxnRunner:ITxnRunner{
 	public async Task<TRet> RunTxn<TRet>(
 		ITxn? Txn
 		,Func<
