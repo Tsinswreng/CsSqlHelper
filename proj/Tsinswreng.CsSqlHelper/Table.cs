@@ -261,8 +261,8 @@ public static class ExtnITable{
 
 	public static T RawToUpper<T>(
 		this ITable z
-		,str CodeColName
 		,obj? RawValue
+		,str CodeColName
 	){
 		return (T)(z.Columns[CodeColName].RawToUpper?.Invoke(RawValue)??RawValue)!;
 	}
