@@ -135,7 +135,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		,CT Ct
 	){
 		var T = TblMgr.GetTable<TEntity>();
-		var Params = T.MkParams(0,0);
+		var Params = T.Prm(0,0);
 		var Sql = $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} = {Params[0]}" ;
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 
@@ -243,11 +243,11 @@ $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		if(T.SoftDelCol == null){
 			throw new Exception("SoftDeleteCol is null");
 		}
-		var ParamList = T.MkParams(1, InClauseParamNum);
+		var ParamList = T.Prm(1, InClauseParamNum);
 		var Sql =
 $"""
 UPDATE {T.Qt(T.DbTblName)}
-SET {T.Fld(T.SoftDelCol.CodeColName)} = {T.MkParams(0,0)[0]}
+SET {T.Fld(T.SoftDelCol.CodeColName)} = {T.Prm(0,0)[0]}
 WHERE {T.Fld(KeyNameInCode)} IN ({str.Join(",", ParamList)})
 AND {T.Fld(KeyNameInCode)} IS NOT NULL
 ;
@@ -261,7 +261,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		)=>{
 			await using BatchListAsy<object?, nil> BatchList = new(async (x, Ct)=>{
 				IList<object?> Args = [ValToSet, ..x];
-				Args = Args.FillUpTo(InClauseParamNum, null);
+				Args.FillUpTo(InClauseParamNum, null);
 				await Cmd.Args(Args).Run(Ct).FirstOrDefaultAsync(Ct);
 				return NIL;
 			});

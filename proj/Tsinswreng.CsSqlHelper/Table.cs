@@ -165,14 +165,11 @@ public static class ExtnITable{
 		return z.SqlMkr.Qt(DbColName);
 	}
 
-/// <summary>
-///
-/// </summary>
 	public static str Prm(
 		this ITable z
-		,str CodeColName
+		,str Name
 	){
-		return z.SqlMkr.Prm(CodeColName);
+		return z.SqlMkr.Prm(Name);
 	}
 
 
@@ -306,12 +303,12 @@ public static class ExtnITable{
 
 /// <summary>
 /// [@0, @1, @2 ...]
-/// </summary>
+/// ,</summary>
 /// <param name="z"></param>
 /// <param name="Start">含</param>
 /// <param name="End">含</param>
 /// <returns></returns>
-	public static IList<str> MkParams(
+	public static IList<str> Prm(
 		this ITable z
 		,u64 Start
 		,u64 End

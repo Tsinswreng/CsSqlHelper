@@ -16,8 +16,8 @@ public  partial class Column: IColumn{
 	= new List<str>();
 #endif
 	public bool NotNull{get;set;}
-	public Func<object?,object?>? UpperToRaw{get;set;} = (x)=>x;
-
-	public Func<object?,object?>? RawToUpper{get;set;} = (x)=>x;
-
+	public RawUpperTypeMapperFn? RawUpperTypeMapper{get;set;}
+	// public Func<object?,object?>? UpperToRaw{get;set;} = (x)=>x;
+	// public Func<object?,object?>? RawToUpper{get;set;} = (x)=>x;
 }
+
