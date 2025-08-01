@@ -291,7 +291,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 			IEnumerable<TKey> Keys
 			,CT Ct
 		)=>{
-			var Args = Keys.Select(K=>T.UpperToRaw(KeyNameInCode, K));
+			var Args = Keys.Select(K=>T.UpperToRaw(K, KeyNameInCode));
 			await NonGeneric(Args, Ct);
 			return NIL;
 		};
@@ -387,7 +387,7 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 			IEnumerable<TKey> Keys
 			,CT Ct
 		)=>{
-			var Args = Keys.Select(Id => T.UpperToRaw(KeyNameInCode, Id));
+			var Args = Keys.Select(Id => T.UpperToRaw(Id, KeyNameInCode));
 			await NonGeneric(Args, Ct);
 			return NIL;
 		};

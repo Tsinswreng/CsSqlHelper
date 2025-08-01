@@ -1,10 +1,17 @@
+#define Impl
+using Tsinswreng.CsCore;
+
 namespace Tsinswreng.CsSqlHelper;
 
-public interface IRawUpperTypeMapperFn{
+public class UpperTypeMapFn
+	:IUpperTypeMapFn
+{
 	/// <summary>
 	/// Convert from `UpperClrType` to `RawClrType`
 	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
 	/// </summary>
+
+	[Impl]
 	public Func<obj?,obj?>? UpperToRaw{get;set;}
 #if Impl
 	= (x)=>x;
@@ -14,6 +21,8 @@ public interface IRawUpperTypeMapperFn{
 	/// Convert from `RawClrType` to `UpperClrType`
 	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
 	/// </summary>
+
+	[Impl]
 	public Func<obj?,obj?>? RawToUpper{get;set;}
 #if Impl
 	= (x)=>x;

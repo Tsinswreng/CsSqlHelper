@@ -124,6 +124,10 @@ public  partial class Table:ITable{
 #if Impl
 	= new List<str>();
 #endif
+	public IDictionary<Type, IUpperTypeMapFn> UpperType_DfltMapper{get;set;}
+#if Impl
+	= new Dictionary<Type, IUpperTypeMapFn>();
+#endif
 }
 
 
@@ -216,25 +220,41 @@ public static class ExtnITable{
 		var ans = new Str_Any();
 		foreach(var (kCode, vCode) in CodeDict){
 			var Col = z.Columns[kCode];
-			var vDb = Col.UpperToRaw?.Invoke(vCode);//-
+			var vDb = Col.UpperToRaw?.Invoke(vCode)??vCode;
 			ans[Col.NameInDb] = vDb;
 		}
 		return ans;
 
 	}
 
-	public static object? UpperToRaw(
+	public static obj? UpperToRaw(
 		this ITable z
+		,obj? UpperValue
 		,str CodeColName
-		,object? CodeValue
 	){
-		return z.Columns[CodeColName].UpperToRaw?.Invoke(CodeValue)??CodeValue;
+		return z.Columns[CodeColName].UpperToRaw?.Invoke(UpperValue)??UpperValue;
+	}
+
+	public static obj? UpperToRaw<T>(
+		this ITable z
+		,T UpperValue
+		,str? CodeColName = null
+	){
+		if(CodeColName != null
+			&& (z.Columns.TryGetValue(CodeColName, out var Col))
+		){
+			return Col.UpperToRaw?.Invoke(UpperValue)??UpperValue;
+		}
+		var Mapper = z.UpperType_DfltMapper[typeof(T)]
+			?? throw new Exception("No UpperTypeMapperFn for type: "+ typeof(T))
+		;
+		return Mapper.UpperToRaw?.Invoke(UpperValue)??UpperValue;
 	}
 
 	public static obj? RawToUpper(
 		this ITable z
-		,str CodeColName
 		,obj? RawValue
+		,str CodeColName
 	){
 		return z.Columns[CodeColName].RawToUpper?.Invoke(RawValue)??RawValue;
 	}

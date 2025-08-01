@@ -95,44 +95,6 @@ public static class ExtnColBuilder{
 		return HasConversion(z, Fns);
 	}
 
-	public static Self HasConversion<TRaw, TUpper>(
-		this Self z
-		,IDbTypeConvFns<TRaw, TUpper> Fns
-	){
-		var col = z.Column;
-		var UpperToRaw = Fns.UpperToRaw;
-		var RawToUpper = Fns.RawToUpper;
-		var ObjToRaw = Fns.ObjToRaw;
-		var ObjToUpper = Fns.ObjToUpper;
-		col.UpperToRaw = (x)=>{
-			try{
-				if(UpperToRaw == null){return x;}
-				if(ObjToUpper != null){
-					return UpperToRaw(ObjToUpper(x));
-				}
-				return UpperToRaw((TUpper)x!);
-			}
-			catch (System.Exception){
-				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ col.NameInDb);
-				throw;
-			}
-		};
-		col.RawToUpper = (x)=>{
-			try{
-				if(RawToUpper == null){return x;}
-				if(ObjToRaw != null){
-					return RawToUpper(ObjToRaw(x));
-				}
-				return RawToUpper((TRaw)x!);
-			}
-			catch (System.Exception){
-				System.Console.Error.WriteLine("Type Conversion Error for Colunm:"+ col.NameInDb);
-				throw;
-			}
-		};
-		return z;
-	}
-
 /// <summary>
 /// 用強轉 轉作Func<object?, object?>。
 /// 需保證入參強轉不報錯
@@ -159,6 +121,19 @@ public static class ExtnColBuilder{
 		var Fns = DbTypeConvFns<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
 		return HasConversion(z, Fns);
 	}
+
+	public static Self HasConversion<TRaw, TUpper>(
+		this Self z
+		,IDbTypeConvFns<TRaw, TUpper> Fns
+	){
+		z.Column.UpperTypeMapper = Fns.ToNonGeneric();
+		z.Table.UpperType_DfltMapper.TryAdd(
+			typeof(TUpper)
+			,z.Column.UpperTypeMapper
+		);
+		return z;
+	}
+
 
 	public static Self AdditionalSqls(
 		this Self z

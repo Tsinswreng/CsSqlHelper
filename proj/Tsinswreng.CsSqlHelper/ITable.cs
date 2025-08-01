@@ -69,4 +69,8 @@ public  partial interface ITable{
 #if Impl
 	= new List<str>();
 #endif
+	public IDictionary<Type, IUpperTypeMapFn> UpperType_DfltMapper{get;set;}
+#if Impl
+	= new Dictionary<Type, IUpperTypeMapperFn>();
+#endif
 }

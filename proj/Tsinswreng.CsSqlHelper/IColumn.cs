@@ -39,17 +39,17 @@ public  partial interface IColumn{
 	/// </summary>
 	public bool NotNull{get;set;}
 
-	public RawUpperTypeMapperFn? RawUpperTypeMapper{get;set;}
+	public IUpperTypeMapFn? UpperTypeMapper{get;set;}
 
 	/// <summary>
 	/// Convert from `UpperClrType` to `RawClrType`
 	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
 	/// </summary>
 	public Func<obj?,obj?>? UpperToRaw{
-		get{return RawUpperTypeMapper?.UpperToRaw;}
+		get{return UpperTypeMapper?.UpperToRaw;}
 		set{
-			RawUpperTypeMapper??=new RawUpperTypeMapperFn();
-			RawUpperTypeMapper.UpperToRaw=value;
+			UpperTypeMapper??=new UpperTypeMapFn();
+			UpperTypeMapper.UpperToRaw=value;
 		}
 	}
 #if Impl
@@ -61,10 +61,10 @@ public  partial interface IColumn{
 	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
 	/// </summary>
 	public Func<obj?,obj?>? RawToUpper{
-		get{return RawUpperTypeMapper?.RawToUpper;}
+		get{return UpperTypeMapper?.RawToUpper;}
 		set{
-			RawUpperTypeMapper??=new RawUpperTypeMapperFn();
-			RawUpperTypeMapper.RawToUpper=value;
+			UpperTypeMapper??=new UpperTypeMapFn();
+			UpperTypeMapper.RawToUpper=value;
 		}
 	}
 #if Impl
