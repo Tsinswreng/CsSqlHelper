@@ -35,4 +35,42 @@ public  partial class EfRepo<TEntity, TId>
 	public async Task<Func<IEnumerable<Id_Dict<TId>>, CT, Task<object>>> FnUpdateManyById(IBaseDbFnCtx? Ctx, IDictionary<string, object?> ModelDict, CT Ct) {
 		throw new NotImplementedException();
 	}
+
+	public Task<Func<
+		IEnumerable<obj?>
+		,CT
+		,Task<nil>
+	>> FnSoftDelManyByKeys(
+		IBaseDbFnCtx? Ctx
+		,str KeyNameInCode
+		,u64 CountPerBatch
+		,CT Ct
+	){
+		throw new NotImplementedException();
+	}
+
+	public Task<Func<
+		IEnumerable<TKey>
+		,CT
+		,Task<nil>
+	>> FnSoftDelManyByKeys<TKey>(
+		IBaseDbFnCtx? Ctx
+		,str KeyNameInCode
+		,u64 CountPerBatch
+		,CT Ct
+	){
+		throw new NotImplementedException();
+	}
+
+	public Task<Func<
+		IEnumerable<TEntity>
+		,CT
+		,Task<nil>
+	>> FnInsertManyNoPrepare(
+		IBaseDbFnCtx? Ctx
+		,CT ct
+	){
+		throw new NotImplementedException();
+	}
+
 }

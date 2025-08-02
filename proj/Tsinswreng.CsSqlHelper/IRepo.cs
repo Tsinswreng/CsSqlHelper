@@ -13,9 +13,6 @@ public  partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
-
-
-
 	public Task<Func<
 		CT
 		,Task<u64>
@@ -39,14 +36,48 @@ public  partial interface IRepo<TEntity, TId>{
 		,Task<nil>
 	>> FnUpdateManyById(
 		IDbFnCtx? Ctx
-		,IDictionary<str, object?> ModelDict //不當有Id
+		,IDictionary<str, obj?> ModelDict //不當有Id
 		,CT Ct
 	);
 
 
+	public Task<Func<
+		IEnumerable<obj?>
+		,CT
+		,Task<nil>
+	>> FnSoftDelManyByKeys(
+		IDbFnCtx? Ctx
+		,str KeyNameInCode
+		,u64 CountPerBatch
+		,CT Ct
+	);
 
 
+	public Task<Func<
+		IEnumerable<TKey>
+		,CT
+		,Task<nil>
+	>> FnSoftDelManyByKeys<TKey>(
+		IDbFnCtx? Ctx
+		,str KeyNameInCode
+		,u64 CountPerBatch
+		,CT Ct
+	);
 
+/// <summary>
+/// 不預編譯。適用于況芝 在事務中 初建表後即添數據
+/// </summary>
+/// <param name="Ctx"></param>
+/// <param name="ct"></param>
+/// <returns></returns>
+	public Task<Func<
+		IEnumerable<TEntity>
+		,CT
+		,Task<nil>
+	>> FnInsertManyNoPrepare(
+		IDbFnCtx? Ctx
+		,CT ct
+	);
 
 
 

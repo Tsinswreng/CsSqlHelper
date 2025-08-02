@@ -10,7 +10,7 @@ using Tsinswreng.CsTools;
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
 //TODO 分頁
-public  partial class Repo<
+public  partial class SqlRepo<
 	TEntity, TId
 >
 	:IRepo<TEntity, TId>
@@ -21,7 +21,7 @@ public ITblMgr TblMgr{get;set;}
 public ISqlCmdMkr SqlCmdMkr{get;set;}
 public IDictMapperShallow DictMapper{get;set;}
 
-	public Repo(
+	public SqlRepo(
 		ITblMgr TblMgr
 		,ISqlCmdMkr SqlCmdMkr
 		,IDictMapperShallow DictMapper
@@ -229,21 +229,22 @@ $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 
 
 //TODO TEST
+	[Impl]
 	public async Task<Func<
-		IEnumerable<object?>
+		IEnumerable<obj?>
 		,CT
 		,Task<nil>
-	>> FnSoftDeleteManyByKeys(
+	>> FnSoftDelManyByKeys(
 		IDbFnCtx? Ctx
 		,str KeyNameInCode
-		,u64 InClauseParamNum
+		,u64 CountPerBatch
 		,CT Ct
 	){
 		var T = TblMgr.GetTable<TEntity>();
 		if(T.SoftDelCol == null){
 			throw new Exception("SoftDeleteCol is null");
 		}
-		var ParamList = T.Prm(1, InClauseParamNum);
+		var ParamList = T.Prm(1, CountPerBatch);
 		var Sql =
 $"""
 UPDATE {T.Qt(T.DbTblName)}
@@ -261,7 +262,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		)=>{
 			await using BatchListAsy<object?, nil> BatchList = new(async (x, Ct)=>{
 				IList<object?> Args = [ValToSet, ..x];
-				Args.FillUpTo(InClauseParamNum, null);
+				Args.FillUpTo(CountPerBatch, null);
 				await Cmd.Args(Args).Run(Ct).FirstOrDefaultAsync(Ct);
 				return NIL;
 			});
@@ -275,6 +276,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		return Fn;
 	}
 
+	[Impl]
 	public async Task<Func<
 		IEnumerable<TKey>
 		,CT
@@ -286,7 +288,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		,CT Ct
 	){
 		var T = TblMgr.GetTable<TEntity>();
-		var NonGeneric = await FnSoftDeleteManyByKeys(Ctx, KeyNameInCode, ParamNum, Ct);
+		var NonGeneric = await FnSoftDelManyByKeys(Ctx, KeyNameInCode, ParamNum, Ct);
 		var Fn = async(
 			IEnumerable<TKey> Keys
 			,CT Ct
@@ -393,6 +395,38 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 		};
 		return Fn;
 	}
+
+	public async Task<Func<
+		TId
+		,obj?
+		,CT
+		,Task<nil>
+	>> FnUpdOneColById(
+		IDbFnCtx Ctx
+		,str Col
+		,CT Ct
+	){
+		var T = TblMgr.GetTable<TEntity>();
+str NId = T.CodeIdName;
+str PTarget = T.Prm("__Target"), PId = T.Prm(NId);
+var Sql = $"""
+UPDATE {T.Qt(T.DbTblName)}
+SET {T.Qt(Col)} = {PTarget}
+WHERE {T.Fld(NId)} = {PId}
+""";
+var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		var Fn = async(TId Id, obj? Target, CT Ct)=>{
+			var Arg = ArgDict.Mk()
+				.Add(PId, T.UpperToRaw(Id, NId))
+				.Add(PTarget, Target)
+				.ToDict()
+			;
+			await SqlCmd.Args(Arg).Run(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		};
+		return Fn;
+	}
+
 
 
 
