@@ -281,7 +281,7 @@ public static class ExtnITable{
 		List<str> segs = [];
 		foreach(var rawField in RawFields){
 			var field = z.Fld(rawField);
-			var param = z.PrmStr(rawField);
+			var param = z.Prm(rawField);
 			segs.Add(field + " = " + param);
 		}
 		return string.Join(", ", segs);
@@ -295,7 +295,7 @@ public static class ExtnITable{
 		List<str> Params = [];
 		foreach(var rawField in RawFields){
 			var field = z.Fld(rawField);
-			var param = z.PrmStr(rawField);
+			var param = z.Prm(rawField).ToString()??"";
 			Fields.Add(field);
 			Params.Add(param);
 		}
@@ -328,6 +328,7 @@ public static class ExtnITable{
 		return string.Join("", R);
 	}
 
+
 /// <summary>
 /// [@0, @1, @2 ...]
 /// ,</summary>
@@ -335,7 +336,28 @@ public static class ExtnITable{
 /// <param name="Start">含</param>
 /// <param name="End">含</param>
 /// <returns></returns>
-	public static IList<str> Prm(
+	public static IList<IParam> Prm(
+		this ITable z
+		,u64 Start
+		,u64 End
+	){
+		var R = new List<IParam>();
+		for(u64 i = Start; i <= End; i++){
+			var Param = z.Prm(i+"");
+			R.Add(Param);
+		}
+		return R;
+	}
+
+/// <summary>
+/// [@0, @1, @2 ...]
+/// ,</summary>
+/// <param name="z"></param>
+/// <param name="Start">含</param>
+/// <param name="End">含</param>
+/// <returns></returns>
+	[Obsolete]
+	public static IList<str> PrmStrArr(
 		this ITable z
 		,u64 Start
 		,u64 End
