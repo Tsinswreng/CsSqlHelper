@@ -11,13 +11,18 @@ public  partial class PostgreSqlSqlMkr
 		return "\"" + Name + "\"";
 	}
 
-	public str Prm(str Name){
+	[Obsolete]
+	public str PrmStr(str Name){
 		return "@" + Name;
+	}
+
+	public IParam Prm(str Name){
+		var R = new PostgreSqlParam(Name);
+		return R;
 	}
 
 	public str PrmLmtOfst(str Limit, str Offset){
 		return $"LIMIT {Prm(Limit)} OFFSET {Prm(Offset)}";
 	}
-
 
 }

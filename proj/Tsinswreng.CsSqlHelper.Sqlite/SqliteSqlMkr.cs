@@ -11,8 +11,13 @@ public  partial class SqliteSqlMkr
 		return "\"" + Name + "\"";
 	}
 
-	public str Prm(str Name){
+	public str PrmStr(str Name){
 		return "@" + Name;
+	}
+
+	public IParam Prm(str Name){
+		var R = new SqliteParam(Name);
+		return R;
 	}
 
 	public str PrmLmtOfst(str Limit, str Offset){

@@ -169,13 +169,20 @@ public static class ExtnITable{
 		return z.SqlMkr.Qt(DbColName);
 	}
 
-	public static str Prm(
+	public static IParam Prm(
 		this ITable z
 		,str Name
 	){
 		return z.SqlMkr.Prm(Name);
 	}
 
+	[Obsolete]
+	public static str PrmStr(
+		this ITable z
+		,str Name
+	){
+		return z.SqlMkr.PrmStr(Name);
+	}
 
 	public static IStr_Any ToCodeDict(
 		this ITable z
@@ -274,7 +281,7 @@ public static class ExtnITable{
 		List<str> segs = [];
 		foreach(var rawField in RawFields){
 			var field = z.Fld(rawField);
-			var param = z.Prm(rawField);
+			var param = z.PrmStr(rawField);
 			segs.Add(field + " = " + param);
 		}
 		return string.Join(", ", segs);
@@ -288,7 +295,7 @@ public static class ExtnITable{
 		List<str> Params = [];
 		foreach(var rawField in RawFields){
 			var field = z.Fld(rawField);
-			var param = z.Prm(rawField);
+			var param = z.PrmStr(rawField);
 			Fields.Add(field);
 			Params.Add(param);
 		}
@@ -311,7 +318,7 @@ public static class ExtnITable{
 		List<str> R = [];
 		R.Add("(");
 		for(u64 i = StartPos; i <= EndPos; i++){
-			var Param = z.Prm(i+"");
+			var Param = z.PrmStr(i+"");
 			R.Add(Param);
 			if(i == EndPos){
 				R.Add(", ");
@@ -335,7 +342,7 @@ public static class ExtnITable{
 	){
 		var R = new List<str>();
 		for(u64 i = Start; i <= End; i++){
-			var Param = z.Prm(i+"");
+			var Param = z.PrmStr(i+"");
 			R.Add(Param);
 		}
 		return R;

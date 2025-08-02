@@ -177,7 +177,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Clause = T.UpdateClause(ModelDict.Keys);
 
 		var Sql =
-$"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
+$"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.PrmStr(NId)}";
 
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
 		var Fn = async(
@@ -408,7 +408,7 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 	){
 		var T = TblMgr.GetTable<TEntity>();
 str NId = T.CodeIdName;
-str PTarget = T.Prm("__Target"), PId = T.Prm(NId);
+var PTarget = T.Prm("__Target");var PId = T.Prm(NId);
 var Sql = $"""
 UPDATE {T.Qt(T.DbTblName)}
 SET {T.Qt(Col)} = {PTarget}

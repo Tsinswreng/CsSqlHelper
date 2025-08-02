@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public  partial interface ISqlMkr{
+public partial interface ISqlMkr{
 
 	public ISqlTypeMapper SqlTypeMapper{get;set;}
 
@@ -15,7 +15,10 @@ public  partial interface ISqlMkr{
 	/// </summary>
 	/// <param name="Name"></param>
 	/// <returns></returns>
-	public str Prm(str Name);
+	[Obsolete]
+	public str PrmStr(str Name);
+
+	public IParam Prm(str Name);
 
 /// <summary>
 ///

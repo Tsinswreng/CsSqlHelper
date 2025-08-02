@@ -12,18 +12,24 @@ public partial class ArgDict: IArgDict{
 		return new ArgDict{Tbl = Tbl};
 	}
 
-	public IDictionary<str, obj?> Dict{get;set;} = new Dictionary<str, obj?>();
+	public IDictionary<str, obj?> ParamName_RawValue{get;set;} = new Dictionary<str, obj?>();
 	public ITable? Tbl{get;set;}
 
 	[Impl]
-	public IArgDict Add(str ParamName, obj? Value){
-		Dict.TryAdd(ParamName, Value);
+	public IArgDict Add(str ParamName, obj? Raw){
+		ParamName_RawValue.TryAdd(ParamName, Raw);
+		return this;
+	}
+
+	[Impl]
+	public IArgDict Add(IParam Param, obj? Raw){
+		ParamName_RawValue.TryAdd(Param.Name, Raw);
 		return this;
 	}
 
 	[Impl]
 	public IDictionary<str, obj?> ToDict(){
-		return Dict;
+		return ParamName_RawValue;
 	}
 }
 
