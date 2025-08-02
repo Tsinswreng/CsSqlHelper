@@ -177,7 +177,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Clause = T.UpdateClause(ModelDict.Keys);
 
 		var Sql =
-$"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.PrmStr(NId)}";
+$"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
 		var Fn = async(

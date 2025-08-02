@@ -309,7 +309,7 @@ public static class ExtnITable{
 /// <param name="z"></param>
 /// <param name="Count"></param>
 /// <returns></returns>
-[Obsolete]
+
 	public static str NumParamClause(
 		this ITable z
 		,u64 EndPos
@@ -318,7 +318,7 @@ public static class ExtnITable{
 		List<str> R = [];
 		R.Add("(");
 		for(u64 i = StartPos; i <= EndPos; i++){
-			var Param = z.PrmStr(i+"");
+			var Param = z.Prm(i+"").ToString()??"";
 			R.Add(Param);
 			if(i == EndPos){
 				R.Add(", ");
@@ -356,19 +356,19 @@ public static class ExtnITable{
 /// <param name="Start">含</param>
 /// <param name="End">含</param>
 /// <returns></returns>
-	[Obsolete]
-	public static IList<str> PrmStrArr(
-		this ITable z
-		,u64 Start
-		,u64 End
-	){
-		var R = new List<str>();
-		for(u64 i = Start; i <= End; i++){
-			var Param = z.PrmStr(i+"");
-			R.Add(Param);
-		}
-		return R;
-	}
+	// [Obsolete]
+	// public static IList<str> PrmStrArr(
+	// 	this ITable z
+	// 	,u64 Start
+	// 	,u64 End
+	// ){
+	// 	var R = new List<str>();
+	// 	for(u64 i = Start; i <= End; i++){
+	// 		var Param = z.PrmStr(i+"");
+	// 		R.Add(Param);
+	// 	}
+	// 	return R;
+	// }
 
 	public static str SqlMkTbl(
 		this ITable z
