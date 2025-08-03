@@ -34,9 +34,9 @@ public  partial interface IRepo<TEntity, TId>{
 		IEnumerable<Id_Dict<TId>>
 		,CT
 		,Task<nil>
-	>> FnUpdateManyById(
+	>> FnUpdManyById(
 		IDbFnCtx? Ctx
-		,IDictionary<str, obj?> ModelDict //不當有Id
+		,IEnumerable<str> FieldsToUpdate
 		,CT Ct
 	);
 

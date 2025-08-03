@@ -50,7 +50,7 @@ public  partial interface ITable{
 	= new Dictionary<str, str>();
 #endif
 
-	public IDictionary<str, Type> Key_Type{get;set;}
+	public IDictionary<str, Type> CodeCol_UpperType{get;set;}
 #if Impl
 	= new Dictionary<str, Type>();
 #endif

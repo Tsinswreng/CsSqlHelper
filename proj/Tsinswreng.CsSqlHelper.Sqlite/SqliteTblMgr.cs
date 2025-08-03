@@ -3,7 +3,7 @@ public  partial class SqliteTblMgr : ITblMgr{
 	public str DbSrcType{get;set;} = "Sqlite";
 	public ISqlMkr SqlMkr{get;set;} = new SqliteSqlMkr();
 
-	public IDictionary<Type, ITable> Type_Table{get;set;} = new Dictionary<Type, ITable>();
+	public IDictionary<Type, ITable> EntityType_Table{get;set;} = new Dictionary<Type, ITable>();
 
 	// public void AddTable<T_Po>(I_Table table){
 	// 	Type__Table.Add(typeof(T_Po), table);

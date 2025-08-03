@@ -8,7 +8,7 @@ public  partial interface ISqlCmdMkr{
 	public Task<ISqlCmd> Prepare(
 		IBaseDbFnCtx? DbFnCtx
 		,str Sql
-		,CT ct
+		,CT Ct
 	);
 
 /// <summary>

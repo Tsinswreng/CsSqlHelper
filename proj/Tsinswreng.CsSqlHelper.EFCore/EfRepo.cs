@@ -32,7 +32,11 @@ public  partial class EfRepo<TEntity, TId>
 		throw new NotImplementedException();
 	}
 
-	public async Task<Func<IEnumerable<Id_Dict<TId>>, CT, Task<object>>> FnUpdateManyById(IBaseDbFnCtx? Ctx, IDictionary<string, object?> ModelDict, CT Ct) {
+	public async Task<Func<IEnumerable<Id_Dict<TId>>, CT, Task<object>>> FnUpdManyById(
+		IBaseDbFnCtx? Ctx
+		,IEnumerable<str> FieldsToUpdate
+		,CT Ct
+	){
 		throw new NotImplementedException();
 	}
 

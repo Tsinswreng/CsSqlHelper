@@ -165,21 +165,19 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		IEnumerable<Id_Dict<TId>>
 		,CT
 		,Task<nil>
-	>> FnUpdateManyById(
+	>> FnUpdManyById(
 		IDbFnCtx? Ctx
-		,IDictionary<str, object?> ModelDict //不當有Id
-		,CT ct
+		//,IDictionary<str, object?> ModelDict //不當有Id
+		,IEnumerable<str> FieldsToUpdate
+		,CT Ct
 	){
 		var T = TblMgr.GetTable<TEntity>();
-		ModelDict = new Dictionary<str, object?>(ModelDict);
 		var NId = T.CodeIdName;
-		ModelDict.Remove(NId);
-		var Clause = T.UpdateClause(ModelDict.Keys);
-
+		var Clause = T.UpdateClause(FieldsToUpdate);
 		var Sql =
 $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 
-		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
+		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		var Fn = async(
 			IEnumerable<Id_Dict<TId>> Id_Dicts
 			,CT ct
@@ -426,10 +424,6 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		};
 		return Fn;
 	}
-
-
-
-
 
 	// public async Task<Func<
 	// 	IEnumerable<T_Entity>

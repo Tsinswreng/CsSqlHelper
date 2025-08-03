@@ -20,12 +20,13 @@ public  partial class SqliteCmd: ISqlCmd{
 		return this;
 	}
 
+
 /// <summary>
 /// @名稱 佔位
 /// </summary>
 /// <param name="Params"></param>
 /// <returns></returns>
-	public ISqlCmd Args(IDictionary<str, object?> Params){
+	public ISqlCmd Args(IDictionary<str, obj?> Params){
 		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
 		foreach(var (k,v) in Params){
 			RawCmd.Parameters.AddWithValue("@"+k, CodeValToDbVal(v));
@@ -38,7 +39,7 @@ public  partial class SqliteCmd: ISqlCmd{
 /// </summary>
 /// <param name="Params"></param>
 /// <returns></returns>
-	public ISqlCmd Args(IEnumerable<object?> Params){
+	public ISqlCmd Args(IEnumerable<obj?> Params){
 		RawCmd.Parameters.Clear();
 		var i = 0;
 		foreach(var v in Params){
@@ -52,28 +53,28 @@ public  partial class SqliteCmd: ISqlCmd{
 /// </summary>
 /// <param name="DbVal"></param>
 /// <returns></returns>
-	public object? DbValToCodeVal(object? DbVal){
+	public obj? DbValToCodeVal(obj? DbVal){
 		if(DbVal is DBNull){
 			return null!;
 		}
 		return DbVal;
 	}
 
-	public object? CodeValToDbVal(object? CodeVal){
+	public obj? CodeValToDbVal(obj? CodeVal){
 		if(CodeVal == null){
 			return DBNull.Value;
 		}
 		return CodeVal;
 	}
 
-	public async IAsyncEnumerable<IDictionary<str, object?>> Run(
+	public async IAsyncEnumerable<IDictionary<str, obj?>> Run(
 		[EnumeratorCancellation]
-		CT ct
+		CT Ct
 	){
-		using var Reader = await RawCmd.ExecuteReaderAsync(ct);
-		while(await Reader.ReadAsync(ct)){
-			var RawDict = new Dictionary<str, object?>();
-			for(int i = 0; i < Reader.FieldCount; i++){
+		using var Reader = await RawCmd.ExecuteReaderAsync(Ct);
+		while(await Reader.ReadAsync(Ct)){
+			var RawDict = new Dictionary<str, obj?>();
+			for(var i = 0; i < Reader.FieldCount; i++){
 				RawDict.Add(Reader.GetName(i), DbValToCodeVal(Reader.GetValue(i)));
 			}
 			yield return RawDict;

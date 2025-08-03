@@ -15,8 +15,8 @@ public partial interface ISqlMkr{
 	/// </summary>
 	/// <param name="Name"></param>
 	/// <returns></returns>
-	[Obsolete]
-	public str PrmStr(str Name);
+	// [Obsolete]
+	// public str PrmStr(str Name);
 
 	public IParam Prm(str Name);
 
@@ -41,12 +41,21 @@ public static class ExtnISqlMkr{
 	/// <param name="Lmt"></param>
 	/// <param name="Ofst"></param>
 	/// <returns></returns>
-	public static str PrmLmtOfst(
+	public static str PrmLmtOfstStr(
 		this ISqlMkr z
 		,out str Lmt, out str Ofst
 	){
 		Lmt=nameof(Lmt);
 		Ofst=nameof(Ofst);
 		return z.PrmLmtOfst(Lmt, Ofst);
+	}
+
+	public static str PrmLmtOfst(
+		this ISqlMkr z
+		,out IParam Lmt, out IParam Ofst
+	){
+		Lmt=z.Prm(nameof(Lmt));
+		Ofst=z.Prm(nameof(Ofst));
+		return z.PrmLmtOfst(Lmt.ToString()??"", Ofst.ToString()??"");
 	}
 }

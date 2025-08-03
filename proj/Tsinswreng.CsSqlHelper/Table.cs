@@ -18,7 +18,7 @@ public  partial class Table:ITable{
 	){
 		this.DictMapper = DictMapper;
 		this.DbTblName = Name;
-		this.Key_Type = ExampleDict;
+		this.CodeCol_UpperType = ExampleDict;
 	}
 
 	bool _Inited = false;
@@ -26,7 +26,7 @@ public  partial class Table:ITable{
 		if(_Inited){
 			return this;
 		}
-		foreach(var (Key,Type) in Key_Type){
+		foreach(var (Key,Type) in CodeCol_UpperType){
 			var Col = new Column();
 			Col.NameInDb = Key;
 			Columns[Key] = Col;
@@ -67,7 +67,7 @@ public  partial class Table:ITable{
 		ITable ans = new Table{
 			DictMapper = DictMapper
 			,DbTblName = DbTblName
-			,Key_Type = Key_Type
+			,CodeCol_UpperType = Key_Type
 			,EntityClrType = EntityClrType
 		}.Init();
 		return ans;
@@ -104,7 +104,7 @@ public  partial class Table:ITable{
 	#if Impl
 	= new Dictionary<str, str>();
 	#endif
-	public IDictionary<str, Type> Key_Type{get;set;}
+	public IDictionary<str, Type> CodeCol_UpperType{get;set;}
 	#if Impl
 	= new Dictionary<str, Type>();
 	#endif
@@ -176,13 +176,13 @@ public static class ExtnITable{
 		return z.SqlMkr.Prm(Name);
 	}
 
-	[Obsolete]
-	public static str PrmStr(
-		this ITable z
-		,str Name
-	){
-		return z.SqlMkr.PrmStr(Name);
-	}
+	// [Obsolete]
+	// public static str PrmStr(
+	// 	this ITable z
+	// 	,str Name
+	// ){
+	// 	return z.SqlMkr.PrmStr(Name);
+	// }
 
 	public static IStr_Any ToCodeDict(
 		this ITable z

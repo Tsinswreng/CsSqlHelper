@@ -35,11 +35,23 @@ public partial class ArgDict: IArgDict{
 
 
 public static class ExtnArgDict{
+	[Obsolete]
 	public static IArgDict AddPageQry(
 		this IArgDict z
 		,IPageQuery PageQry
 		,str PrmLmt
 		,str PrmOfst
+	){
+		z.Add(PrmLmt, PageQry.PageSize)
+		.Add(PrmOfst, PageQry.Offset_());
+		return z;
+	}
+
+	public static IArgDict AddPageQry(
+		this IArgDict z
+		,IPageQuery PageQry
+		,IParam PrmLmt
+		,IParam PrmOfst
 	){
 		z.Add(PrmLmt, PageQry.PageSize)
 		.Add(PrmOfst, PageQry.Offset_());
