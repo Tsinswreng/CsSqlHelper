@@ -10,7 +10,7 @@ using Tsinswreng.CsTools;
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
 //TODO 分頁
-public  partial class SqlRepo<
+public partial class SqlRepo<
 	TEntity, TId
 >
 	:IRepo<TEntity, TId>
@@ -43,6 +43,7 @@ public IDictMapperShallow DictMapper{get;set;}
 		var Sql =
 $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		Ctx?.AddToDispose(Cmd);
 		var Fn = async(
 			CT Ct
 		)=>{
@@ -59,6 +60,8 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 		};
 		return Fn;
 	}
+
+	//public class _ClsInsrtMany<E,I>(SqlRepo<E,I> z)
 
 
 	protected async Task<Func<
@@ -78,6 +81,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		if(Prepare){
 			Cmd = await SqlCmdMkr.Prepare(Cmd, Ct);
 		}
+		Ctx?.AddToDispose(Cmd);
 		var Fn = async(
 			IEnumerable<TEntity> Entitys
 			,CT ct
@@ -93,6 +97,8 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		};
 		return Fn;
 	}
+
+
 
 	[Impl]
 	public async Task<Func<
@@ -138,7 +144,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Params = T.Prm(0,0);
 		var Sql = $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} = {Params[0]}" ;
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
-
+		Ctx?.AddToDispose(Cmd);
 		var Fn = async(
 			TId Id
 			,CT Ct
@@ -178,6 +184,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		Ctx?.AddToDispose(Cmd);
 		var Fn = async(
 			IEnumerable<Id_Dict<TId>> Id_Dicts
 			,CT ct
@@ -253,7 +260,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 """;
 		var ValToSet = T.SoftDelCol.FnDelete(null);
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
-
+		Ctx?.AddToDispose(Cmd);
 		var Fn = async(
 			IEnumerable<object?> Keys
 			,CT Ct
@@ -311,16 +318,17 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.Fld(T.CodeIdName)} = ?";
 
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
+		Ctx?.AddToDispose(Cmd);
 		async Task<nil> Fn(
 			TId Id
-			, CT ct
+			,CT Ct
 		) {
 			if (Id is not TId id) {
 				throw new Exception("Id is not T_Id id");
 			}
 			var IdCol = T.Columns[T.CodeIdName];
 			var ConvertedId = IdCol.UpperToRaw?.Invoke(Id);
-			await Cmd.Args([ConvertedId]).Run(ct).FirstOrDefaultAsync(ct);
+			await Cmd.Args([ConvertedId]).Run(Ct).FirstOrDefaultAsync(Ct);
 			return NIL;
 		}
 		return Fn;
@@ -347,6 +355,7 @@ DELETE FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(KeyNameInCode)} IN ${Clause}
 AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 """;
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		Ctx?.AddToDispose(Cmd);
 		var Fn = async(
 			IEnumerable<object?> Keys
 			,CT Ct
@@ -413,6 +422,7 @@ SET {T.Qt(Col)} = {PTarget}
 WHERE {T.Fld(NId)} = {PId}
 """;
 var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		Ctx?.AddToDispose(SqlCmd);
 		var Fn = async(TId Id, obj? Target, CT Ct)=>{
 			var Arg = ArgDict.Mk()
 				.Add(PId, T.UpperToRaw(Id, NId))

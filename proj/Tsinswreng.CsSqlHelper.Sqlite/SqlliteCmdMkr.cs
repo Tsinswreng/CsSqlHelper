@@ -49,7 +49,7 @@ public  partial class SqliteCmdMkr
 	public async Task<ISqlCmd> Prepare(
 		IDbFnCtx? DbFnCtx
 		,str Sql
-		, CT Ct
+		,CT Ct
 	){
 		var Cmd = await MkCmd(DbFnCtx, Sql, Ct);
 		return await Prepare(Cmd, Ct);

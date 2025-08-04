@@ -56,6 +56,6 @@ public static class ExtnISqlMkr{
 	){
 		Lmt=z.Prm(nameof(Lmt));
 		Ofst=z.Prm(nameof(Ofst));
-		return z.PrmLmtOfst(Lmt.ToString()??"", Ofst.ToString()??"");
+		return z.PrmLmtOfst(Lmt.Name, Ofst.Name);
 	}
 }

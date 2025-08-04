@@ -7,7 +7,6 @@ public partial interface IArgDict{
 	/// <param name="ParamName"></param>
 	/// <param name="Raw"></param>
 	/// <returns></returns>
-	[Obsolete]
 	public IArgDict Add(str ParamName, obj? Raw);
 	public IArgDict Add(IParam Param, obj? Raw);
 	public IDictionary<str, obj?> ToDict();

@@ -5,13 +5,15 @@ using Microsoft.Data.Sqlite;
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 
-public  partial class SqliteCmd: ISqlCmd{
+public partial class SqliteCmd
+	:ISqlCmd
+	,IAsyncDisposable
+{
 	public SqliteCommand RawCmd{get;set;}
 	public str? Sql{get;set;}
 	public SqliteCmd(SqliteCommand DbCmd){
 		RawCmd = DbCmd;
 	}
-
 
 	public ISqlCmd WithCtx(IDbFnCtx? Ctx){
 		if(Ctx?.Txn?.RawTxn != null){
@@ -79,5 +81,10 @@ public  partial class SqliteCmd: ISqlCmd{
 			}
 			yield return RawDict;
 		}
+	}
+
+	public ValueTask DisposeAsync() {
+		RawCmd.Dispose();
+		return default;
 	}
 }
