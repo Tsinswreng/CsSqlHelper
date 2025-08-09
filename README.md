@@ -8,6 +8,8 @@ version yet and everything may change. If you really want to try it, we
 recommand you to clone the code and reference the source code directly
 (including some of my dependencies in my other repos).⚠️**
 
+**⚠️This doc may be outdated, incomplete, or incorrect⚠️**
+
 CsSqlHelper is a tiny ORM
 
 -   AOT-compatible using
