@@ -1,6 +1,9 @@
 //pandoc .\README.typ -o README.md
 = CsSqlHelper//https://github.com/Tsinswreng/CsSqlHelper
 
+For Java version, see #link("https://github.com/Tsinswreng/JavaSqlHelper")[JavaSqlHelper]
+
+
 *⚠️This project is only for my personal user now. It has no release version yet and everything may change. If you really want to try it, we recommand you to clone the code and reference the source code directly (including some of my dependencies in my other repos).⚠️*
 
 //TODO page

@@ -3,20 +3,20 @@ namespace Tsinswreng.CsSqlHelper;
 /// <summary>
 /// Stands for a column in a table or a property in an entity
 /// </summary>
-public  partial interface IColumn{
+public partial interface IColumn{
 	/// <summary>
 	/// Column name in database table
 	/// </summary>
-	public string NameInDb { get; set; }
+	public str DbName { get; set; }
 	/// <summary>
 	/// Should be full type name like `TEXT`, `VARCHAR(64)`; only `VARCHAR` is unsupported
 	/// </summary>
-	public str TypeInDb{get;set;}
+	public str DbType{get;set;}
 	/// <summary>
 	/// 有自封裝ʹ類型旹 即其內ʹ原始類型
 	/// Type of the data that is retrieved from the database
 	/// </summary>
-	public Type? RawClrType{get;set;}
+	public Type? RawCodeType{get;set;}
 	/// <summary>
 	/// 自封裝ʹ類型
 	/// Type defined in entity
@@ -24,7 +24,7 @@ public  partial interface IColumn{
 	/// in this way `RawClrType` is `long` and `UpperClrType` is your custom struct
 	///
 	/// </summary>
-	public Type? UpperClrType{get;set;}
+	public Type? UpperCodeType{get;set;}
 	/// <summary>
 	/// Additional SQL statements to be executed when creating the column
 	/// e.g `UNIQUE(Email)`

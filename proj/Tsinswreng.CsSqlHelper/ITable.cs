@@ -9,12 +9,12 @@ using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 /// <summary>
 /// Table in database
 /// </summary>
-public  partial interface ITable{
+public partial interface ITable{
 	/// <summary>
 	/// mapper to convert between object and dictionary
 	/// </summary>
 	public IDictMapperShallow DictMapper{get;set;}
-	public Type EntityClrType{get;set;}
+	public Type CodeEntityType{get;set;}
 	/// <summary>
 	/// table name in database
 	/// </summary>

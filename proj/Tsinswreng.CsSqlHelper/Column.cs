@@ -7,10 +7,10 @@ public  partial class Column: IColumn{
 	/// <summary>
 	/// 在數據庫中 字段ʹ名
 	/// </summary>
-	public string NameInDb { get; set; } = "";
-	public str TypeInDb{get;set;} = "";
-	public Type? RawClrType{get;set;}
-	public Type? UpperClrType{get;set;}
+	public string DbName { get; set; } = "";
+	public str DbType{get;set;} = "";
+	public Type? RawCodeType{get;set;}
+	public Type? UpperCodeType{get;set;}
 	public IList<str> AdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();

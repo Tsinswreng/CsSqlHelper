@@ -38,7 +38,7 @@ public IDictMapperShallow DictMapper{get;set;}
 		IDbFnCtx? Ctx
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		var NCnt = "Cnt";
 		var Sql =
 $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
@@ -73,7 +73,7 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 		,bool Prepare
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		var Clause = T.InsertClause(T.Columns.Keys);
 		var Sql =
 $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
@@ -140,7 +140,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		IDbFnCtx? Ctx
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		var Params = T.Prm(0,0);
 		var Sql = $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} = {Params[0]}" ;
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
@@ -177,7 +177,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		,IEnumerable<str> FieldsToUpdate
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		var NId = T.CodeIdName;
 		var Clause = T.UpdateClause(FieldsToUpdate);
 		var Sql =
@@ -245,7 +245,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		,u64 CountPerBatch
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		if(T.SoftDelCol == null){
 			throw new Exception("SoftDeleteCol is null");
 		}
@@ -292,7 +292,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		,u64 ParamNum
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		var NonGeneric = await FnSoftDelManyByKeys(Ctx, KeyNameInCode, ParamNum, Ct);
 		var Fn = async(
 			IEnumerable<TKey> Keys
@@ -314,7 +314,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		IDbFnCtx? Ctx
 		,CT ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.Fld(T.CodeIdName)} = ?";
 
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, ct);
@@ -347,7 +347,7 @@ var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.Fld(T.CodeIdName)} = ?";
 		,u64 ParamNum
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		var Clause = T.NumParamClause(ParamNum-1);
 		var Sql =
 $"""
@@ -390,7 +390,7 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 		,u64 ParamNum
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 		var NonGeneric = await FnDeleteManyByKeys(Ctx, KeyNameInCode, ParamNum, Ct);
 		var Fn = async(
 			IEnumerable<TKey> Keys
@@ -413,7 +413,7 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 		,str Col
 		,CT Ct
 	){
-		var T = TblMgr.GetTable<TEntity>();
+		var T = TblMgr.GetTbl<TEntity>();
 str NId = T.CodeIdName;
 var PTarget = T.Prm("__Target");var PId = T.Prm(NId);
 var Sql = $"""

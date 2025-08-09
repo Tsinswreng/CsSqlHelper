@@ -1,5 +1,8 @@
 # CsSqlHelper
 
+For Java version, see
+[JavaSqlHelper](https://github.com/Tsinswreng/JavaSqlHelper)
+
 **⚠️This project is only for my personal user now. It has no release
 version yet and everything may change. If you really want to try it, we
 recommand you to clone the code and reference the source code directly

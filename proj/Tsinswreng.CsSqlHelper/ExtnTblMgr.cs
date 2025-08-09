@@ -5,7 +5,7 @@ public static class ExtnTblMgr{
 		this ITblMgr z
 	){
 		List<str> R = [];
-		foreach(var (Type, Tbl) in z.EntityType_Table){
+		foreach(var (Type, Tbl) in z.EntityType_Tbl){
 			var U = Tbl.SqlMkTbl();
 			R.Add(U);
 		}

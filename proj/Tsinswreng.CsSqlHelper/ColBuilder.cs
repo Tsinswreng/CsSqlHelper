@@ -4,7 +4,7 @@ using Self = ColBuilder;
 /// <summary>
 /// A helper class to build a `IColumn` object.
 /// </summary>
-public  partial class ColBuilder{
+public partial class ColBuilder{
 	public ITable Table{get;set;}
 	public IColumn Column { get; set; }
 	public ColBuilder(
@@ -40,10 +40,10 @@ public static class ExtnColBuilder{
 		,str? TypeNameInDb = null
 	){
 		if(TypeNameInDb != null){
-			z.Column.TypeInDb = TypeNameInDb;
+			z.Column.DbType = TypeNameInDb;
 		}
-		z.Column.RawClrType = typeof(TRaw);
-		z.Column.UpperClrType = typeof(TUpper);
+		z.Column.RawCodeType = typeof(TRaw);
+		z.Column.UpperCodeType = typeof(TUpper);
 		return z;
 	}
 
@@ -74,25 +74,25 @@ public static class ExtnColBuilder{
 /// <param name="UpperToRaw"></param>
 /// <param name="RawToUpper"></param>
 /// <returns></returns>
-	public static Self HasConversionEtMapType<TRaw, TUpper>(
+	public static Self MapType<TRaw, TUpper>(
 		this Self z
 		,Func<TUpper,TRaw> UpperToRaw
 		,Func<TRaw,TUpper> RawToUpper
 		,Func<object?, TRaw>? ObjToRaw = null
 		,Func<object?, TUpper>? ObjToUpper = null
 	){
-		var Fns = DbTypeConvFns<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
-		return HasConversionEtMapType(z, Fns);
+		var Fns = UpperTypeMapFnT<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
+		return MapType(z, Fns);
 	}
 
-	public static Self HasConversionEtMapType<TRaw, TUpper>(
+	public static Self MapType<TRaw, TUpper>(
 		this Self z
-		,IDbTypeConvFns<TRaw, TUpper> Fns
+		,IUpperTypeMapFnT<TRaw, TUpper> Fns
 	){
 		var col = z.Column;
-		col.RawClrType = typeof(TRaw);
-		col.UpperClrType = typeof(TUpper);
-		return HasConversion(z, Fns);
+		col.RawCodeType = typeof(TRaw);
+		col.UpperCodeType = typeof(TUpper);
+		return HasConv(z, Fns);
 	}
 
 /// <summary>
@@ -111,20 +111,20 @@ public static class ExtnColBuilder{
 /// <param name="UpperToRaw"></param>
 /// <param name="RawToUpper"></param>
 /// <returns></returns>
-	public static Self HasConversion<TRaw, TUpper>(
+	public static Self HasConv<TRaw, TUpper>(
 		this Self z
 		,Func<TUpper,TRaw> UpperToRaw
 		,Func<TRaw,TUpper> RawToUpper
 		,Func<object?, TRaw>? ObjToRaw = null
 		,Func<object?, TUpper>? ObjToUpper = null
 	){
-		var Fns = DbTypeConvFns<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
-		return HasConversion(z, Fns);
+		var Fns = UpperTypeMapFnT<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
+		return HasConv(z, Fns);
 	}
 
-	public static Self HasConversion<TRaw, TUpper>(
+	public static Self HasConv<TRaw, TUpper>(
 		this Self z
-		,IDbTypeConvFns<TRaw, TUpper> Fns
+		,IUpperTypeMapFnT<TRaw, TUpper> Fns
 	){
 		z.Column.UpperTypeMapper = Fns.ToNonGeneric();
 		z.Table.UpperType_DfltMapper.TryAdd(

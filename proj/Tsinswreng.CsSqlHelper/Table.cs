@@ -1,24 +1,24 @@
 #define Impl
-using System.Net;
-using Tsinswreng.CsDictMapper;
-using IStr_Any = System.Collections.Generic.IDictionary<string, object?>;
-using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 namespace Tsinswreng.CsSqlHelper;
 
+using Tsinswreng.CsCore;
+using Tsinswreng.CsDictMapper;
+using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
+using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 
 
-public  partial class Table:ITable{
+public partial class Table:ITable{
 	public IDictMapperShallow DictMapper{get;set;}
-	public Type EntityClrType{get;set;}
+	public Type CodeEntityType{get;set;}
 	public Table(){}
 	public Table(
 		IDictMapperShallow DictMapper
 		,str Name
-		,IDictionary<str, Type> ExampleDict
+		,IDictionary<str, Type> CodeCol_UpperType
 	){
 		this.DictMapper = DictMapper;
 		this.DbTblName = Name;
-		this.CodeCol_UpperType = ExampleDict;
+		this.CodeCol_UpperType = CodeCol_UpperType;
 	}
 
 	bool _Inited = false;
@@ -28,11 +28,11 @@ public  partial class Table:ITable{
 		}
 		foreach(var (Key,Type) in CodeCol_UpperType){
 			var Col = new Column();
-			Col.NameInDb = Key;
+			Col.DbName = Key;
 			Columns[Key] = Col;
 			DbColName_CodeColName[Key] = Key;
-			Col.RawClrType = Type;
-			Col.UpperClrType = Type;
+			Col.RawCodeType = Type;
+			Col.UpperCodeType = Type;
 			// if(v != null){
 			// 	Col.RawClrType = v.GetType();
 			// 	Col.UpperClrType = v.GetType();
@@ -68,7 +68,7 @@ public  partial class Table:ITable{
 			DictMapper = DictMapper
 			,DbTblName = DbTblName
 			,CodeCol_UpperType = Key_Type
-			,EntityClrType = EntityClrType
+			,CodeEntityType = EntityClrType
 		}.Init();
 		return ans;
 	}
@@ -85,34 +85,45 @@ public  partial class Table:ITable{
 		return Mk<T>;
 	}
 
+	[Impl]
 	public str DbTblName{get;set;}
 	#if Impl
 	= "";
 	#endif
+
+	[Impl]
 	public IDictionary<str, IColumn> Columns{get;set;}
 	#if Impl
 	= new Dictionary<str, IColumn>();
 	#endif
 
+	[Impl]
 	public str CodeIdName{get;set;}
 	#if Impl
 	= "Id";
 	#endif
 
+	[Impl]
 	public ISoftDeleteCol? SoftDelCol{get;set;}
+
+	[Impl]
 	public IDictionary<str, str> DbColName_CodeColName{get;set;}
 	#if Impl
 	= new Dictionary<str, str>();
 	#endif
+
+	[Impl]
 	public IDictionary<str, Type> CodeCol_UpperType{get;set;}
 	#if Impl
 	= new Dictionary<str, Type>();
 	#endif
 
+	[Impl]
 	public ISqlMkr SqlMkr{get;set;}
-/// <summary>
+	/// <summary>
 	/// 在CREATE TABLE() 塊內
 	/// </summary>
+	[Impl]
 	public IList<str> InnerAdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();
@@ -120,6 +131,7 @@ public  partial class Table:ITable{
 	/// <summary>
 	/// 在CREATE TABLE() 塊外
 	/// </summary>
+	[Impl]
 	public IList<str> OuterAdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();
@@ -154,7 +166,7 @@ public static class ExtnITable{
 		this ITable z
 		,str CodeColName
 	){
-		var DbColName = z.Columns[CodeColName].NameInDb;
+		var DbColName = z.Columns[CodeColName].DbName;
 		return DbColName;
 	}
 
@@ -165,7 +177,7 @@ public static class ExtnITable{
 		this ITable z
 		,str CodeColName
 	){
-		var DbColName = z.Columns[CodeColName].NameInDb;
+		var DbColName = z.Columns[CodeColName].DbName;
 		return z.SqlMkr.Qt(DbColName);
 	}
 
@@ -228,7 +240,7 @@ public static class ExtnITable{
 		foreach(var (kCode, vCode) in CodeDict){
 			var Col = z.Columns[kCode];
 			var vDb = Col.UpperToRaw?.Invoke(vCode)??vCode;
-			ans[Col.NameInDb] = vDb;
+			ans[Col.DbName] = vDb;
 		}
 		return ans;
 
@@ -375,20 +387,20 @@ public static class ExtnITable{
 	){
 		str OneCol(ITable Tbl, IColumn Col){
 			var R = new List<str>();
-			R.Add(Tbl.Qt(Col.NameInDb));
-			if(!str.IsNullOrEmpty(Col.TypeInDb)){
-				R.Add(Col.TypeInDb);
+			R.Add(Tbl.Qt(Col.DbName));
+			if(!str.IsNullOrEmpty(Col.DbType)){
+				R.Add(Col.DbType);
 			}else{
-				if(Col.RawClrType == null){
-					var Msg = $"{Col.NameInDb}:\nCol.RawClrType == null";
+				if(Col.RawCodeType == null){
+					var Msg = $"{Col.DbName}:\nCol.RawClrType == null";
 					throw new Exception("Col.RawClrType == null");
 				}
 				try{
-					var DbTypeName = z.SqlMkr.SqlTypeMapper.ToDbTypeName(Col.RawClrType);
+					var DbTypeName = z.SqlMkr.SqlTypeMapper.ToDbTypeName(Col.RawCodeType);
 					R.Add(DbTypeName);
 				}
 				catch (System.Exception e){
-					throw new Exception("Type Mapping Error for Colunm:"+ Col.NameInDb, e);
+					throw new Exception("Type Mapping Error for Colunm:"+ Col.DbName, e);
 				}
 			}
 			R.AddRange(Col.AdditionalSqls??[]);
