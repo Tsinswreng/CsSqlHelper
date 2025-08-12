@@ -1,6 +1,7 @@
 using System.Data;
 using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
+using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
@@ -22,15 +23,25 @@ public partial class SqliteCmd
 		return this;
 	}
 
+	[Impl]
+	public ISqlCmd ResolvedArgs(IDictionary<str, obj?> Args){
+		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
+		foreach(var (k,v) in Args){
+			RawCmd.Parameters.AddWithValue(k, CodeValToDbVal(v));
+		}
+		return this;
+	}
+
 
 /// <summary>
-/// @名稱 佔位
+/// 傳入之字典不帶@名稱 佔位
 /// </summary>
-/// <param name="Params"></param>
+/// <param name="Args"></param>
 /// <returns></returns>
-	public ISqlCmd Args(IDictionary<str, obj?> Params){
+	[Impl]
+	public ISqlCmd RawArgs(IDictionary<str, obj?> Args){
 		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
-		foreach(var (k,v) in Params){
+		foreach(var (k,v) in Args){
 			RawCmd.Parameters.AddWithValue("@"+k, CodeValToDbVal(v));
 		}
 		return this;
@@ -81,6 +92,10 @@ public partial class SqliteCmd
 			}
 			yield return RawDict;
 		}
+	}
+
+	public void Dispose(){
+		RawCmd.Dispose();
 	}
 
 	public ValueTask DisposeAsync() {

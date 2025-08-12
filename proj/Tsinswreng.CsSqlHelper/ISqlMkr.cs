@@ -9,7 +9,7 @@ public partial interface ISqlMkr{
 	/// </summary>
 	/// <param name="Name"></param>
 	/// <returns></returns>
-	public str Qt(str Name);
+	public str Quote(str Name);
 	/// <summary>
 	/// 如Name -> "@Name" 等
 	/// </summary>
@@ -18,7 +18,7 @@ public partial interface ISqlMkr{
 	// [Obsolete]
 	// public str PrmStr(str Name);
 
-	public IParam Prm(str Name);
+	public IParam Param(str Name);
 
 /// <summary>
 ///
@@ -26,7 +26,7 @@ public partial interface ISqlMkr{
 /// <param name="Limit">參數名</param>
 /// <param name="Offset">參數名</param>
 /// <returns></returns>
-	public str PrmLmtOfst(str Limit, str Offset);
+	public str ParamLimOfst(str Limit, str Offset);
 }
 
 
@@ -41,21 +41,21 @@ public static class ExtnISqlMkr{
 	/// <param name="Lmt"></param>
 	/// <param name="Ofst"></param>
 	/// <returns></returns>
-	public static str PrmLmtOfstStr(
+	public static str ParamLimOfstStr(
 		this ISqlMkr z
 		,out str Lmt, out str Ofst
 	){
 		Lmt=nameof(Lmt);
 		Ofst=nameof(Ofst);
-		return z.PrmLmtOfst(Lmt, Ofst);
+		return z.ParamLimOfst(Lmt, Ofst);
 	}
 
-	public static str PrmLmtOfst(
+	public static str ParamLimOfst(
 		this ISqlMkr z
 		,out IParam Lmt, out IParam Ofst
 	){
-		Lmt=z.Prm(nameof(Lmt));
-		Ofst=z.Prm(nameof(Ofst));
-		return z.PrmLmtOfst(Lmt.Name, Ofst.Name);
+		Lmt=z.Param(nameof(Lmt));
+		Ofst=z.Param(nameof(Ofst));
+		return z.ParamLimOfst(Lmt.Name, Ofst.Name);
 	}
 }

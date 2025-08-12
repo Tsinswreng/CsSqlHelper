@@ -28,7 +28,7 @@ public  partial class EfRepo<TEntity, TId>
 		return Fn;
 	}
 
-	public async Task<Func<TId, CT, Task<TEntity?>>> FnSelectById(IBaseDbFnCtx? Ctx, CT Ct) {
+	public async Task<Func<TId, CT, Task<TEntity?>>> FnSlctById(IBaseDbFnCtx? Ctx, CT Ct) {
 		throw new NotImplementedException();
 	}
 

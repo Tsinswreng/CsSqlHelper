@@ -156,13 +156,13 @@ public static class ExtnITable{
 		this ITable z
 		,str s
 	){
-		return z.SqlMkr.Qt(s);
+		return z.SqlMkr.Quote(s);
 	}
 
 /// <summary>
 /// 映射到數據庫表ʹ字段名
 /// </summary>
-	public static str ToDbName(
+	public static str ColNameToDb(
 		this ITable z
 		,str CodeColName
 	){
@@ -178,14 +178,14 @@ public static class ExtnITable{
 		,str CodeColName
 	){
 		var DbColName = z.Columns[CodeColName].DbName;
-		return z.SqlMkr.Qt(DbColName);
+		return z.SqlMkr.Quote(DbColName);
 	}
 
 	public static IParam Prm(
 		this ITable z
 		,str Name
 	){
-		return z.SqlMkr.Prm(Name);
+		return z.SqlMkr.Param(Name);
 	}
 
 	// [Obsolete]
@@ -210,7 +210,7 @@ public static class ExtnITable{
 		return ans;
 	}
 
-	public static T AssignCodePo<T>(
+	public static T AssignEntity<T>(
 		this ITable z
 		,IStr_Any DbDict
 		,T ToBeAssigned
@@ -220,14 +220,24 @@ public static class ExtnITable{
 		return ToBeAssigned;
 	}
 
-	public static TPo DbDictToPo<TPo>(
+	public static TPo DbDictToEntity<TPo>(
+		this ITable z
+		,IStr_Any DbDict
+		,ref TPo R
+	)where TPo:new(){
+		var CodeDict = z.ToCodeDict(DbDict);
+		R ??= new TPo();
+		z.DictMapper.AssignShallowT(R, CodeDict);
+		return R;
+	}
+
+	public static TPo DbDictToEntity<TPo>(
 		this ITable z
 		,IStr_Any DbDict
 	)where TPo:new(){
-		var CodeDict = z.ToCodeDict(DbDict);
-		var ans = new TPo();
-		z.DictMapper.AssignShallowT(ans, CodeDict);
-		return ans;
+		var R = new TPo();
+		z.DbDictToEntity(DbDict, ref R);
+		return R;
 	}
 
 	//static i32 i = 0;
@@ -400,7 +410,7 @@ public static class ExtnITable{
 					R.Add(DbTypeName);
 				}
 				catch (System.Exception e){
-					throw new Exception("Type Mapping Error for Colunm:"+ Col.DbName, e);
+					throw new Exception("Type Mapping Error for Column:"+ Col.DbName, e);
 				}
 			}
 			R.AddRange(Col.AdditionalSqls??[]);

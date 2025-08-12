@@ -90,7 +90,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			foreach(var entity in Entitys){
 				var CodeDict = DictMapper.ToDictShallowT(entity);
 				var DbDict = T.ToDbDict(CodeDict);
-				await Cmd.Args(DbDict).Run(ct).FirstOrDefaultAsync(ct);
+				await Cmd.RawArgs(DbDict).Run(ct).FirstOrDefaultAsync(ct);
 				i++;
 			}
 			return NIL;
@@ -136,7 +136,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		TId
 		,CT
 		,Task<TEntity?>
-	>> FnSelectById(
+	>> FnSlctById(
 		IDbFnCtx? Ctx
 		,CT Ct
 	){
@@ -144,7 +144,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Params = T.Prm(0,0);
 		var Sql = $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} = {Params[0]}" ;
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
-		Ctx?.AddToDispose(Cmd);
+		Ctx?.AddToDisposeAsy(Cmd);
 		var Fn = async(
 			TId Id
 			,CT Ct
@@ -193,7 +193,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 				var CodeId = id_dict.Id;
 				var CodeDict = id_dict.Dict;
 				var DbDict = T.ToDbDict(CodeDict);
-				await Cmd.Args(DbDict).Run(ct).FirstOrDefaultAsync(ct);
+				await Cmd.RawArgs(DbDict).Run(ct).FirstOrDefaultAsync(ct);
 			}//~for
 			return NIL;
 		};
@@ -429,7 +429,7 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 				.Add(PTarget, Target)
 				.ToDict()
 			;
-			await SqlCmd.Args(Arg).Run(Ct).FirstOrDefaultAsync(Ct);
+			await SqlCmd.RawArgs(Arg).Run(Ct).FirstOrDefaultAsync(Ct);
 			return NIL;
 		};
 		return Fn;

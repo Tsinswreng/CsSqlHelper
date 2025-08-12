@@ -4,9 +4,9 @@ public  partial class SqliteTypeMapper : ISqlTypeMapper{
 protected static SqliteTypeMapper? _Inst = null;
 public static SqliteTypeMapper Inst => _Inst??= new SqliteTypeMapper();
 
-	public IDictionary<Type, str> ClrType_Name{get;set;} = new Dictionary<Type, str>();
+	public IDictionary<Type, str> CodeType_Name{get;set;} = new Dictionary<Type, str>();
 	public SqliteTypeMapper(){
-		ClrType_Name = new Dictionary<Type, str>(){
+		CodeType_Name = new Dictionary<Type, str>(){
 			{ EValueTypeNotNull.Byte, "INTEGER" }
 			,{ EValueTypeNotNull.SByte, "INTEGER" }
 			,{ EValueTypeNotNull.UInt16, "INTEGER" }
@@ -36,7 +36,7 @@ public static SqliteTypeMapper Inst => _Inst??= new SqliteTypeMapper();
 	}
 
 	public str ToDbTypeName(Type Type){
-		if(ClrType_Name.TryGetValue(Type, out str? result)){
+		if(CodeType_Name.TryGetValue(Type, out str? result)){
 			return result;
 		}
 		throw new NotImplementedException($"Type {Type.Name} is not supported and cannot be mapped to a Sqlite type name.");

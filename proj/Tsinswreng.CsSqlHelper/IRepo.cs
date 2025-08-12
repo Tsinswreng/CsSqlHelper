@@ -25,7 +25,7 @@ public  partial interface IRepo<TEntity, TId>{
 		TId
 		,CT
 		,Task<TEntity?>
-	>> FnSelectById(
+	>> FnSlctById(
 		IDbFnCtx? Ctx
 		,CT Ct
 	);

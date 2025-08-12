@@ -1,13 +1,13 @@
 namespace Tsinswreng.CsSqlHelper;
 
-using Self = ColBuilder;
+using Self = ColBldr;
 /// <summary>
 /// A helper class to build a `IColumn` object.
 /// </summary>
-public partial class ColBuilder{
+public partial class ColBldr{
 	public ITable Table{get;set;}
 	public IColumn Column { get; set; }
-	public ColBuilder(
+	public ColBldr(
 		ITable Table
 		,IColumn Column
 	){
@@ -18,7 +18,7 @@ public partial class ColBuilder{
 }
 
 
-public static class ExtnColBuilder{
+public static class ExtnColBldr{
 
 	public static IColumn Build(
 		this Self z
@@ -31,7 +31,7 @@ public static class ExtnColBuilder{
 		,str NameInCode
 	){
 		var col = z.Columns[NameInCode];
-		var R = new ColBuilder(z, col);
+		var R = new ColBldr(z, col);
 		return R;
 	}
 

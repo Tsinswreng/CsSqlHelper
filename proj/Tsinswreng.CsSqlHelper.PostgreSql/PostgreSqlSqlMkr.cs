@@ -7,7 +7,7 @@ public  partial class PostgreSqlSqlMkr
 	public static PostgreSqlSqlMkr Inst => _Inst??= new PostgreSqlSqlMkr();
 	public ISqlTypeMapper SqlTypeMapper{get;set;} = PostgreSqlTypeMapper.Inst;
 
-	public str Qt(str Name){
+	public str Quote(str Name){
 		return "\"" + Name + "\"";
 	}
 
@@ -16,13 +16,13 @@ public  partial class PostgreSqlSqlMkr
 		return "@" + Name;
 	}
 
-	public IParam Prm(str Name){
+	public IParam Param(str Name){
 		var R = new PostgreSqlParam(Name);
 		return R;
 	}
 
-	public str PrmLmtOfst(str Limit, str Offset){
-		return $"LIMIT {Prm(Limit)} OFFSET {Prm(Offset)}";
+	public str ParamLimOfst(str Limit, str Offset){
+		return $"LIMIT {Param(Limit)} OFFSET {Param(Offset)}";
 	}
 
 }

@@ -38,7 +38,7 @@ public static class ExtnArgDict{
 	[Obsolete]
 	public static IArgDict AddPageQry(
 		this IArgDict z
-		,IPageQuery PageQry
+		,IPageQry PageQry
 		,str PrmLmt
 		,str PrmOfst
 	){
@@ -49,7 +49,7 @@ public static class ExtnArgDict{
 
 	public static IArgDict AddPageQry(
 		this IArgDict z
-		,IPageQuery PageQry
+		,IPageQry PageQry
 		,IParam PrmLmt
 		,IParam PrmOfst
 	){

@@ -22,12 +22,37 @@ public partial interface IBaseDbFnCtx
 }
 
 public static partial class ExtnIBaseDbFnCtx{
-	public static TSelf AddToDispose<TSelf>(
+	private static TSelf _AddToDispose<TSelf>(
 		this TSelf z
 		,obj? Disposable
 	)where TSelf: IBaseDbFnCtx{
 		z.ObjsToDispose??=new List<obj?>();
 		z.ObjsToDispose.Add(Disposable);
+		return z;
+	}
+
+	public static TSelf AddToDispose<TSelf>(
+		this TSelf z
+		,IDisposable Disposable
+	)where TSelf: IBaseDbFnCtx{
+		return z._AddToDispose(Disposable);
+	}
+
+	public static TSelf AddToDisposeAsy<TSelf>(
+		this TSelf z
+		,IAsyncDisposable Disposable
+	)where TSelf: IBaseDbFnCtx{
+		return z._AddToDispose(Disposable);
+	}
+
+	public static TSelf AddToDispose<TSelf>(
+		this TSelf z
+		,IEnumerable<obj?> DisposableObjs
+	)where TSelf: IBaseDbFnCtx{
+		z.ObjsToDispose??=new List<obj?>();
+		foreach(var obj in DisposableObjs){
+			z.ObjsToDispose.Add(obj);
+		}
 		return z;
 	}
 
