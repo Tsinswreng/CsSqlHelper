@@ -1,7 +1,7 @@
 namespace Tsinswreng.CsSqlHelper;
 
 
-public  partial interface ISqlCmdMkr{
+public partial interface ISqlCmdMkr{
 
 	public Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct);
 

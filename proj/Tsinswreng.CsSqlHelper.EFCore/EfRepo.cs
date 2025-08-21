@@ -1,8 +1,7 @@
-
-
-using Microsoft.EntityFrameworkCore;
-
 namespace Tsinswreng.CsSqlHelper.EFCore;
+using Microsoft.EntityFrameworkCore;
+using Tsinswreng.CsPage;
+using IDbFnCtx = IBaseDbFnCtx;
 
 public  partial class EfRepo<TEntity, TId>
 	: IRepo<TEntity, TId>
@@ -77,4 +76,17 @@ public  partial class EfRepo<TEntity, TId>
 		throw new NotImplementedException();
 	}
 
+	public Task<Func<
+		IPageQry
+		,CT, Task<IPageAsy<IDictionary<str, obj?>>>
+	>> FnPageAllDict(IDbFnCtx? Ctx, CT Ct){
+		throw new NotImplementedException();
+	}
+
+	public Task<Func<
+		IPageQry
+		,CT, Task<IPageAsy<TEntity>>
+	>> FnPageAll(IDbFnCtx Ctx, CT Ct){
+		throw new NotImplementedException();
+	}
 }

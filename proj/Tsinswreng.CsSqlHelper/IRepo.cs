@@ -1,9 +1,8 @@
 namespace Tsinswreng.CsSqlHelper;
 
+using Tsinswreng.CsPage;
 using IDbFnCtx = IBaseDbFnCtx;
 public  partial interface IRepo<TEntity, TId>{
-
-
 	public Task<Func<
 		IEnumerable<TEntity>
 		,CT
@@ -29,6 +28,17 @@ public  partial interface IRepo<TEntity, TId>{
 		IDbFnCtx? Ctx
 		,CT Ct
 	);
+
+
+	public Task<Func<
+		IPageQry
+		,CT, Task<IPageAsy<IDictionary<str, obj?>>>
+	>> FnPageAllDict(IDbFnCtx? Ctx, CT Ct);
+
+	public Task<Func<
+		IPageQry
+		,CT, Task<IPageAsy<TEntity>>
+	>> FnPageAll(IDbFnCtx Ctx, CT Ct);
 
 	public Task<Func<
 		IEnumerable<Id_Dict<TId>>

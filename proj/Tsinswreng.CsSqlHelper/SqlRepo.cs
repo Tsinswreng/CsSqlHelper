@@ -6,6 +6,7 @@ using IDbFnCtx = IBaseDbFnCtx;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;
+using Tsinswreng.CsPage;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
@@ -57,6 +58,56 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 				}
 			}
 			return R;
+		};
+		return Fn;
+	}
+
+	public async Task<Func<
+		IPageQry
+		,CT, Task<IPageAsy<IDictionary<str, obj?>>>
+	>> FnPageAllDict(IDbFnCtx? Ctx, CT Ct){
+		var T = TblMgr.GetTbl<TEntity>();
+		var Sql = $"""
+		SELECT * FROM {T.Qt(T.DbTblName)}
+		{T.SqlMkr.ParamLimOfst(out var Lim, out var Ofst)}
+		""";
+		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		var CountAll = await FnCount(Ctx, Ct);
+		Ctx?.AddToDispose(Cmd);
+		var Fn = async(IPageQry Qry, CT Ct)=>{
+			var Arg = ArgDict.Mk().AddPageQry(Qry, Lim, Ofst);
+			var Ran = Cmd.Args(Arg).Run(Ct);
+
+			u64 Cnt = 0;
+			var HasCnt = false;
+			if(Qry.WantTotCnt){
+				Cnt = await CountAll(Ct);
+				HasCnt = true;
+			}
+
+			var R = PageAsy.Mk(
+				Qry, Ran, HasCnt, Cnt
+			);
+			return R;
+		};
+		return Fn;
+	}
+
+	public async Task<Func<
+		IPageQry
+		,CT, Task<IPageAsy<TEntity>>
+	>> FnPageAll(IDbFnCtx Ctx, CT Ct){
+		var T = TblMgr.GetTbl<TEntity>();
+		var PageAllDict = await FnPageAllDict(Ctx, Ct);
+		var Fn = async(IPageQry Qry, CT Ct)=>{
+			var AllDictPage = await PageAllDict(Qry, Ct);
+			if(AllDictPage.DataAsy != null){
+				var EntityData = AllDictPage.DataAsy.Select(d=>T.DbDictToEntity<TEntity>(d));
+				var R = PageAsy.Mk(Qry, EntityData, AllDictPage.HasTotCnt, AllDictPage.TotCnt);
+				return R;
+			}else{
+				return PageAsy.Mk<TEntity>(Qry, null, false, 0);
+			}
 		};
 		return Fn;
 	}

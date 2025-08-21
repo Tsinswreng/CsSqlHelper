@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
-public  partial class SqliteCmdMkr
+public partial class SqliteCmdMkr
 	:ISqlCmdMkr
 	,I_GetTxnAsy
 {
