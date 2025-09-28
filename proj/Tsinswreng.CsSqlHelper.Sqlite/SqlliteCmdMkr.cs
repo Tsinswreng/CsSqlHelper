@@ -1,5 +1,6 @@
 using System.Data;
 using Microsoft.Data.Sqlite;
+using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
@@ -12,10 +13,11 @@ public partial class SqliteCmdMkr
 		this.DbConnection = DbConnection;
 	}
 
-	public virtual async Task<ISqlCmd> MkCmd(
+	[Impl(typeof(ISqlCmdMkr))]
+	public async Task<ISqlCmd> MkCmd(
 		IDbFnCtx? DbFnCtx
 		,str Sql
-		,CT ct
+		,CT Ct
 	){
 		if(DbConnection is not SqliteConnection sqlConn){
 			throw new InvalidOperationException("DbConnection is not SqlConnection");
@@ -29,7 +31,8 @@ public partial class SqliteCmdMkr
 		return ans;
 	}
 
-	public virtual async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
+	[Impl(typeof(ISqlCmdMkr))]
+	public async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
 		if(Cmd is not SqliteCmd SqlCmd){
 			throw new InvalidOperationException("ISqlCmd is not SqliteCmd");
 		}
@@ -46,6 +49,7 @@ public partial class SqliteCmdMkr
 	/// <param name="Ct"></param>
 	/// <returns></returns>
 	/// <exception cref="InvalidOperationException"></exception>
+	[Impl(typeof(ISqlCmdMkr))]
 	public async Task<ISqlCmd> Prepare(
 		IDbFnCtx? DbFnCtx
 		,str Sql
@@ -55,6 +59,7 @@ public partial class SqliteCmdMkr
 		return await Prepare(Cmd, Ct);
 	}
 
+	[Impl(typeof(I_GetTxnAsy))]
 	public async Task<ITxn> GetTxnAsy(CT Ct){
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);

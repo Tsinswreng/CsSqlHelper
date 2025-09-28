@@ -76,7 +76,7 @@ public partial class PostgreSqlCmd: ISqlCmd{
 		return CodeVal;
 	}
 
-	public async IAsyncEnumerable<IDictionary<str, object?>> Run(
+	public async IAsyncEnumerable<IDictionary<str, object?>> IterIAsy(
 		[EnumeratorCancellation]
 		CT ct
 	){
@@ -89,6 +89,20 @@ public partial class PostgreSqlCmd: ISqlCmd{
 			yield return RawDict;
 		}
 	}
+
+	public async Task<IList<IDictionary<str, obj?>>> All(CT Ct){
+		using var reader = await RawCmd.ExecuteReaderAsync(Ct);
+		var result = new List<IDictionary<str, obj?>>();
+
+		while (await reader.ReadAsync(Ct)){
+			var row = new Dictionary<str, obj?>(reader.FieldCount);
+			for (var i = 0; i < reader.FieldCount; i++)
+				row[reader.GetName(i)] = DbValToCodeVal(reader.GetValue(i));
+			result.Add(row);
+		}
+		return result;
+	}
+
 
 	public void Dispose(){
 		RawCmd.Dispose();

@@ -2,7 +2,9 @@ namespace Tsinswreng.CsSqlHelper;
 
 public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 	public str? Sql{get;set;}
-	public IAsyncEnumerable<IDictionary<str, obj?>> Run(CT Ct);
+	public IAsyncEnumerable<IDictionary<str, obj?>> IterIAsy(CT Ct);
+
+	public Task<IList<IDictionary<str, obj?>>> All(CT Ct);
 
 	/// <summary>
 	/// raw arg name to value

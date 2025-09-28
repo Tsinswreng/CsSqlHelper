@@ -80,7 +80,7 @@ public partial class SqliteCmd
 		return CodeVal;
 	}
 
-	public async IAsyncEnumerable<IDictionary<str, obj?>> Run(
+	public async IAsyncEnumerable<IDictionary<str, obj?>> IterIAsy(
 		[EnumeratorCancellation]
 		CT Ct
 	){
@@ -92,6 +92,19 @@ public partial class SqliteCmd
 			}
 			yield return RawDict;
 		}
+	}
+
+	public async Task<IList<IDictionary<str, obj?>>> All(CT Ct){
+		using var reader = await RawCmd.ExecuteReaderAsync(Ct);
+		var result = new List<IDictionary<str, obj?>>();
+
+		while (await reader.ReadAsync(Ct)){
+			var row = new Dictionary<str, obj?>(reader.FieldCount);
+			for (var i = 0; i < reader.FieldCount; i++)
+				row[reader.GetName(i)] = DbValToCodeVal(reader.GetValue(i));
+			result.Add(row);
+		}
+		return result;
 	}
 
 	public void Dispose(){

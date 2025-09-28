@@ -48,7 +48,7 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 		var Fn = async(
 			CT Ct
 		)=>{
-			var CountDict = await Cmd.Run(Ct).FirstOrDefaultAsync(Ct);
+			var CountDict = await Cmd.IterIAsy(Ct).FirstOrDefaultAsync(Ct);
 			u64 R = 0;
 			if (CountDict != null){
 				if(CountDict.TryGetValue(NCnt, out var Cnt)){
@@ -76,7 +76,7 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 		Ctx?.AddToDispose(Cmd);
 		var Fn = async(IPageQry Qry, CT Ct)=>{
 			var Arg = ArgDict.Mk().AddPageQry(Qry, Lim, Ofst);
-			var Ran = Cmd.Args(Arg).Run(Ct);
+			var Ran = Cmd.Args(Arg).IterIAsy(Ct);
 
 			u64 Cnt = 0;
 			var HasCnt = false;
@@ -141,7 +141,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			foreach(var entity in Entitys){
 				var CodeDict = DictMapper.ToDictShallowT(entity);
 				var DbDict = T.ToDbDict(CodeDict);
-				await Cmd.RawArgs(DbDict).Run(ct).FirstOrDefaultAsync(ct);
+				await Cmd.RawArgs(DbDict).IterIAsy(ct).FirstOrDefaultAsync(ct);
 				i++;
 			}
 			return NIL;
@@ -204,7 +204,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			var ConvertedId = IdCol.UpperToRaw?.Invoke(Id)??Id;
 			var RawDict = await Cmd
 				.Args([ConvertedId])
-				.Run(Ct).FirstOrDefaultAsync(Ct)
+				.IterIAsy(Ct).FirstOrDefaultAsync(Ct)
 			;
 			if(RawDict == null){
 				return null;
@@ -244,7 +244,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 				var CodeId = id_dict.Id;
 				var CodeDict = id_dict.Dict;
 				var DbDict = T.ToDbDict(CodeDict);
-				await Cmd.RawArgs(DbDict).Run(ct).FirstOrDefaultAsync(ct);
+				await Cmd.RawArgs(DbDict).IterIAsy(ct).FirstOrDefaultAsync(ct);
 			}//~for
 			return NIL;
 		};
@@ -319,7 +319,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 			await using BatchListAsy<object?, nil> BatchList = new(async (x, Ct)=>{
 				IList<object?> Args = [ValToSet, ..x];
 				Args.FillUpTo(CountPerBatch, null);
-				await Cmd.Args(Args).Run(Ct).FirstOrDefaultAsync(Ct);
+				await Cmd.Args(Args).IterIAsy(Ct).FirstOrDefaultAsync(Ct);
 				return NIL;
 			});
 
@@ -379,7 +379,7 @@ var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.Fld(T.CodeIdName)} = ?";
 			}
 			var IdCol = T.Columns[T.CodeIdName];
 			var ConvertedId = IdCol.UpperToRaw?.Invoke(Id);
-			await Cmd.Args([ConvertedId]).Run(Ct).FirstOrDefaultAsync(Ct);
+			await Cmd.Args([ConvertedId]).IterIAsy(Ct).FirstOrDefaultAsync(Ct);
 			return NIL;
 		}
 		return Fn;
@@ -417,13 +417,13 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 			foreach(var key in Keys){
 				Args.Add(key);
 				if(j == ParamNum - 1){
-					await Cmd.Args(Args).Run(Ct).FirstOrDefaultAsync(Ct);
+					await Cmd.Args(Args).IterIAsy(Ct).FirstOrDefaultAsync(Ct);
 					Args.Clear();
 					j = 0;
 				}
 			i++;j++;}
 			if(j > 0){
-				await Cmd.Args(Args).Run(Ct).FirstOrDefaultAsync(Ct);
+				await Cmd.Args(Args).IterIAsy(Ct).FirstOrDefaultAsync(Ct);
 			}
 			return NIL;
 		};
@@ -480,7 +480,7 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 				.Add(PTarget, Target)
 				.ToDict()
 			;
-			await SqlCmd.RawArgs(Arg).Run(Ct).FirstOrDefaultAsync(Ct);
+			await SqlCmd.RawArgs(Arg).IterIAsy(Ct).FirstOrDefaultAsync(Ct);
 			return NIL;
 		};
 		return Fn;
