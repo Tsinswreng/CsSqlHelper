@@ -78,14 +78,14 @@ public  partial class EfRepo<TEntity, TId>
 
 	public Task<Func<
 		IPageQry
-		,CT, Task<IPageAsy<IDictionary<str, obj?>>>
+		,CT, Task<IPageAsyE<IDictionary<str, obj?>>>
 	>> FnPageAllDict(IDbFnCtx? Ctx, CT Ct){
 		throw new NotImplementedException();
 	}
 
 	public Task<Func<
 		IPageQry
-		,CT, Task<IPageAsy<TEntity>>
+		,CT, Task<IPageAsyE<TEntity>>
 	>> FnPageAll(IDbFnCtx Ctx, CT Ct){
 		throw new NotImplementedException();
 	}

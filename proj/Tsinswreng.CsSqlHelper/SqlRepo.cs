@@ -64,7 +64,7 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 
 	public async Task<Func<
 		IPageQry
-		,CT, Task<IPageAsy<IDictionary<str, obj?>>>
+		,CT, Task<IPageAsyE<IDictionary<str, obj?>>>
 	>> FnPageAllDict(IDbFnCtx? Ctx, CT Ct){
 		var T = TblMgr.GetTbl<TEntity>();
 		var Sql = $"""
@@ -85,7 +85,7 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 				HasCnt = true;
 			}
 
-			var R = PageAsy.Mk(
+			var R = PageAsyE.Mk(
 				Qry, Ran, HasCnt, Cnt
 			);
 			return R;
@@ -95,18 +95,18 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 
 	public async Task<Func<
 		IPageQry
-		,CT, Task<IPageAsy<TEntity>>
+		,CT, Task<IPageAsyE<TEntity>>
 	>> FnPageAll(IDbFnCtx Ctx, CT Ct){
 		var T = TblMgr.GetTbl<TEntity>();
 		var PageAllDict = await FnPageAllDict(Ctx, Ct);
 		var Fn = async(IPageQry Qry, CT Ct)=>{
 			var AllDictPage = await PageAllDict(Qry, Ct);
-			if(AllDictPage.DataAsy != null){
-				var EntityData = AllDictPage.DataAsy.Select(d=>T.DbDictToEntity<TEntity>(d));
-				var R = PageAsy.Mk(Qry, EntityData, AllDictPage.HasTotCnt, AllDictPage.TotCnt);
+			if(AllDictPage.DataAsyE != null){
+				var EntityData = AllDictPage.DataAsyE.Select(d=>T.DbDictToEntity<TEntity>(d));
+				var R = PageAsyE.Mk(Qry, EntityData, AllDictPage.HasTotCnt, AllDictPage.TotCnt);
 				return R;
 			}else{
-				return PageAsy.Mk<TEntity>(Qry, null, false, 0);
+				return PageAsyE.Mk<TEntity>(Qry, null, false, 0);
 			}
 		};
 		return Fn;
@@ -318,7 +318,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		)=>{
 			await using BatchListAsy<object?, nil> BatchList = new(async (x, Ct)=>{
 				IList<object?> Args = [ValToSet, ..x];
-				Args.FillUpTo(CountPerBatch, null);
+				Args.FillUpTo(CountPerBatch+1, null);
 				await Cmd.Args(Args).IterIAsy(Ct).FirstOrDefaultAsync(Ct);
 				return NIL;
 			});

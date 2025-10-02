@@ -6,10 +6,10 @@ public  partial interface ISoftDeleteCol{
 	/// FnDelete(舊值)=>新值
 	/// 參數用DbColType 勿用CodeType
 	/// </summary>
-	public Func<object?, object?> FnDelete{get;set;}
+	public Func<obj?, obj?> FnDelete{get;set;}
 	/// <summary>
 	/// FnRestore(舊值)=>新值
 	/// 參數用DbColType 勿用CodeType
 	/// </summary>
-	public Func<object?, object?> FnRestore{get;set;}
+	public Func<obj?, obj?> FnRestore{get;set;}
 }

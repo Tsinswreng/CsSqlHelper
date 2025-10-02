@@ -32,12 +32,12 @@ public  partial interface IRepo<TEntity, TId>{
 
 	public Task<Func<
 		IPageQry
-		,CT, Task<IPageAsy<IDictionary<str, obj?>>>
+		,CT, Task<IPageAsyE<IDictionary<str, obj?>>>
 	>> FnPageAllDict(IDbFnCtx? Ctx, CT Ct);
 
 	public Task<Func<
 		IPageQry
-		,CT, Task<IPageAsy<TEntity>>
+		,CT, Task<IPageAsyE<TEntity>>
 	>> FnPageAll(IDbFnCtx Ctx, CT Ct);
 
 	public Task<Func<
