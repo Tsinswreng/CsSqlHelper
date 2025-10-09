@@ -14,16 +14,34 @@ public partial interface IUpperTypeMapFnT<TRaw, TUpper>{
 
 public partial class UpperTypeMapFnT<TRaw, TUpper>
 	:IUpperTypeMapFnT<TRaw, TUpper>
+
 {
-	public Func<TUpper,TRaw>? UpperToRaw{get;set;}
 	public Func<TRaw,TUpper>? RawToUpper{get;set;}
-	public Func<object?, TRaw>? ObjToRaw{get;set;}
-	public Func<object?, TUpper>? ObjToUpper{get;set;}
+	public Func<TUpper,TRaw>? UpperToRaw{get;set;}
+	public Func<obj?, TRaw>? ObjToRaw{get;set;}
+	public Func<obj?, TUpper>? ObjToUpper{get;set;}
+
 	public static IUpperTypeMapFnT<TRaw2, TUpper2> Mk<TRaw2, TUpper2>(
+		Func<TRaw2,TUpper2> RawToUpper
+		,Func<TUpper2,TRaw2> UpperToRaw
+		,Func<obj?, TUpper2>? ObjToUpper = null
+		,Func<obj?, TRaw2>? ObjToRaw = null
+	){
+		var R = new UpperTypeMapFnT<TRaw2, TUpper2>{
+			UpperToRaw = UpperToRaw
+			,RawToUpper = RawToUpper
+			,ObjToRaw = ObjToRaw
+			,ObjToUpper = ObjToUpper
+		};
+		return R;
+	}
+
+	[Obsolete]
+	public static IUpperTypeMapFnT<TRaw2, TUpper2> MkOld<TRaw2, TUpper2>(
 		Func<TUpper2,TRaw2> UpperToRaw
 		,Func<TRaw2,TUpper2> RawToUpper
-		,Func<object?, TRaw2>? ObjToRaw = null
-		,Func<object?, TUpper2>? ObjToUpper = null
+		,Func<obj?, TRaw2>? ObjToRaw = null
+		,Func<obj?, TUpper2>? ObjToUpper = null
 	){
 		var R = new UpperTypeMapFnT<TRaw2, TUpper2>{
 			UpperToRaw = UpperToRaw
@@ -35,10 +53,26 @@ public partial class UpperTypeMapFnT<TRaw, TUpper>
 	}
 
 	public static IUpperTypeMapFnT<TRaw, TUpper> Mk(
+		Func<TRaw,TUpper> RawToUpper
+		,Func<TUpper,TRaw> UpperToRaw
+		,Func<obj?, TUpper>? ObjToUpper = null
+		,Func<obj?, TRaw>? ObjToRaw = null
+	){
+		var R = new UpperTypeMapFnT<TRaw, TUpper>{
+			UpperToRaw = UpperToRaw
+			,RawToUpper = RawToUpper
+			,ObjToRaw = ObjToRaw
+			,ObjToUpper = ObjToUpper
+		};
+		return R;
+	}
+
+	[Obsolete]
+	public static IUpperTypeMapFnT<TRaw, TUpper> MkOld(
 		Func<TUpper,TRaw> UpperToRaw
 		,Func<TRaw,TUpper> RawToUpper
-		,Func<object?, TRaw>? ObjToRaw = null
-		,Func<object?, TUpper>? ObjToUpper = null
+		,Func<obj?, TRaw>? ObjToRaw = null
+		,Func<obj?, TUpper>? ObjToUpper = null
 	){
 		var R = new UpperTypeMapFnT<TRaw, TUpper>{
 			UpperToRaw = UpperToRaw

@@ -454,6 +454,7 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 		return Fn;
 	}
 
+	[Impl]
 	public async Task<Func<
 		TId
 		,obj?
@@ -485,6 +486,7 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		};
 		return Fn;
 	}
+
 
 	// public async Task<Func<
 	// 	IEnumerable<T_Entity>

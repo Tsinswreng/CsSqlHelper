@@ -89,6 +89,17 @@ public  partial interface IRepo<TEntity, TId>{
 		,CT ct
 	);
 
+	public Task<Func<
+		TId
+		,obj?
+		,CT
+		,Task<nil>
+	>> FnUpdOneColById(
+		IDbFnCtx Ctx
+		,str Col
+		,CT Ct
+	);
+
 
 
 }

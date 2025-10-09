@@ -76,12 +76,35 @@ public static class ExtnColBldr{
 /// <returns></returns>
 	public static Self MapType<TRaw, TUpper>(
 		this Self z
+		,Func<TRaw,TUpper> RawToUpper//先Raw後Upper、㕥合泛型參數ʹ序
+		,Func<TUpper,TRaw> UpperToRaw
+		,Func<object?, TRaw>? ObjToRaw = null
+		,Func<object?, TUpper>? ObjToUpper = null
+	){
+		var Fns = UpperTypeMapFnT<nil, nil>.Mk<TRaw, TUpper>(RawToUpper, UpperToRaw, ObjToUpper, ObjToRaw);
+		return MapType(z, Fns);
+	}
+
+	public static Self MapEnumTypeInt32<TEnum>(
+		this Self z
+	)where TEnum : struct, Enum{
+		z.MapType<i32, TEnum>(
+			(raw)=>(TEnum)(obj)(raw)
+			,(upper)=>(i32)(obj)upper
+			,ObjToRaw: (obj)=>Convert.ToInt32(obj)
+		);
+		return z;
+	}
+
+	[Obsolete]
+	public static Self MapTypeOld<TRaw, TUpper>(
+		this Self z
 		,Func<TUpper,TRaw> UpperToRaw
 		,Func<TRaw,TUpper> RawToUpper
 		,Func<object?, TRaw>? ObjToRaw = null
 		,Func<object?, TUpper>? ObjToUpper = null
 	){
-		var Fns = UpperTypeMapFnT<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
+		var Fns = UpperTypeMapFnT<nil, nil>.MkOld<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
 		return MapType(z, Fns);
 	}
 
@@ -94,6 +117,7 @@ public static class ExtnColBldr{
 		col.UpperCodeType = typeof(TUpper);
 		return HasConv(z, Fns);
 	}
+
 
 /// <summary>
 /// 用強轉 轉作Func<object?, object?>。
@@ -118,7 +142,7 @@ public static class ExtnColBldr{
 		,Func<object?, TRaw>? ObjToRaw = null
 		,Func<object?, TUpper>? ObjToUpper = null
 	){
-		var Fns = UpperTypeMapFnT<nil, nil>.Mk<TRaw, TUpper>(UpperToRaw, RawToUpper, ObjToRaw, ObjToUpper);
+		var Fns = UpperTypeMapFnT<nil, nil>.Mk<TRaw, TUpper>(RawToUpper, UpperToRaw, ObjToUpper, ObjToRaw);
 		return HasConv(z, Fns);
 	}
 
