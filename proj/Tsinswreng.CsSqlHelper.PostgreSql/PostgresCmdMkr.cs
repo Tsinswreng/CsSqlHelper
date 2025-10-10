@@ -1,14 +1,14 @@
+namespace Tsinswreng.CsSqlHelper.PostgreSql;
 using System.Data;
 using Npgsql;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
-namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
-public  partial class PostgreSqlCmdMkr
+public partial class PostgresCmdMkr
 	:ISqlCmdMkr
 	,I_GetTxnAsy
 {
 	public IDbConnection DbConnection{get;set;}
-	public PostgreSqlCmdMkr(IDbConnection DbConnection){
+	public PostgresCmdMkr(IDbConnection DbConnection){
 		this.DbConnection = DbConnection;
 	}
 
@@ -22,7 +22,7 @@ public  partial class PostgreSqlCmdMkr
 		}
 		var RawCmd = sqlConn.CreateCommand();
 		RawCmd.CommandText = Sql;
-		var ans = new PostgreSqlCmd(RawCmd);
+		var ans = new PostgresCmd(RawCmd);
 		if(DbFnCtx!= null){
 			ans.WithCtx(DbFnCtx);
 		}
@@ -30,7 +30,7 @@ public  partial class PostgreSqlCmdMkr
 	}
 
 	public virtual async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
-		if(Cmd is not PostgreSqlCmd SqlCmd){
+		if(Cmd is not PostgresCmd SqlCmd){
 			throw new InvalidOperationException("ISqlCmd is not SqliteCmd");
 		}
 		SqlCmd.RawCmd.Prepare();

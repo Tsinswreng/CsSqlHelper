@@ -1,8 +1,8 @@
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
-public partial class PostgreSqlParam:IParam{
+public partial class PostgresParam:IParam{
 	public str Name{get;set;} = "";
-	public PostgreSqlParam(str Name){
+	public PostgresParam(str Name){
 		this.Name = Name;
 	}
 	public override string ToString() {

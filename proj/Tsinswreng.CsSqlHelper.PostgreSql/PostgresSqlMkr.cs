@@ -1,11 +1,11 @@
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
-public  partial class PostgreSqlSqlMkr
+public partial class PostgresSqlMkr
 	:ISqlMkr
 {
-	protected static PostgreSqlSqlMkr? _Inst = null;
-	public static PostgreSqlSqlMkr Inst => _Inst??= new PostgreSqlSqlMkr();
-	public ISqlTypeMapper SqlTypeMapper{get;set;} = PostgreSqlTypeMapper.Inst;
+	protected static PostgresSqlMkr? _Inst = null;
+	public static PostgresSqlMkr Inst => _Inst??= new PostgresSqlMkr();
+	public ISqlTypeMapper SqlTypeMapper{get;set;} = PostgresTypeMapper.Inst;
 
 	public str Quote(str Name){
 		return "\"" + Name + "\"";
@@ -17,7 +17,7 @@ public  partial class PostgreSqlSqlMkr
 	}
 
 	public IParam Param(str Name){
-		var R = new PostgreSqlParam(Name);
+		var R = new PostgresParam(Name);
 		return R;
 	}
 

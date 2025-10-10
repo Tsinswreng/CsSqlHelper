@@ -1,9 +1,10 @@
 namespace Tsinswreng.CsSqlHelper.EFCore;
+
 using Microsoft.EntityFrameworkCore;
 using Tsinswreng.CsPage;
 using IDbFnCtx = IBaseDbFnCtx;
 
-public  partial class EfRepo<TEntity, TId>
+public partial class EfRepo<TEntity, TId>
 	: IRepo<TEntity, TId>
 	where TEntity:class
 {
@@ -87,6 +88,10 @@ public  partial class EfRepo<TEntity, TId>
 		IPageQry
 		,CT, Task<IPageAsyE<TEntity>>
 	>> FnPageAll(IDbFnCtx Ctx, CT Ct){
+		throw new NotImplementedException();
+	}
+
+	public Task<Func<TId, object?, CT, Task<object>>> FnUpdOneColById(IDbFnCtx Ctx, string Col, CT Ct) {
 		throw new NotImplementedException();
 	}
 }

@@ -1,15 +1,15 @@
 namespace Tsinswreng.CsSqlHelper.PostgreSql;
 
 
-public  partial class PostgreSqlTypeMapper : ISqlTypeMapper {
-	protected static PostgreSqlTypeMapper? _Inst = null;
+public partial class PostgresTypeMapper : ISqlTypeMapper {
+	protected static PostgresTypeMapper? _Inst = null;
 
-	public static PostgreSqlTypeMapper Inst => _Inst ??= new PostgreSqlTypeMapper();
+	public static PostgresTypeMapper Inst => _Inst ??= new PostgresTypeMapper();
 
 	// <del>这里用 object 作为 key，支持三类枚举的混合 Dictionary</del>
 	public IDictionary<Type, string> ClrType_Name { get; set; } = new Dictionary<Type, string>();
 
-	public PostgreSqlTypeMapper() {
+	public PostgresTypeMapper() {
 		ClrType_Name = new Dictionary<Type, string>()
 		{
 				// 非空值类型映射

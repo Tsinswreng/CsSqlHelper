@@ -1,15 +1,13 @@
-using System.Data;
+namespace Tsinswreng.CsSqlHelper.PostgreSql;
+
 using System.Runtime.CompilerServices;
 using Npgsql;
 using Tsinswreng.CsCore;
 
-namespace Tsinswreng.CsSqlHelper.PostgreSql;
-
-
-public partial class PostgreSqlCmd: ISqlCmd{
+public partial class PostgresCmd: ISqlCmd{
 	public NpgsqlCommand RawCmd{get;set;}
 	public str? Sql{get;set;}
-	public PostgreSqlCmd(NpgsqlCommand DbCmd){
+	public PostgresCmd(NpgsqlCommand DbCmd){
 		RawCmd = DbCmd;
 	}
 
