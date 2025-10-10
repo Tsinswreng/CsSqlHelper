@@ -15,7 +15,7 @@ CsSqlHelper is a tiny ORM
 - Functional Crud
 - Make your sql string portable(database independent)
 - Abstact interfaces to adapt to different database or ORM
-- Adapted Sqlite, PostgreSql, EFCore by now
+- Adapted Sqlite, Postgres, EFCore by now
 - Field and Type mapping
 - Soft delete
 - Transaction support

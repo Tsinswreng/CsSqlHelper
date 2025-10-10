@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.PostgreSql;
+namespace Tsinswreng.CsSqlHelper.Postgres;
 using System.Data;
 using Npgsql;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;

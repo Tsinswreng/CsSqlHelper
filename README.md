@@ -21,7 +21,7 @@ CsSqlHelper is a tiny ORM
 
 -   Abstact interfaces to adapt to different database or ORM
 
--   Adapted Sqlite, PostgreSql, EFCore by now
+-   Adapted Sqlite, Postgres, EFCore by now
 
 -   Field and Type mapping
 

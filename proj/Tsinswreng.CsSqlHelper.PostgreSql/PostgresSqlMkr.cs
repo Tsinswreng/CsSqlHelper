@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.PostgreSql;
+namespace Tsinswreng.CsSqlHelper.Postgres;
 
 public partial class PostgresSqlMkr
 	:ISqlMkr
