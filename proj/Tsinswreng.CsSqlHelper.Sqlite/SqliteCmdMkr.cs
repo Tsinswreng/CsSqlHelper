@@ -1,8 +1,9 @@
-using System.Data;
+namespace Tsinswreng.CsSqlHelper.Sqlite;
+
 using Microsoft.Data.Sqlite;
 using Tsinswreng.CsCore;
 
-namespace Tsinswreng.CsSqlHelper.Sqlite;
+
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 public partial class SqliteCmdMkr
 	:ISqlCmdMkr
