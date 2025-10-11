@@ -181,6 +181,19 @@ public static class ExtnITable{
 		return z.SqlMkr.Quote(DbColName);
 	}
 
+/// <summary>
+/// 映射到數據庫表ʹ字段名 並加引號/括號
+/// IParam CodeColNameParam 其Name須同於數據庫字段名
+/// </summary>
+	public static str Fld(
+		this ITable z
+		,IParam CodeColNameParam
+	){
+		var CodeColName = CodeColNameParam.Name;
+		var DbColName = z.Columns[CodeColName].DbName;
+		return z.SqlMkr.Quote(DbColName);
+	}
+
 	public static IParam Prm(
 		this ITable z
 		,str Name

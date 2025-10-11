@@ -6,7 +6,7 @@ namespace Tsinswreng.CsSqlHelper;
 /// <typeparam name="T"></typeparam>
 /// <param name="Id"></param>
 /// <param name="Dict"></param>
-public  partial struct Id_Dict<T>(
+public partial struct Id_Dict<T>(
 	T Id
 	, IDictionary<string, object?> Dict
 ){

@@ -7,9 +7,14 @@ public partial class PostgresCmdMkr
 	:ISqlCmdMkr
 	,I_GetTxnAsy
 {
-	public IDbConnection DbConnection{get;set;}
-	public PostgresCmdMkr(IDbConnection DbConnection){
-		this.DbConnection = DbConnection;
+	// public IDbConnection DbConnection{get;set;}
+	// public PostgresCmdMkr(IDbConnection DbConnection){
+	// 	this.DbConnection = DbConnection;
+	// }
+
+	public I_GetDbConnAsy DbConnGetter{get;set;}
+	public PostgresCmdMkr(I_GetDbConnAsy DbConnGetter){
+		this.DbConnGetter = DbConnGetter;
 	}
 
 	public virtual async Task<ISqlCmd> MkCmd(
@@ -17,6 +22,7 @@ public partial class PostgresCmdMkr
 		,str Sql
 		,CT Ct
 	){
+		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
 		if(DbConnection is not NpgsqlConnection sqlConn){
 			throw new InvalidOperationException("DbConnection is not NpgsqlConnection");
 		}
@@ -56,6 +62,7 @@ public partial class PostgresCmdMkr
 	}
 
 	public async Task<ITxn> GetTxnAsy(CT Ct){
+		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
 		return Ans;

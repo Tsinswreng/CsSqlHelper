@@ -5,10 +5,10 @@ using Tsinswreng.CsPage;
 namespace Tsinswreng.CsSqlHelper;
 
 public partial class ArgDict: IArgDict{
-	public static IArgDict Mk(){
+	public static ArgDict Mk(){
 		return new ArgDict();
 	}
-	public static IArgDict Mk(ITable? Tbl){
+	public static ArgDict Mk(ITable? Tbl){
 		return new ArgDict{Tbl = Tbl};
 	}
 
@@ -27,6 +27,15 @@ public partial class ArgDict: IArgDict{
 		return this;
 	}
 
+	public IArgDict AddConv<T>(IParam Param, T Upper, str? CodeColName=null){
+		if(Tbl is null){
+			throw new Exception("Tbl is null");
+		}
+		var Raw = Tbl.UpperToRaw(Upper, CodeColName);
+		ParamName_RawValue.TryAdd(Param.Name, Raw);
+		return this;
+	}
+
 	[Impl]
 	public IDictionary<str, obj?> ToDict(){
 		return ParamName_RawValue;
@@ -35,18 +44,6 @@ public partial class ArgDict: IArgDict{
 
 
 public static class ExtnArgDict{
-	[Obsolete]
-	public static IArgDict AddPageQry(
-		this IArgDict z
-		,IPageQry PageQry
-		,str PrmLmt
-		,str PrmOfst
-	){
-		z.Add(PrmLmt, PageQry.PageSize)
-		.Add(PrmOfst, PageQry.Offset_());
-		return z;
-	}
-
 	public static IArgDict AddPageQry(
 		this IArgDict z
 		,IPageQry PageQry

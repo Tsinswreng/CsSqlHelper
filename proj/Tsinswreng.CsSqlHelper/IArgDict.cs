@@ -9,6 +9,7 @@ public partial interface IArgDict{
 	/// <returns></returns>
 	public IArgDict Add(str ParamName, obj? Raw);
 	public IArgDict Add(IParam Param, obj? Raw);
+	public IArgDict AddConv<T>(IParam Param, T Raw, str? CodeColName=null);
 	public IDictionary<str, obj?> ToDict();
 }
 

@@ -7,6 +7,7 @@ using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;
 using Tsinswreng.CsPage;
+using System.Collections;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
@@ -216,6 +217,18 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		};
 		return Fn;
 	}
+
+// 	[Impl]
+// 	public async Task<Func<
+// 		obj//raw
+// 		,CT
+// 		,Task<IPage<IDictionary<str, obj?>>>
+// 	>> FnPageByOneCol(IDbFnCtx? Ctx, str DbColName, CT Ct){
+// var T = TblMgr.GetTbl<TEntity>();
+// var Sql =
+// """
+// """
+// 	}
 
 	[Impl]
 	public async Task<Func<

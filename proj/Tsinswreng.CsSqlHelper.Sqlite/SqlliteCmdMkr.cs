@@ -8,9 +8,19 @@ public partial class SqliteCmdMkr
 	:ISqlCmdMkr
 	,I_GetTxnAsy
 {
-	public IDbConnection DbConnection{get;set;}
-	public SqliteCmdMkr(IDbConnection DbConnection){
-		this.DbConnection = DbConnection;
+	// [Obsolete]
+	// public IDbConnection? DbConnection{get;set;}
+
+	//#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	// [Obsolete]
+	// public SqliteCmdMkr(IDbConnection DbConnection){
+	// 	this.DbConnection = DbConnection;
+	// }
+
+	public I_GetDbConnAsy DbConnGetter{get;set;}
+
+	public SqliteCmdMkr(I_GetDbConnAsy DbConnGetter){
+		this.DbConnGetter = DbConnGetter;
 	}
 
 	[Impl(typeof(ISqlCmdMkr))]
@@ -19,6 +29,7 @@ public partial class SqliteCmdMkr
 		,str Sql
 		,CT Ct
 	){
+		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
 		if(DbConnection is not SqliteConnection sqlConn){
 			throw new InvalidOperationException("DbConnection is not SqlConnection");
 		}
@@ -61,6 +72,7 @@ public partial class SqliteCmdMkr
 
 	[Impl(typeof(I_GetTxnAsy))]
 	public async Task<ITxn> GetTxnAsy(CT Ct){
+		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
 		return Ans;

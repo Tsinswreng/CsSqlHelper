@@ -33,3 +33,65 @@ public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 	public ISqlCmd WithCtx(IBaseDbFnCtx? DbFnCtx);
 
 }
+
+public static class ExtnISqlCmd{
+	public static async Task<IDictionary<str, obj?>> DictFirst(
+		this ISqlCmd z, CT Ct
+	){
+		var AsyE = z.IterIAsy(Ct);
+		var i = 0;
+		IDictionary<str, obj?> R = null!;
+		await foreach(var e in AsyE){
+			if(i >= 1){
+				break;
+			}
+			R = e;
+			i++;
+		}
+		if(i == 0){
+			throw new InvalidOperationException("no result");
+		}
+		return R;
+	}
+
+	public static async Task<T?> FirstOrDefault<T>(
+		this ISqlCmd z, ITable Tbl, CT Ct
+	)where T:new(){
+		var AsyE = z.IterIAsy(Ct);
+		var i = 0;
+		IDictionary<str, obj?> Dict = null!;
+		await foreach(var e in AsyE){
+			if(i >= 1){
+				break;
+			}
+			Dict = e;
+			i++;
+		}
+		if(i == 0){
+			throw new InvalidOperationException("no result");
+		}
+		var R = Tbl.DbDictToEntity<T>(Dict);
+		return R;
+	}
+
+	public static async Task<IDictionary<str, obj?>?> DictFirstOrDefault(
+		this ISqlCmd z, CT Ct
+	){
+		var AsyE = z.IterIAsy(Ct);
+		var i = 0;
+		IDictionary<str, obj?> R = null!;
+		await foreach(var e in AsyE){
+			if(i >= 1){
+				break;
+			}
+			R = e;
+			i++;
+		}
+		if(i == 0){
+			return null;
+		}
+		return R;
+	}
+
+
+}
