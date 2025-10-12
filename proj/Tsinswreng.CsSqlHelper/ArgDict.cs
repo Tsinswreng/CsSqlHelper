@@ -22,14 +22,22 @@ public partial class ArgDict: IArgDict{
 	}
 
 	[Impl]
-	public IArgDict Add(IParam Param, obj? Raw){
+	public IArgDict AddRaw(IParam Param, obj? Raw){
 		ParamName_RawValue.TryAdd(Param.Name, Raw);
 		return this;
 	}
 
-	public IArgDict AddConv<T>(IParam Param, T Upper, str? CodeColName=null){
+	/// <summary>
+	/// 嘗試 Upper ->Raw轉換、轉不得則添 Upper
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="Param"></param>
+	/// <param name="Upper"></param>
+	/// <param name="CodeColName"></param>
+	/// <returns></returns>
+	public IArgDict AddT<T>(IParam Param, T Upper, str? CodeColName=null){
 		if(Tbl is null){
-			throw new Exception("Tbl is null");
+			return AddRaw(Param, Upper);
 		}
 		var Raw = Tbl.UpperToRaw(Upper, CodeColName);
 		ParamName_RawValue.TryAdd(Param.Name, Raw);
@@ -50,8 +58,8 @@ public static class ExtnArgDict{
 		,IParam PrmLmt
 		,IParam PrmOfst
 	){
-		z.Add(PrmLmt, PageQry.PageSize)
-		.Add(PrmOfst, PageQry.Offset_());
+		z.AddRaw(PrmLmt, PageQry.PageSize)
+		.AddRaw(PrmOfst, PageQry.Offset_());
 		return z;
 	}
 

@@ -290,7 +290,8 @@ public static class ExtnITable{
 		if(z.UpperType_DfltMapper.TryGetValue(typeof(T), out var Mapper)){
 			return Mapper.UpperToRaw?.Invoke(UpperValue)??UpperValue;
 		}
-		throw new Exception("No UpperTypeMapperFn for type: "+ typeof(T));
+		return UpperValue;
+		//throw new Exception("No UpperTypeMapperFn for type: "+ typeof(T));
 	}
 
 	public static obj? RawToUpper(

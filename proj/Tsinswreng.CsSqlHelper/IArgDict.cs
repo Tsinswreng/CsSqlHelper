@@ -8,8 +8,8 @@ public partial interface IArgDict{
 	/// <param name="Raw"></param>
 	/// <returns></returns>
 	public IArgDict Add(str ParamName, obj? Raw);
-	public IArgDict Add(IParam Param, obj? Raw);
-	public IArgDict AddConv<T>(IParam Param, T Raw, str? CodeColName=null);
+	public IArgDict AddRaw(IParam Param, obj? Raw);
+	public IArgDict AddT<T>(IParam Param, T Raw, str? CodeColName=null);
 	public IDictionary<str, obj?> ToDict();
 }
 

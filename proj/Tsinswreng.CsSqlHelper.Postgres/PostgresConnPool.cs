@@ -5,7 +5,7 @@ using Npgsql;
 
 public class PostgresConnPool : I_GetDbConnAsy{
 	NpgsqlDataSource DataSource;
-	PostgresConnPool(
+	public PostgresConnPool(
 		NpgsqlDataSource DataSource
 	){
 		this.DataSource = DataSource;

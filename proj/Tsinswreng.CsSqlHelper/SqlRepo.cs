@@ -490,8 +490,8 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		Ctx?.AddToDispose(SqlCmd);
 		var Fn = async(TId Id, obj? Target, CT Ct)=>{
 			var Arg = ArgDict.Mk()
-				.Add(PId, T.UpperToRaw(Id, NId))
-				.Add(PTarget, Target)
+				.AddRaw(PId, T.UpperToRaw(Id, NId))
+				.AddRaw(PTarget, Target)
 				.ToDict()
 			;
 			await SqlCmd.RawArgs(Arg).IterIAsy(Ct).FirstOrDefaultAsync(Ct);
