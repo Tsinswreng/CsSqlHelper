@@ -41,6 +41,16 @@ public partial interface IRepo<TEntity, TId>{
 	>> FnPageAll(IDbFnCtx Ctx, CT Ct);
 
 	public Task<Func<
+		TId
+		,TEntity
+		,CT, Task<nil>
+	>> FnUpdById(
+		IDbFnCtx? Ctx
+		,IEnumerable<str>? FieldsToUpdate
+		,CT Ct
+	);
+
+	public Task<Func<
 		IEnumerable<Id_Dict<TId>>
 		,CT
 		,Task<nil>

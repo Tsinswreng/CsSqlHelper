@@ -10,6 +10,7 @@ using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 public partial class Table:ITable{
 	public IDictMapperShallow DictMapper{get;set;}
 	public Type CodeEntityType{get;set;}
+	#pragma warning disable CS8618
 	public Table(){}
 	public Table(
 		IDictMapperShallow DictMapper
@@ -385,6 +386,19 @@ public static class ExtnITable{
 		return R;
 	}
 
+
+	public static str Eq(
+		this ITable z
+		,str DbColName, IParam Param
+	){
+		return z.SqlMkr.Eq(DbColName, Param);
+	}
+
+	public static str Eq(this ITable z, IParam Param){
+		return z.Eq(Param.Name, Param);
+	}
+
+
 /// <summary>
 /// [@0, @1, @2 ...]
 /// ,</summary>
@@ -424,7 +438,7 @@ public static class ExtnITable{
 					R.Add(DbTypeName);
 				}
 				catch (System.Exception e){
-					throw new Exception("Type Mapping Error for Column:"+ Col.DbName, e);
+					throw new Exception($"Type Mapping Error:\n{Tbl.DbTblName}.{Col.DbName}\n{e}");
 				}
 			}
 			R.AddRange(Col.AdditionalSqls??[]);
@@ -466,6 +480,8 @@ CREATE TABLE IF NOT EXISTS {z.Qt(z.DbTblName)}(
 """;
 		return S;
 	}
+
+
 
 
 }

@@ -1,7 +1,7 @@
 namespace Tsinswreng.CsSqlHelper;
 using IDbFnCtx = IBaseDbFnCtx;
 
-public  partial class TxnWrapper<TDbFnCtx>
+public partial class TxnWrapper<TDbFnCtx>
 	where TDbFnCtx: IDbFnCtx, new()
 {
 	public IDbFnCtxMkr<TDbFnCtx> DbFnCtxMkr{get;set;}

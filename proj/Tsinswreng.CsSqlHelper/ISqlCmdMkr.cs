@@ -3,6 +3,12 @@ namespace Tsinswreng.CsSqlHelper;
 
 public partial interface ISqlCmdMkr{
 
+	/// <summary>
+	/// 璫允 先Prepare後傳參數。㕥便 複用SqlCmd、每次傳不同參數。
+	/// </summary>
+	/// <param name="Cmd"></param>
+	/// <param name="Ct"></param>
+	/// <returns></returns>
 	public Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct);
 
 	public Task<ISqlCmd> Prepare(

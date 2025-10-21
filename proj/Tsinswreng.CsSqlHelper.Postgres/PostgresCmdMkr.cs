@@ -1,6 +1,7 @@
 namespace Tsinswreng.CsSqlHelper.Postgres;
 using System.Data;
 using Npgsql;
+using Tsinswreng.CsCore;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 
 public partial class PostgresCmdMkr
@@ -17,7 +18,8 @@ public partial class PostgresCmdMkr
 		this.DbConnGetter = DbConnGetter;
 	}
 
-	public virtual async Task<ISqlCmd> MkCmd(
+	[Impl]
+	public async Task<ISqlCmd> MkCmd(
 		IDbFnCtx? DbFnCtx
 		,str Sql
 		,CT Ct
@@ -35,12 +37,18 @@ public partial class PostgresCmdMkr
 		return ans;
 	}
 
-	public virtual async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
-		if(Cmd is not PostgresCmd SqlCmd){
-			throw new InvalidOperationException("ISqlCmd is not SqliteCmd");
-		}
-		SqlCmd.RawCmd.Prepare();
+	/// <summary>
+	/// Npgsql叵 先Prepare後傳參數。若需效sqlite芝prepare後多次傳異ʹ參數 宜用Batch
+	/// </summary>
+	[Impl]
+	public async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
+
 		return Cmd;
+		// if(Cmd is not PostgresCmd SqlCmd){
+		// 	throw new InvalidOperationException("ISqlCmd is not SqliteCmd");
+		// }
+		// SqlCmd.RawCmd.Prepare();
+		// return Cmd;
 	}
 
 

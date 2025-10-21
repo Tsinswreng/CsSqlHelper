@@ -115,7 +115,7 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 
 	//public class _ClsInsrtMany<E,I>(SqlRepo<E,I> z)
 
-
+//TODO 用多值插入語法、免 for循環中多次查詢
 	protected async Task<Func<
 		IEnumerable<TEntity>
 		,CT
@@ -229,6 +229,44 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 // """
 // """
 // 	}
+
+	/// <summary>
+	///
+	/// </summary>
+	/// <param name="Ctx"></param>
+	/// <param name="FieldsToUpdate">潙null旹更新全部字段</param>
+	/// <param name="Ct"></param>
+	/// <returns></returns>
+	public async Task<Func<
+		TId
+		,TEntity
+		,CT, Task<nil>
+	>> FnUpdById(
+		IDbFnCtx? Ctx
+		,IEnumerable<str>? FieldsToUpdate
+		,CT Ct
+	){
+		var T = TblMgr.GetTbl<TEntity>();
+		var NId = T.CodeIdName;
+		FieldsToUpdate = FieldsToUpdate??T.Columns.Keys;
+		var Clause = T.UpdateClause(FieldsToUpdate);
+		var FieldsToUpdateMap = FieldsToUpdate.ToHashSet();
+		var Sql =
+$"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
+		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		Ctx?.AddToDispose(Cmd);
+		return async(Id, Entity, Ct)=>{
+			var Arg = ArgDict.Mk(T);
+			var CodeDict = DictMapper.ToDictShallowT(Entity);
+			foreach(var (k,v) in CodeDict){
+				if(FieldsToUpdateMap.Contains(k)){
+					Arg.AddT(T.Prm(k), v, k);
+				}
+			}
+			await Cmd.Args(Arg).All(Ct);
+			return NIL;
+		};
+	}
 
 	[Impl]
 	public async Task<Func<
@@ -474,7 +512,7 @@ AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 		,CT
 		,Task<nil>
 	>> FnUpdOneColById(
-		IDbFnCtx Ctx
+		IDbFnCtx? Ctx
 		,str Col
 		,CT Ct
 	){

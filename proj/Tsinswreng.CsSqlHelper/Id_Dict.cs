@@ -8,8 +8,8 @@ namespace Tsinswreng.CsSqlHelper;
 /// <param name="Dict"></param>
 public partial struct Id_Dict<T>(
 	T Id
-	, IDictionary<string, object?> Dict
+	, IDictionary<str, obj?> Dict
 ){
 	public T Id{get;set;} = Id;
-	public IDictionary<string, object?> Dict{get;set;} = Dict;
+	public IDictionary<str, obj?> Dict{get;set;} = Dict;
 }

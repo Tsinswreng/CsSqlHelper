@@ -68,11 +68,23 @@ public static class ExtnISqlCmd{
 			i++;
 		}
 		if(i == 0){
-			throw new InvalidOperationException("no result");
+			return default;
 		}
 		var R = Tbl.DbDictToEntity<T>(Dict);
 		return R;
 	}
+
+	public static async Task<T?> First<T>(
+		this ISqlCmd z, ITable Tbl, CT Ct
+	)where T:new(){
+		var R = await z.FirstOrDefault<T>(Tbl, Ct);
+		if(R is null){
+			throw new InvalidOperationException("no result");
+		}
+		return R;
+	}
+
+
 
 	public static async Task<IDictionary<str, obj?>?> DictFirstOrDefault(
 		this ISqlCmd z, CT Ct

@@ -58,4 +58,20 @@ public static class ExtnISqlMkr{
 		Ofst=z.Param(nameof(Ofst));
 		return z.ParamLimOfst(Lmt.Name, Ofst.Name);
 	}
+
+	/// <summary>
+	/// 直轉`=`、不支持比較 null
+	/// </summary>
+	/// <param name="z"></param>
+	/// <param name="DbColName"></param>
+	/// <param name="Param"></param>
+	/// <returns></returns>
+	public static str Eq(
+		this ISqlMkr z
+		,str DbColName, IParam Param
+	){
+		var Col = DbColName;
+		//return $"({Col} = {Param} OR ({Col} IS NULL AND {Param} IS NULL))";
+		return $"{z.Quote(DbColName)} = {Param}";
+	}
 }
