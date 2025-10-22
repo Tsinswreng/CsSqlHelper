@@ -7,7 +7,7 @@ using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;
 using Tsinswreng.CsPage;
-using System.Collections;
+
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
@@ -241,7 +241,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		TId
 		,TEntity
 		,CT, Task<nil>
-	>> FnUpdById(
+	>> FnUpdByIdOld(
 		IDbFnCtx? Ctx
 		,IEnumerable<str>? FieldsToUpdate
 		,CT Ct
@@ -268,14 +268,74 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		};
 	}
 
+	/// <summary>
+	///
+	/// </summary>
+	/// <param name="Ctx"></param>
+	/// <param name="FieldsToUpdate">潙null旹更新全部字段</param>
+	/// <param name="Ct"></param>
+	/// <returns></returns>
+	public async Task<Func<
+		TEntity
+		,CT, Task<nil>
+	>> FnUpdById(
+		IDbFnCtx? Ctx
+		,IEnumerable<str>? FieldsToUpdate
+		,CT Ct
+	){
+		var T = TblMgr.GetTbl<TEntity>();
+		var NId = T.CodeIdName;
+		FieldsToUpdate = FieldsToUpdate??T.Columns.Keys;
+		var Clause = T.UpdateClause(FieldsToUpdate);
+		var FieldsToUpdateMap = FieldsToUpdate.ToHashSet();
+		var Sql =
+$"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
+		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+		Ctx?.AddToDispose(Cmd);
+		return async(Entity, Ct)=>{
+			var Arg = ArgDict.Mk(T);
+			var CodeDict = DictMapper.ToDictShallowT(Entity);
+			foreach(var (k,v) in CodeDict){
+				if(FieldsToUpdateMap.Contains(k)){
+					Arg.AddT(T.Prm(k), v, k);
+				}
+			}
+			await Cmd.Args(Arg).All(Ct);
+			return NIL;
+		};
+	}
+
+
+
+	/// <param name="FieldsToUpdate">潙null旹更新全部字段</param>
+	/// TODO 用批量插入sql 代替for循環
+	public async Task<Func<
+		IEnumerable<TEntity>
+		,CT
+		,Task<nil>
+	>> FnUpdManyById(
+		IDbFnCtx? Ctx
+		,IEnumerable<str>? FieldsToUpdate
+		,CT Ct
+	){
+		var UpdById = await FnUpdById(Ctx, FieldsToUpdate, Ct);
+		return async(Entitys, Ct)=>{
+			foreach(var e in Entitys){
+				await UpdById(e, Ct);
+			}
+			return NIL;
+		};
+	}
+
+
+	[Obsolete]
 	[Impl]
 	public async Task<Func<
 		IEnumerable<Id_Dict<TId>>
 		,CT
 		,Task<nil>
-	>> FnUpdManyById(
+	>> FnUpdManyByIdOld(
 		IDbFnCtx? Ctx
-		//,IDictionary<str, object?> ModelDict //不當有Id
 		,IEnumerable<str> FieldsToUpdate
 		,CT Ct
 	){

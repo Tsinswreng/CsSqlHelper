@@ -40,9 +40,31 @@ public partial interface IRepo<TEntity, TId>{
 		,CT, Task<IPageAsyE<TEntity>>
 	>> FnPageAll(IDbFnCtx Ctx, CT Ct);
 
+	[Obsolete]
 	public Task<Func<
 		TId
 		,TEntity
+		,CT, Task<nil>
+	>> FnUpdByIdOld(
+		IDbFnCtx? Ctx
+		,IEnumerable<str>? FieldsToUpdate
+		,CT Ct
+	);
+
+	[Obsolete]
+	public Task<Func<
+		IEnumerable<Id_Dict<TId>>
+		,CT
+		,Task<nil>
+	>> FnUpdManyByIdOld(
+		IDbFnCtx? Ctx
+		,IEnumerable<str> FieldsToUpdate
+		,CT Ct
+	);
+
+
+	public Task<Func<
+		TEntity
 		,CT, Task<nil>
 	>> FnUpdById(
 		IDbFnCtx? Ctx
@@ -51,12 +73,12 @@ public partial interface IRepo<TEntity, TId>{
 	);
 
 	public Task<Func<
-		IEnumerable<Id_Dict<TId>>
+		IEnumerable<TEntity>
 		,CT
 		,Task<nil>
 	>> FnUpdManyById(
 		IDbFnCtx? Ctx
-		,IEnumerable<str> FieldsToUpdate
+		,IEnumerable<str>? FieldsToUpdate
 		,CT Ct
 	);
 
