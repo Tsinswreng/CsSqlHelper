@@ -94,4 +94,20 @@ public partial class EfRepo<TEntity, TId>
 	public Task<Func<TId, object?, CT, Task<object>>> FnUpdOneColById(IDbFnCtx Ctx, string Col, CT Ct) {
 		throw new NotImplementedException();
 	}
+
+	public Task<Func<TEntity, CT, Task<object>>> FnInsertOne(IDbFnCtx? Ctx, CT Ct) {
+		throw new NotImplementedException();
+	}
+
+	public Task<Func<TId, TEntity, CT, Task<object>>> FnUpdByIdOld(IDbFnCtx? Ctx, IEnumerable<string>? FieldsToUpdate, CT Ct) {
+		throw new NotImplementedException();
+	}
+
+	public Task<Func<TEntity, CT, Task<object>>> FnUpdById(IDbFnCtx? Ctx, IEnumerable<string>? FieldsToUpdate, CT Ct) {
+		throw new NotImplementedException();
+	}
+
+	public Task<Func<IEnumerable<TEntity>, CT, Task<object>>> FnUpdManyById(IDbFnCtx? Ctx, IEnumerable<string>? FieldsToUpdate, CT Ct) {
+		throw new NotImplementedException();
+	}
 }
