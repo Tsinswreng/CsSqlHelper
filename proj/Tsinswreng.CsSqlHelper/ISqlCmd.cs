@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Tsinswreng.CsSqlHelper;
 
 public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
@@ -35,6 +37,35 @@ public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 }
 
 public static class ExtnISqlCmd{
+	/// <summary>
+	/// Prepare並AddToDispose
+	/// </summary>
+	/// <typeparam name="TSelf"></typeparam>
+	/// <param name="z"></param>
+	/// <param name="CmdMkr"></param>
+	/// <param name="Sql"></param>
+	/// <param name="Ct"></param>
+	/// <returns></returns>
+	public static async Task<ISqlCmd> PrepareToDispose<TSelf>(
+		this TSelf? z
+		,ISqlCmdMkr CmdMkr
+		,str Sql
+		,CT Ct
+	)where TSelf: IBaseDbFnCtx{
+		var R = await CmdMkr.Prepare(z, Sql, Ct);
+		z?.AddToDispose(R);
+		return R;
+	}
+	public static ISqlCmd Attach<TSelf>(
+		this TSelf? z
+		,ISqlCmd Cmd
+		,IArgDict Arg
+	)
+		where TSelf: IBaseDbFnCtx
+	{
+		Cmd.WithCtx(z).Args(Arg);
+		return Cmd;
+	}
 	public static async Task<IDictionary<str, obj?>> DictFirst(
 		this ISqlCmd z, CT Ct
 	){

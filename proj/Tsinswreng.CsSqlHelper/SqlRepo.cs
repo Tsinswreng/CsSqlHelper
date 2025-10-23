@@ -164,6 +164,21 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		return await _FnInsertMany(Ctx, true, Ct);
 	}
 
+	public async Task<Func<
+		TEntity
+		,CT
+		,Task<nil>
+	>> FnInsertOne(
+		IDbFnCtx? Ctx
+		,CT Ct
+	){
+		var InsrtMany = await FnInsertMany(Ctx, Ct);
+		return async(Entity, Ct)=>{
+			await InsrtMany([Entity], Ct);
+			return NIL;
+		};
+	}
+
 
 /// <summary>
 /// 不預編譯。適用于況芝 在事務中 初建表後即添數據

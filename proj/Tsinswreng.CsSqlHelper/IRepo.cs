@@ -13,6 +13,16 @@ public partial interface IRepo<TEntity, TId>{
 	);
 
 	public Task<Func<
+		TEntity
+		,CT
+		,Task<nil>
+	>> FnInsertOne(
+		IDbFnCtx? Ctx
+		,CT Ct
+	);
+
+
+	public Task<Func<
 		CT
 		,Task<u64>
 	>> FnCount(
