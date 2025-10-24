@@ -313,10 +313,10 @@ public static class ExtnITable{
 
 	public static str UpdateClause(
 		this ITable z
-		,IEnumerable<str> RawFields
+		,IEnumerable<str> UpperFields
 	){
 		List<str> segs = [];
-		foreach(var rawField in RawFields){
+		foreach(var rawField in UpperFields){
 			var field = z.Fld(rawField);
 			var param = z.Prm(rawField);
 			segs.Add(field + " = " + param);

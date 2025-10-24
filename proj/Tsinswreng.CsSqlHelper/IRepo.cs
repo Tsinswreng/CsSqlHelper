@@ -76,9 +76,9 @@ public partial interface IRepo<TEntity, TId>{
 	public Task<Func<
 		TEntity
 		,CT, Task<nil>
-	>> FnUpdById(
+	>> FnUpdOneById(
 		IDbFnCtx? Ctx
-		,IEnumerable<str>? FieldsToUpdate
+		,IEnumerable<str>? UpperFieldsToUpdate
 		,CT Ct
 	);
 
@@ -88,7 +88,7 @@ public partial interface IRepo<TEntity, TId>{
 		,Task<nil>
 	>> FnUpdManyById(
 		IDbFnCtx? Ctx
-		,IEnumerable<str>? FieldsToUpdate
+		,IEnumerable<str>? UpperFieldsToUpdate
 		,CT Ct
 	);
 

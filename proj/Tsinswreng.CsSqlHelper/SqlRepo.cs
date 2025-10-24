@@ -249,7 +249,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 	///
 	/// </summary>
 	/// <param name="Ctx"></param>
-	/// <param name="FieldsToUpdate">潙null旹更新全部字段</param>
+	/// <param name="UpperFieldsToUpdate">潙null旹更新全部字段</param>
 	/// <param name="Ct"></param>
 	/// <returns></returns>
 	public async Task<Func<
@@ -258,14 +258,14 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		,CT, Task<nil>
 	>> FnUpdByIdOld(
 		IDbFnCtx? Ctx
-		,IEnumerable<str>? FieldsToUpdate
+		,IEnumerable<str>? UpperFieldsToUpdate
 		,CT Ct
 	){
 		var T = TblMgr.GetTbl<TEntity>();
 		var NId = T.CodeIdName;
-		FieldsToUpdate = FieldsToUpdate??T.Columns.Keys;
-		var Clause = T.UpdateClause(FieldsToUpdate);
-		var FieldsToUpdateMap = FieldsToUpdate.ToHashSet();
+		UpperFieldsToUpdate = UpperFieldsToUpdate??T.Columns.Keys;
+		var Clause = T.UpdateClause(UpperFieldsToUpdate);
+		var FieldsToUpdateMap = UpperFieldsToUpdate.ToHashSet();
 		var Sql =
 $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
@@ -287,22 +287,22 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 	///
 	/// </summary>
 	/// <param name="Ctx"></param>
-	/// <param name="FieldsToUpdate">潙null旹更新全部字段</param>
+	/// <param name="UpperFieldsToUpdate">潙null旹更新全部字段</param>
 	/// <param name="Ct"></param>
 	/// <returns></returns>
 	public async Task<Func<
 		TEntity
 		,CT, Task<nil>
-	>> FnUpdById(
+	>> FnUpdOneById(
 		IDbFnCtx? Ctx
-		,IEnumerable<str>? FieldsToUpdate
+		,IEnumerable<str>? UpperFieldsToUpdate
 		,CT Ct
 	){
 		var T = TblMgr.GetTbl<TEntity>();
 		var NId = T.CodeIdName;
-		FieldsToUpdate = FieldsToUpdate??T.Columns.Keys;
-		var Clause = T.UpdateClause(FieldsToUpdate);
-		var FieldsToUpdateMap = FieldsToUpdate.ToHashSet();
+		UpperFieldsToUpdate = UpperFieldsToUpdate??T.Columns.Keys;
+		var Clause = T.UpdateClause(UpperFieldsToUpdate);
+		var FieldsToUpdateMap = UpperFieldsToUpdate.ToHashSet();
 		var Sql =
 $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
@@ -333,7 +333,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		,IEnumerable<str>? FieldsToUpdate
 		,CT Ct
 	){
-		var UpdById = await FnUpdById(Ctx, FieldsToUpdate, Ct);
+		var UpdById = await FnUpdOneById(Ctx, FieldsToUpdate, Ct);
 		return async(Entitys, Ct)=>{
 			foreach(var e in Entitys){
 				await UpdById(e, Ct);
