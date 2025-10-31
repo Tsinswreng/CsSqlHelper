@@ -1,10 +1,12 @@
 namespace Tsinswreng.CsSqlHelper.Postgres;
 
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Npgsql;
 using Tsinswreng.CsCore;
 
 public partial class PostgresCmd: ISqlCmd{
+	public IList<Func<Task<nil>>> FnsOnDispose{get;set;} = new List<Func<Task<nil>>>();
 	public NpgsqlCommand RawCmd{get;set;}
 	public str? Sql{get;set;}
 	public PostgresCmd(NpgsqlCommand DbCmd){
@@ -103,11 +105,18 @@ public partial class PostgresCmd: ISqlCmd{
 
 
 	public void Dispose(){
-		RawCmd.Dispose();
+		var R = DisposeAsync();
+		// RawCmd.Dispose();
+		// foreach(var fn in FnsOnDispose){
+		// 	fn();
+		// }
 	}
-	public ValueTask DisposeAsync(){
+	public async ValueTask DisposeAsync(){
 		RawCmd.Dispose();
-		return default;
+		foreach(var fn in FnsOnDispose){
+			await fn();
+		}
+		return;
 	}
 
 }

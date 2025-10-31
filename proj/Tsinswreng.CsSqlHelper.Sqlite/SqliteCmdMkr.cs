@@ -18,9 +18,9 @@ public partial class SqliteCmdMkr
 	// 	this.DbConnection = DbConnection;
 	// }
 
-	public I_GetDbConnAsy DbConnGetter{get;set;}
+	public IDbConnMgr DbConnGetter{get;set;}
 
-	public SqliteCmdMkr(I_GetDbConnAsy DbConnGetter){
+	public SqliteCmdMkr(IDbConnMgr DbConnGetter){
 		this.DbConnGetter = DbConnGetter;
 	}
 
@@ -36,11 +36,14 @@ public partial class SqliteCmdMkr
 		}
 		var RawCmd = sqlConn.CreateCommand();
 		RawCmd.CommandText = Sql;
-		var ans = new SqliteCmd(RawCmd);
+		var R = new SqliteCmd(RawCmd);
 		if(DbFnCtx!= null){
-			ans.WithCtx(DbFnCtx);
+			R.WithCtx(DbFnCtx);
 		}
-		return ans;
+		R.FnsOnDispose.Add(async()=>{
+			return await DbConnGetter.AfterUsingConnAsy(DbConnection, default);
+		});
+		return R;
 	}
 
 	[Impl(typeof(ISqlCmdMkr))]

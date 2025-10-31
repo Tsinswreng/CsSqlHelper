@@ -11,6 +11,7 @@ public partial class SqliteCmd
 	,IAsyncDisposable
 {
 	public SqliteCommand RawCmd{get;set;}
+	public IList<Func<Task<nil>>> FnsOnDispose{get;set;} = new List<Func<Task<nil>>>();
 	public str? Sql{get;set;}
 	public SqliteCmd(SqliteCommand DbCmd){
 		RawCmd = DbCmd;

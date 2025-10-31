@@ -1,11 +1,18 @@
-using System.Threading.Tasks;
-
 namespace Tsinswreng.CsSqlHelper;
 
+public class EvtArgDispose: EventArgs{
+
+}
+
+
+
 public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
+	/// <summary>
+	/// dispose旹 額外ᵈ珩之諸操作
+	/// </summary>
+	public IList<Func<Task<nil>>> FnsOnDispose{get;set;}
 	public str? Sql{get;set;}
 	public IAsyncEnumerable<IDictionary<str, obj?>> IterIAsy(CT Ct);
-
 	public Task<IList<IDictionary<str, obj?>>> All(CT Ct);
 
 	/// <summary>

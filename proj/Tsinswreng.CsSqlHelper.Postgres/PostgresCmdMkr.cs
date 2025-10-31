@@ -13,8 +13,8 @@ public partial class PostgresCmdMkr
 	// 	this.DbConnection = DbConnection;
 	// }
 
-	public I_GetDbConnAsy DbConnGetter{get;set;}
-	public PostgresCmdMkr(I_GetDbConnAsy DbConnGetter){
+	public IDbConnMgr DbConnGetter{get;set;}
+	public PostgresCmdMkr(IDbConnMgr DbConnGetter){
 		this.DbConnGetter = DbConnGetter;
 	}
 
@@ -30,11 +30,14 @@ public partial class PostgresCmdMkr
 		}
 		var RawCmd = sqlConn.CreateCommand();
 		RawCmd.CommandText = Sql;
-		var ans = new PostgresCmd(RawCmd);
+		var R = new PostgresCmd(RawCmd);
 		if(DbFnCtx!= null){
-			ans.WithCtx(DbFnCtx);
+			R.WithCtx(DbFnCtx);
 		}
-		return ans;
+		R.FnsOnDispose.Add(async()=>{
+			return await DbConnGetter.AfterUsingConnAsy(DbConnection, default);
+		});
+		return R;
 	}
 
 	/// <summary>
