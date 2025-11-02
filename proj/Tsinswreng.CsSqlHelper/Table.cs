@@ -3,11 +3,13 @@ namespace Tsinswreng.CsSqlHelper;
 
 using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
+using Tsinswreng.CsPage;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 
 
 public partial class Table:ITable{
+	public ITblMgr? TblMgr{get;set;}
 	public IDictMapperShallow DictMapper{get;set;}
 	public Type CodeEntityType{get;set;}
 	#pragma warning disable CS8618
@@ -479,6 +481,17 @@ CREATE TABLE IF NOT EXISTS {z.Qt(z.DbTblName)}(
 {FmtOuterSqls(z.OuterAdditionalSqls)}
 """;
 		return S;
+	}
+
+
+	public static IPageQry PageSlctAll(this ITable z){
+		var R = new PageQry();
+		if(z.TblMgr?.DbSrcType == ConstDbSrcType.Postgres){
+			R.PageSize = i64.MaxValue;
+		}else{
+			R.PageSize = u64.MaxValue;
+		}
+		return R;
 	}
 
 

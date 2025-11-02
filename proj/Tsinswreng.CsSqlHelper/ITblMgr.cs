@@ -13,6 +13,7 @@ public partial interface ITblMgr{
 	// }
 	public void AddTbl(ITable Tbl){
 		Tbl.SqlMkr = SqlMkr;
+		Tbl.TblMgr = this;
 		//EntityType_Tbl.Add(Tbl.CodeEntityType, Tbl);
 		EntityType_Tbl[Tbl.CodeEntityType] = Tbl;
 	}

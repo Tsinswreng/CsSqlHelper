@@ -10,6 +10,7 @@ using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 /// Table in database
 /// </summary>
 public partial interface ITable{
+	public ITblMgr? TblMgr{get;set;}
 	/// <summary>
 	/// mapper to convert between object and dictionary
 	/// </summary>

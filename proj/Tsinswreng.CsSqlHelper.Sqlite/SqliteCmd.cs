@@ -81,7 +81,7 @@ public partial class SqliteCmd
 		return CodeVal;
 	}
 
-	public async IAsyncEnumerable<IDictionary<str, obj?>> IterIAsy(
+	public async IAsyncEnumerable<IDictionary<str, obj?>> IterAsyE(
 		[EnumeratorCancellation]
 		CT Ct
 	){

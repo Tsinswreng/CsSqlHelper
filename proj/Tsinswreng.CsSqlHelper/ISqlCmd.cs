@@ -12,7 +12,7 @@ public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 	/// </summary>
 	public IList<Func<Task<nil>>> FnsOnDispose{get;set;}
 	public str? Sql{get;set;}
-	public IAsyncEnumerable<IDictionary<str, obj?>> IterIAsy(CT Ct);
+	public IAsyncEnumerable<IDictionary<str, obj?>> IterAsyE(CT Ct);
 	public Task<IList<IDictionary<str, obj?>>> All(CT Ct);
 
 	/// <summary>
@@ -63,7 +63,7 @@ public static class ExtnISqlCmd{
 		z?.AddToDispose(R);
 		return R;
 	}
-	public static ISqlCmd Attach<TSelf>(
+	public static ISqlCmd RunCmd<TSelf>(
 		this TSelf? z
 		,ISqlCmd Cmd
 		,IArgDict Arg
@@ -76,7 +76,7 @@ public static class ExtnISqlCmd{
 	public static async Task<IDictionary<str, obj?>> DictFirst(
 		this ISqlCmd z, CT Ct
 	){
-		var AsyE = z.IterIAsy(Ct);
+		var AsyE = z.IterAsyE(Ct);
 		var i = 0;
 		IDictionary<str, obj?> R = null!;
 		await foreach(var e in AsyE){
@@ -95,7 +95,7 @@ public static class ExtnISqlCmd{
 	public static async Task<T?> FirstOrDefault<T>(
 		this ISqlCmd z, ITable Tbl, CT Ct
 	)where T:new(){
-		var AsyE = z.IterIAsy(Ct);
+		var AsyE = z.IterAsyE(Ct);
 		var i = 0;
 		IDictionary<str, obj?> Dict = null!;
 		await foreach(var e in AsyE){
@@ -127,7 +127,7 @@ public static class ExtnISqlCmd{
 	public static async Task<IDictionary<str, obj?>?> DictFirstOrDefault(
 		this ISqlCmd z, CT Ct
 	){
-		var AsyE = z.IterIAsy(Ct);
+		var AsyE = z.IterAsyE(Ct);
 		var i = 0;
 		IDictionary<str, obj?> R = null!;
 		await foreach(var e in AsyE){

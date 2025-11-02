@@ -62,21 +62,25 @@ public partial class PostgresCmd: ISqlCmd{
 /// </summary>
 /// <param name="DbVal"></param>
 /// <returns></returns>
-	public object? DbValToCodeVal(object? DbVal){
+	public obj? DbValToCodeVal(obj? DbVal){
 		if(DbVal is DBNull){
 			return null!;
 		}
 		return DbVal;
 	}
 
-	public object? CodeValToDbVal(object? CodeVal){
+	public obj? CodeValToDbVal(obj? CodeVal){
 		if(CodeVal == null){
 			return DBNull.Value;
+		}
+		if(CodeVal is UInt64){
+//  System.NotSupportedException: The CLR type System.UInt64 isn't natively supported by Npgsql or your PostgreSQL. To use it with a PostgreSQL composite you need to specify DataTypeName or to map it, please refer to the documentation.
+			return Convert.ToInt64(CodeVal);
 		}
 		return CodeVal;
 	}
 
-	public async IAsyncEnumerable<IDictionary<str, object?>> IterIAsy(
+	public async IAsyncEnumerable<IDictionary<str, object?>> IterAsyE(
 		[EnumeratorCancellation]
 		CT ct
 	){
