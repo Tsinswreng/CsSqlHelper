@@ -331,14 +331,55 @@ public static class ExtnITable{
 		,IEnumerable<str> RawFields
 	){
 		List<str> Fields = [];
-		List<str> Params = [];
+		List<IParam> Params = [];
 		foreach(var rawField in RawFields){
 			var field = z.Fld(rawField);
-			var param = z.Prm(rawField).ToString()??"";
+			var param = z.Prm(rawField);
 			Fields.Add(field);
 			Params.Add(param);
 		}
 		return "(" + string.Join(", ", Fields) + ") VALUES (" + string.Join(", ", Params) + ")";
+	}
+
+	public static str InsertManyClause(
+		this ITable z
+		,IEnumerable<str> RawFields
+		,u64 GroupCnt = 1000
+	){
+		IList<str> Fields = [];
+		foreach(var rawField in RawFields){
+			var field = z.Fld(rawField);
+			var param = z.Prm(rawField);
+			Fields.Add(field);
+		}
+
+
+		IList<IList<IParam>> ParamLists = [];
+		for(u64 i = 0; i < GroupCnt; i++){
+			IList<IParam> Params = [];
+			foreach(var rawField in RawFields){
+				var param = z.NumFieldParam(rawField, i);
+				Params.Add(param);
+			}
+			ParamLists.Add(Params);
+		}
+		var sqlFieldsValus = "(" + string.Join(", ", Fields) + ") VALUES";
+
+		List<str> R = [];
+		//R.Add(sqlFieldsValus);
+		for(u64 i = 0; i < GroupCnt; i++){
+			var ParamList = ParamLists[i.ToI32()];
+			R.Add(" (" + string.Join(", ", ParamList) + ")");
+		}
+
+		return sqlFieldsValus+" "+string.Join(", ", R);
+	}
+
+	public static IParam NumFieldParam(
+		this ITable z
+		,str Field, u64 Num
+	){
+		return z.Prm(Field+"__"+Num);
 	}
 
 

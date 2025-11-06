@@ -7,6 +7,7 @@ using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;
 using Tsinswreng.CsPage;
+using System.Collections;
 
 
 //using T = Bo_Word;
@@ -115,12 +116,12 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 
 	//public class _ClsInsrtMany<E,I>(SqlRepo<E,I> z)
 
-//TODO 用多值插入語法、免 for循環中多次查詢
+	[Obsolete("用多值插入語法、免 for循環中多次查詢")]
 	protected async Task<Func<
 		IEnumerable<TEntity>
 		,CT
 		,Task<nil>
-	>> _FnInsertMany(
+	>> _FnInsertManyOld(
 		IDbFnCtx? Ctx
 		,bool Prepare
 		,CT Ct
@@ -148,7 +149,116 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		return Fn;
 	}
 
+	public class CfgInsertMany{
+		public bool Prepare = true;
+		/// <summary>
+		/// 餘ʹ數據量ˋ逾此則用大批插入
+		/// </summary>
+		public u64 FullBatchSize = 900;//Sqlite最多支持999個參數
+		/// <summary>
+		/// 餘ʹ數據量ˋ不足FullBatchSize則試小批插入
+		/// </summary>
+		public u64 SmallBatchSize = 50;
+		//public u64 BatchSize = 4;
+	}
 
+	protected async Task<Func<
+		IEnumerable<TEntity>,CT,Task<nil>
+	>> _FnInsertMany(
+		IDbFnCtx? Ctx,CfgInsertMany? Cfg,CT Ct
+	){
+		var T = TblMgr.GetTbl<TEntity>();
+		Cfg??=new();
+
+		var mkCmd = async(u64 BatchSize)=>{
+			var Clause = T.InsertManyClause(T.Columns.Keys, BatchSize);
+			var Sql =
+	$"INSERT INTO {T.Qt(T.DbTblName)} {Clause}"; //TODO INSERT INTO 多值插入 不被oracle支持
+			var Cmd = await SqlCmdMkr.MkCmd(Ctx, Sql, Ct);
+			if(Cfg.Prepare){
+				Cmd = await SqlCmdMkr.Prepare(Cmd, Ct);
+			}
+			Ctx?.AddToDispose(Cmd);
+			return Cmd;
+		};
+
+		u64 SmallSize = Cfg.SmallBatchSize;
+		var CmdFullSize = await mkCmd(Cfg.FullBatchSize);//大批 插入 sql命令
+		var CmdSmallSize = await mkCmd(SmallSize); // 小批插入sql命令
+		var CmdOne = await mkCmd(1);// 插入單條實體
+
+		var Cmd = CmdFullSize;
+
+		return async(IEnumerable<TEntity> Entitys,CT Ct)=>{
+			//插入一批
+			var OneBatch = async(ISqlCmd Cmd,  IList<IDictionary<string, object?>> ArgDicts)=>{
+				var FullArgDict = new Dictionary<str, obj?>();
+				u64 i = 0;
+				foreach(var ArgDict in ArgDicts){
+					foreach(var (k,v) in ArgDict){
+						FullArgDict[T.NumFieldParam(k,(u64)i).Name] = v;
+					}
+					i++;
+				}
+				await Cmd.RawArgs(FullArgDict).IterAsyE(Ct).FirstOrDefaultAsync(Ct);
+			};
+
+			await using var BatchList = new BatchListAsy<IDictionary<str, obj?>,nil>(
+				async(ArgDicts, Ct)=>{
+					if((u64)ArgDicts.Count >= Cfg.FullBatchSize){
+						await OneBatch(Cmd, ArgDicts);
+					}else{
+						var (SmallBatchCnt, Remainder) = DivideWithRemainder(
+							(u64)ArgDicts.Count, SmallSize
+						);
+						var Reversed = ArgDicts.Reverse().ToList();
+						for(u64 i = 0; i < SmallBatchCnt; i++){
+							await OneBatch(
+								CmdSmallSize
+								,PopMany(Reversed, SmallSize)
+							);
+						}
+						for(u64 i = 0; i < Remainder; i++){
+							await OneBatch(
+								CmdOne, PopMany(Reversed, 1)
+							);
+						}
+					}
+
+					return NIL;
+				}
+				,Cfg.FullBatchSize
+			);
+
+			foreach(var (i,entity) in Entitys.Index()){
+				var CodeDict = DictMapper.ToDictShallowT(entity);
+				var DbDict = T.ToDbDict(CodeDict);
+				await BatchList.Add(DbDict, Ct);
+			}
+			await BatchList.End(Ct);
+			return NIL;
+		};
+	}
+	static IList<T> PopMany<T>(IList<T> list, u64 cnt) {
+		var R = new List<T>();
+		for(u64 i = 0; i < cnt; i++){
+			var item = list[list.Count - 1];
+			list.RemoveAt(list.Count - 1);
+			R.Add(item);
+		}
+		return R;
+	}
+	public static (u64 quotient, u64 remainder) DivideWithRemainder(
+		u64 dividend, u64 divisor
+	){
+		if (divisor == 0)
+			throw new ArgumentException("除數不可為 0", nameof(divisor));
+
+		u64 quotient = dividend / divisor;
+		u64 remainder = dividend % divisor;
+
+		return (quotient, remainder);
+	}
 
 	[Impl]
 	public async Task<Func<
@@ -159,7 +269,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		IDbFnCtx? Ctx
 		,CT Ct
 	){
-		return await _FnInsertMany(Ctx, true, Ct);
+		return await _FnInsertMany(Ctx, null, Ct);
 	}
 
 	public async Task<Func<
@@ -182,7 +292,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 /// 不預編譯。適用于況芝 在事務中 初建表後即添數據
 /// </summary>
 /// <param name="Ctx"></param>
-/// <param name="ct"></param>
+/// <param name="Ct"></param>
 /// <returns></returns>
 	public async Task<Func<
 		IEnumerable<TEntity>
@@ -190,9 +300,9 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		,Task<nil>
 	>> FnInsertManyNoPrepare(
 		IDbFnCtx? Ctx
-		,CT ct
+		,CT Ct
 	){
-		return await _FnInsertMany(Ctx, false, ct);
+		return await _FnInsertMany(Ctx, new CfgInsertMany{Prepare = false}, Ct);
 	}
 
 
