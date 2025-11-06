@@ -85,13 +85,29 @@ public static class ExtnColBldr{
 		return MapType(z, Fns);
 	}
 
-	public static Self MapEnumTypeInt32<TEnum>(
+	public static Self MapEnumToInt32<TEnum>(
 		this Self z
 	)where TEnum : struct, Enum{
 		z.MapType<i32, TEnum>(
 			(raw)=>(TEnum)(obj)(raw)
 			,(upper)=>(i32)(obj)upper
 			,ObjToRaw: (obj)=>Convert.ToInt32(obj)
+		);
+		return z;
+	}
+
+	public static Self MapEnumToStr<TEnum>(
+		this Self z
+	)where TEnum : struct, Enum{
+		z.MapType<str, TEnum>(
+			(raw)=>{
+				if (Enum.TryParse(typeof(TEnum), raw, ignoreCase: false, out obj? obj)){
+					return (TEnum)obj;
+				}
+				throw new ArgumentException($"'{raw}' is not valid {typeof(TEnum).Name}");
+			}
+			,(upper)=>upper.ToString()
+			//,ObjToRaw: (obj)=>Convert.ToInt32(obj)
 		);
 		return z;
 	}

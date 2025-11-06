@@ -138,12 +138,10 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			IEnumerable<TEntity> Entitys
 			,CT ct
 		)=>{
-			var i = 0;
-			foreach(var entity in Entitys){
+			foreach(var (i,entity) in Entitys.Index()){
 				var CodeDict = DictMapper.ToDictShallowT(entity);
 				var DbDict = T.ToDbDict(CodeDict);
 				await Cmd.RawArgs(DbDict).IterAsyE(ct).FirstOrDefaultAsync(ct);
-				i++;
 			}
 			return NIL;
 		};

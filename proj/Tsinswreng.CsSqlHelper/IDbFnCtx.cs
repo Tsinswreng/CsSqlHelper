@@ -1,9 +1,12 @@
+using System.Data;
+
 namespace Tsinswreng.CsSqlHelper;
 
 public partial interface IBaseDbFnCtx
 	:IAsyncDisposable
 {
 	public ITxn? Txn{get;set;}
+	public IDbConnection? DbConn{get;set;}
 	public IDictionary<str, obj?>? Props{get;set;}
 	public ICollection<obj?>? ObjsToDispose{get;set;}
 #if Impl

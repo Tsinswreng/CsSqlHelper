@@ -30,7 +30,7 @@ public partial class SqliteCmdMkr
 		,str Sql
 		,CT Ct
 	){
-		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+		var DbConnection = DbFnCtx?.DbConn?? await DbConnGetter.GetConnAsy(Ct);
 		if(DbConnection is not SqliteConnection sqlConn){
 			throw new InvalidOperationException("DbConnection is not SqlConnection");
 		}
@@ -74,9 +74,20 @@ public partial class SqliteCmdMkr
 		return await Prepare(Cmd, Ct);
 	}
 
+	// [Impl(typeof(I_GetTxnAsy))]
+	// public async Task<ITxn> GetTxnAsy(CT Ct){
+	// 	var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+	// 	var Tx = DbConnection.BeginTransaction();
+	// 	var Ans = new AdoTxn(Tx);
+	// 	return Ans;
+	// }
+
 	[Impl(typeof(I_GetTxnAsy))]
-	public async Task<ITxn> GetTxnAsy(CT Ct){
+	public async Task<ITxn> GetTxnAsy(
+		IBaseDbFnCtx Ctx, CT Ct
+	){
 		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+		Ctx.DbConn = DbConnection;
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
 		return Ans;

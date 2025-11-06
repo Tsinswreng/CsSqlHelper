@@ -1,12 +1,12 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public  partial interface IDbFnCtxMkr<TDbFnCtx>
+public partial interface IDbFnCtxMkr<TDbFnCtx>
 	where TDbFnCtx: IBaseDbFnCtx, new()
 {
 	public I_GetTxnAsy TxnGetter{get;set;}
 	public async Task<TDbFnCtx> MkTxnDbFnCtxAsy(CT Ct){
 		var R = new TDbFnCtx();
-		R.Txn = await TxnGetter.GetTxnAsy(Ct);
+		R.Txn = await TxnGetter.GetTxnAsy(R, Ct);
 		return R;
 	}
 }

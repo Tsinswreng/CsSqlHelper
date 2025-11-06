@@ -24,7 +24,7 @@ public partial class PostgresCmdMkr
 		,str Sql
 		,CT Ct
 	){
-		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+		var DbConnection = DbFnCtx?.DbConn??await DbConnGetter.GetConnAsy(Ct);
 		if(DbConnection is not NpgsqlConnection sqlConn){
 			throw new InvalidOperationException("DbConnection is not NpgsqlConnection");
 		}
@@ -72,8 +72,19 @@ public partial class PostgresCmdMkr
 		return await Prepare(Cmd, Ct);
 	}
 
-	public async Task<ITxn> GetTxnAsy(CT Ct){
+	// [Obsolete]
+	// public async Task<ITxn> GetTxnAsy(CT Ct){
+	// 	var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+	// 	var Tx = DbConnection.BeginTransaction();
+	// 	var Ans = new AdoTxn(Tx);
+	// 	return Ans;
+	// }
+
+	public async Task<ITxn> GetTxnAsy(
+		IBaseDbFnCtx Ctx, CT Ct
+	){
 		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+		Ctx.DbConn = DbConnection;
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
 		return Ans;

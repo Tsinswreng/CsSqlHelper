@@ -82,10 +82,10 @@ public partial class PostgresCmd: ISqlCmd{
 
 	public async IAsyncEnumerable<IDictionary<str, object?>> IterAsyE(
 		[EnumeratorCancellation]
-		CT ct
+		CT Ct
 	){
-		using var Reader = await RawCmd.ExecuteReaderAsync(ct);
-		while(await Reader.ReadAsync(ct)){
+		using var Reader = await RawCmd.ExecuteReaderAsync(Ct);
+		while(await Reader.ReadAsync(Ct)){
 			var RawDict = new Dictionary<str, object?>();
 			for(int i = 0; i < Reader.FieldCount; i++){
 				RawDict.Add(Reader.GetName(i), DbValToCodeVal(Reader.GetValue(i)));
