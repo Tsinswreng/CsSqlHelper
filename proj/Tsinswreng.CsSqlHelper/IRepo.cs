@@ -34,7 +34,7 @@ public partial interface IRepo<TEntity, TId>{
 		TId
 		,CT
 		,Task<TEntity?>
-	>> FnSlctById(
+	>> FnSlctOneById(
 		IDbFnCtx? Ctx
 		,CT Ct
 	);

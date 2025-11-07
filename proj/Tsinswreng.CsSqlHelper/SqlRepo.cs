@@ -8,6 +8,7 @@ using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;
 using Tsinswreng.CsPage;
 using System.Collections;
+using System.Diagnostics;
 
 
 //using T = Bo_Word;
@@ -116,12 +117,18 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 
 	//public class _ClsInsrtMany<E,I>(SqlRepo<E,I> z)
 
-	[Obsolete("用多值插入語法、免 for循環中多次查詢")]
+	/// <summary>
+	/// 適用sqlite
+	/// </summary>
+	/// <param name="Ctx"></param>
+	/// <param name="Prepare"></param>
+	/// <param name="Ct"></param>
+	/// <returns></returns>
 	protected async Task<Func<
 		IEnumerable<TEntity>
 		,CT
 		,Task<nil>
-	>> _FnInsertManyOld(
+	>> _FnInsertManyLoop(
 		IDbFnCtx? Ctx
 		,bool Prepare
 		,CT Ct
@@ -140,9 +147,12 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			,CT ct
 		)=>{
 			foreach(var (i,entity) in Entitys.Index()){
+				//var sw = Stopwatch.StartNew();
 				var CodeDict = DictMapper.ToDictShallowT(entity);
 				var DbDict = T.ToDbDict(CodeDict);
 				await Cmd.RawArgs(DbDict).IterAsyE(ct).FirstOrDefaultAsync(ct);
+				//sw.Stop();
+				//Console.WriteLine($"loog:{i}: {sw.ElapsedMilliseconds}");
 			}
 			return NIL;
 		};
@@ -154,11 +164,11 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		/// <summary>
 		/// 餘ʹ數據量ˋ逾此則用大批插入
 		/// </summary>
-		public u64 FullBatchSize = 900;//Sqlite最多支持999個參數
+		public u64 FullBatchSize = 500;//Sqlite最多支持999個參數
 		/// <summary>
 		/// 餘ʹ數據量ˋ不足FullBatchSize則試小批插入
 		/// </summary>
-		public u64 SmallBatchSize = 50;
+		public u64 SmallBatchSize = 20;
 		//public u64 BatchSize = 4;
 	}
 
@@ -167,8 +177,13 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 	>> _FnInsertMany(
 		IDbFnCtx? Ctx,CfgInsertMany? Cfg,CT Ct
 	){
-		var T = TblMgr.GetTbl<TEntity>();
 		Cfg??=new();
+		var T = TblMgr.GetTbl<TEntity>();
+
+		if(T.TblMgr?.DbSrcType == ConstDbSrcType.Sqlite){
+			var old = await _FnInsertManyLoop(Ctx, Cfg.Prepare, Ct);
+			return old;
+		}
 
 		var mkCmd = async(u64 BatchSize)=>{
 			var Clause = T.InsertManyClause(T.Columns.Keys, BatchSize);
@@ -190,6 +205,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Cmd = CmdFullSize;
 
 		return async(IEnumerable<TEntity> Entitys,CT Ct)=>{
+			//System.Console.WriteLine(typeof(TEntity));
 			//插入一批
 			var OneBatch = async(ISqlCmd Cmd,  IList<IDictionary<string, object?>> ArgDicts)=>{
 				var FullArgDict = new Dictionary<str, obj?>();
@@ -206,22 +222,37 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			await using var BatchList = new BatchListAsy<IDictionary<str, obj?>,nil>(
 				async(ArgDicts, Ct)=>{
 					if((u64)ArgDicts.Count >= Cfg.FullBatchSize){
+						//var sw = Stopwatch.StartNew();
 						await OneBatch(Cmd, ArgDicts);
+						//sw.Stop();
+						// System.Console.WriteLine(
+						// 	$"FullBatch:{sw.Elapsed.TotalMilliseconds}ms"
+						// );
 					}else{
 						var (SmallBatchCnt, Remainder) = DivideWithRemainder(
 							(u64)ArgDicts.Count, SmallSize
 						);
 						var Reversed = ArgDicts.Reverse().ToList();
 						for(u64 i = 0; i < SmallBatchCnt; i++){
+							//var sw = Stopwatch.StartNew();
 							await OneBatch(
 								CmdSmallSize
 								,PopMany(Reversed, SmallSize)
 							);
+							// sw.Stop();
+							// System.Console.WriteLine(
+							// 	$"SmallBatch:{sw.Elapsed.TotalMilliseconds}ms"
+							// );
 						}
 						for(u64 i = 0; i < Remainder; i++){
+							//var sw = Stopwatch.StartNew();
 							await OneBatch(
 								CmdOne, PopMany(Reversed, 1)
 							);
+							//sw.Stop();
+							// System.Console.WriteLine(
+							// 	$"OneBatch:{sw.Elapsed.TotalMilliseconds}ms"
+							// );
 						}
 					}
 
@@ -311,7 +342,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		TId
 		,CT
 		,Task<TEntity?>
-	>> FnSlctById(
+	>> FnSlctOneById(
 		IDbFnCtx? Ctx
 		,CT Ct
 	){
@@ -320,10 +351,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Sql = $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} = {Params[0]}" ;
 		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		Ctx?.AddToDisposeAsy(Cmd);
-		var Fn = async(
-			TId Id
-			,CT Ct
-		)=>{
+		return async(Id ,Ct)=>{
 			var IdCol = T.Columns[T.CodeIdName];
 			var ConvertedId = IdCol.UpperToRaw?.Invoke(Id)??Id;
 			var RawDict = await Cmd
@@ -338,7 +366,33 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			DictMapper.AssignShallowT(R, CodeDict);
 			return R;
 		};
-		return Fn;
+	}
+
+	[Impl]
+	public async Task<Func<
+		IEnumerable<TId>
+		,CT
+		,Task<IList<TEntity?>>
+	>> FnSlctListByIds(//TODO 改潙真批量
+		IDbFnCtx? Ctx
+		,CT Ct
+	){
+		var SlctOneById = await FnSlctOneById(Ctx, Ct);
+		return async(Ids, Ct)=>{
+			var R = new List<TEntity?>();
+			foreach(var Id in Ids){
+				var R1 = await SlctOneById(Id, Ct);
+				R.Add(R1);
+			}
+			return R;
+		};
+		// async IAsyncEnumerable<TEntity?> Fn(IEnumerable<TId>Ids, CT Ct){
+		// 	var R = new List<TEntity?>();
+		// 	foreach(var Id in Ids){
+		// 		var R1 = await SlctOneById(Id, Ct);
+		// 		yield return R1;
+		// 	}
+		// };
 	}
 
 // 	[Impl]
