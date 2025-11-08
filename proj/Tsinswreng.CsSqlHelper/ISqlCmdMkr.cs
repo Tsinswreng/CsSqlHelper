@@ -17,17 +17,27 @@ public partial interface ISqlCmdMkr{
 		,CT Ct
 	);
 
+	public Task<ISqlCmd> Prepare(
+		IBaseDbFnCtx? DbFnCtx
+		,ISql Sql
+		,CT Ct
+	){
+		return Prepare(DbFnCtx, Sql.RawStr, Ct);
+	}
+
 /// <summary>
 /// 無prepare、適用于CREATE TABLE等
 /// </summary>
 /// <param name="DbFnCtx"></param>
 /// <param name="Sql"></param>
-/// <param name="ct"></param>
+/// <param name="Ct"></param>
 /// <returns></returns>
 	public Task<ISqlCmd> MkCmd(
 		IBaseDbFnCtx? DbFnCtx
 		,str Sql
-		,CT ct
+		,CT Ct
 	);
 
 }
+
+

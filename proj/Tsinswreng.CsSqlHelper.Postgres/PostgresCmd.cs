@@ -1,5 +1,6 @@
 namespace Tsinswreng.CsSqlHelper.Postgres;
 
+using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Npgsql;
@@ -100,11 +101,33 @@ public partial class PostgresCmd: ISqlCmd{
 
 		while (await reader.ReadAsync(Ct)){
 			var row = new Dictionary<str, obj?>(reader.FieldCount);
-			for (var i = 0; i < reader.FieldCount; i++)
+			for (var i = 0; i < reader.FieldCount; i++){
 				row[reader.GetName(i)] = DbValToCodeVal(reader.GetValue(i));
+			}
 			result.Add(row);
 		}
 		return result;
+	}
+
+
+	public async Task<IList<
+		IList<IDictionary<str, obj?>>>
+	> All2d(CT Ct){
+		using var reader = await RawCmd.ExecuteReaderAsync(Ct);
+		var result2d = new List<IList<IDictionary<str, obj?>>>();
+
+		do{
+			var result = new List<IDictionary<str, obj?>>();
+			while (await reader.ReadAsync(Ct)){
+				var row = new Dictionary<str, obj?>(reader.FieldCount);
+				for (var i = 0; i < reader.FieldCount; i++){
+					row[reader.GetName(i)] = DbValToCodeVal(reader.GetValue(i));
+				}
+				result.Add(row);
+			}
+			result2d.Add(result);
+		}while(await reader.NextResultAsync(Ct));
+		return result2d;
 	}
 
 

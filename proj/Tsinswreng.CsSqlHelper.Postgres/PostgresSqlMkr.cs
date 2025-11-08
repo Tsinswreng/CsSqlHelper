@@ -17,7 +17,7 @@ public partial class PostgresSqlMkr
 	}
 
 	public IParam Param(str Name){
-		var R = new PostgresParam(Name);
+		var R = new Param(Name, PostgresParamPrefix.Inst);
 		return R;
 	}
 

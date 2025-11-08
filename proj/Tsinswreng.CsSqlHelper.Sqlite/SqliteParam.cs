@@ -1,11 +1,11 @@
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 
-public partial class SqliteParam:IParam{
-	public str Name{get;set;} = "";
-	public SqliteParam(str Name){
-		this.Name = Name;
-	}
-	public override string ToString() {
+public class SqliteParamPrefix:I_AddParamPrefix{
+protected static SqliteParamPrefix? _Inst = null;
+public static SqliteParamPrefix Inst => _Inst??= new SqliteParamPrefix();
+
+	public str AddParamPrefix(str Name){
 		return "@"+Name;
 	}
 }
+

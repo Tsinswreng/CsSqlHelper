@@ -16,7 +16,7 @@ public partial class SqliteSqlMkr
 	}
 
 	public IParam Param(str Name){
-		var R = new SqliteParam(Name);
+		var R = new Param(Name, SqliteParamPrefix.Inst);
 		return R;
 	}
 

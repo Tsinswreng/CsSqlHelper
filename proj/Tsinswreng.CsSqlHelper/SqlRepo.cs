@@ -207,7 +207,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		return async(IEnumerable<TEntity> Entitys,CT Ct)=>{
 			//System.Console.WriteLine(typeof(TEntity));
 			//插入一批
-			var OneBatch = async(ISqlCmd Cmd,  IList<IDictionary<string, object?>> ArgDicts)=>{
+			var OneBatch = async(ISqlCmd Cmd, IList<IDictionary<string, object?>> ArgDicts)=>{
 				var FullArgDict = new Dictionary<str, obj?>();
 				u64 i = 0;
 				foreach(var ArgDict in ArgDicts){
@@ -219,7 +219,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 				await Cmd.RawArgs(FullArgDict).IterAsyE(Ct).FirstOrDefaultAsync(Ct);
 			};
 
-			await using var BatchList = new BatchListAsy<IDictionary<str, obj?>,nil>(
+			await using var BatchList = new BatchCollector<IDictionary<str, obj?>,nil>(
 				async(ArgDicts, Ct)=>{
 					if((u64)ArgDicts.Count >= Cfg.FullBatchSize){
 						//var sw = Stopwatch.StartNew();
@@ -604,7 +604,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 			IEnumerable<object?> Keys
 			,CT Ct
 		)=>{
-			await using BatchListAsy<object?, nil> BatchList = new(async (x, Ct)=>{
+			await using BatchCollector<object?, nil> BatchList = new(async (x, Ct)=>{
 				IList<object?> Args = [ValToSet, ..x];
 				Args.FillUpTo(CountPerBatch+1, null);
 				await Cmd.Args(Args).IterAsyE(Ct).FirstOrDefaultAsync(Ct);

@@ -16,7 +16,7 @@ public partial class ArgDict: IArgDict{
 	public ITable? Tbl{get;set;}
 
 	[Impl]
-	public IArgDict Add(str ParamName, obj? Raw){
+	public IArgDict AddRaw(str ParamName, obj? Raw){
 		ParamName_RawValue.TryAdd(ParamName, Raw);
 		return this;
 	}
