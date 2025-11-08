@@ -32,4 +32,8 @@ public class Param:IParam{
 	public IParam this[u64 i]{get{
 		return new Param(NumSuffixParam(Name, i), ParamPrefixAdder);
 	}}
+
+	public override str ToString(){
+		return ParamPrefixAdder.AddParamPrefix(Name);
+	}
 }
