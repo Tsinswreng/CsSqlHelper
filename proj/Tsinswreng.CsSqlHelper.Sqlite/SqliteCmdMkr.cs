@@ -37,6 +37,7 @@ public partial class SqliteCmdMkr
 		var RawCmd = sqlConn.CreateCommand();
 		RawCmd.CommandText = Sql;
 		var R = new SqliteCmd(RawCmd);
+		R.Sql = Sql;
 		if(DbFnCtx!= null){
 			R.WithCtx(DbFnCtx);
 		}

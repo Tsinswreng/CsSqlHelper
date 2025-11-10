@@ -31,6 +31,7 @@ public partial class PostgresCmdMkr
 		var RawCmd = sqlConn.CreateCommand();
 		RawCmd.CommandText = Sql;
 		var R = new PostgresCmd(RawCmd);
+		R.Sql = Sql;
 		if(DbFnCtx!= null){
 			R.WithCtx(DbFnCtx);
 		}
