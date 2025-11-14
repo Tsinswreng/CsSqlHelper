@@ -1,7 +1,9 @@
+//TODO 類似ₐXxxCmd間 做抽象復用。SqliteCmd 新於 PostgresCmd
 using System.Data;
 using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
 using Tsinswreng.CsCore;
+using Tsinswreng.CsTools;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
@@ -85,7 +87,22 @@ public partial class SqliteCmd
 		[EnumeratorCancellation]
 		CT Ct
 	){
-		using var Reader = await RawCmd.ExecuteReaderAsync(Ct);
+		using var Dl = new DisposableList();
+		SqliteDataReader Reader = null!;
+		try{
+			Reader = await RawCmd.ExecuteReaderAsync(Ct);
+			Dl.Add(Reader);
+		}
+		catch (System.Exception e){
+			var Err = new DbErr(
+				e.Message
+				+"\nSql:\n"+Sql
+				+"\nParams"+RawCmd.Parameters.ToReadableString()
+				,e
+			);
+			Dl.Dispose();
+			throw Err;
+		}
 		while(await Reader.ReadAsync(Ct)){
 			var RawDict = new Dictionary<str, obj?>();
 			for(var i = 0; i < Reader.FieldCount; i++){

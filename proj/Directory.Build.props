@@ -1,5 +1,6 @@
 <Project>
 	<PropertyGroup>
+		<AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>

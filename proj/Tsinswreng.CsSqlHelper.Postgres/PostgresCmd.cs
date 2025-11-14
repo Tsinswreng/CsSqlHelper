@@ -1,3 +1,4 @@
+//TODO 類似ₐXxxCmd間 做抽象復用。SqliteCmd 新於 PostgresCmd
 namespace Tsinswreng.CsSqlHelper.Postgres;
 
 using System.Collections;
