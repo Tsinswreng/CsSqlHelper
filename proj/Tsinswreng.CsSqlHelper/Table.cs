@@ -368,7 +368,7 @@ public static class ExtnITable{
 		List<str> R = [];
 		//R.Add(sqlFieldsValus);
 		for(u64 i = 0; i < GroupCnt; i++){
-			var ParamList = ParamLists[i.ToI32()];
+			var ParamList = ParamLists[i.AsI32()];
 			R.Add(" (" + string.Join(", ", ParamList) + ")");
 		}
 
