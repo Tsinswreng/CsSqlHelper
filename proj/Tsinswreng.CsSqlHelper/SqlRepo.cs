@@ -505,6 +505,24 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 	}
 
 
+	public async Task<Func<
+		IAsyncEnumerable<TEntity>
+		,CT
+		,Task<nil>
+	>> FnAsyEUpdManyById(
+		IDbFnCtx? Ctx
+		,IEnumerable<str>? UpperFieldsToUpdate
+		,CT Ct
+	){
+		var UpdManyById = await FnUpdManyById(Ctx, UpperFieldsToUpdate, Ct);
+		return async(PoAsyE, Ct)=>{
+			await UpdManyById(PoAsyE.ToBlockingEnumerable(), Ct);//TODO
+			return NIL;
+		};
+	}
+
+
+
 	[Obsolete]
 	[Impl]
 	public async Task<Func<
@@ -774,6 +792,8 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		};
 		return Fn;
 	}
+
+
 
 
 	// public async Task<Func<

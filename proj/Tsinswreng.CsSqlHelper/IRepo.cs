@@ -92,6 +92,16 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
+	public Task<Func<
+		IAsyncEnumerable<TEntity>
+		,CT
+		,Task<nil>
+	>> FnAsyEUpdManyById(
+		IDbFnCtx? Ctx
+		,IEnumerable<str>? UpperFieldsToUpdate
+		,CT Ct
+	);
+
 
 	public Task<Func<
 		IEnumerable<obj?>

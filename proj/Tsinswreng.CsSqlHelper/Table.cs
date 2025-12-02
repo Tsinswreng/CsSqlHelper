@@ -180,8 +180,13 @@ public static class ExtnITable{
 		this ITable z
 		,str CodeColName
 	){
-		var DbColName = z.Columns[CodeColName].DbName;
-		return z.SqlMkr.Quote(DbColName);
+		try{
+			var DbColName = z.Columns[CodeColName].DbName;
+			return z.SqlMkr.Quote(DbColName);
+		}catch(Exception e){
+			throw new Exception($"No such column: {CodeColName}", e);
+		}
+
 	}
 
 /// <summary>

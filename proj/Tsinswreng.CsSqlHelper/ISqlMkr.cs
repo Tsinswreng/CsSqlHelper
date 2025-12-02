@@ -27,6 +27,7 @@ public partial interface ISqlMkr{
 /// <param name="Offset">參數名</param>
 /// <returns></returns>
 	public str ParamLimOfst(str Limit, str Offset);
+
 }
 
 

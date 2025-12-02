@@ -26,12 +26,22 @@ public partial class TxnWrapper<TDbFnCtx>
 		>>> FnXxx
 		,CT Ct
 	){
-		await using var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
-		var Xxx = await FnXxx(Ctx, Ct);
-		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
-			return await Xxx(Ct);
-		}, Ct);
-		return R;
+		TDbFnCtx Ctx = default;
+		try{
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			var Xxx = await FnXxx(Ctx, Ct);
+			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+				return await Xxx(Ct);
+			}, Ct);
+			await Ctx.DisposeAsync();
+			return R;
+		}catch(Exception e){
+			if(Ctx is not null){
+				await Ctx.Txn.Rollback(Ct);
+				await Ctx.DisposeAsync();
+			}
+			throw e;
+		}
 	}
 	//1
 	public async Task<TRet> Wrap<TArg0, TRet>(
@@ -43,12 +53,22 @@ public partial class TxnWrapper<TDbFnCtx>
 		,TArg0 Arg0
 		,CT Ct
 	){
-		await using var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
-		var Xxx = await FnXxx(Ctx, Ct);
-		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
-			return await Xxx(Arg0, Ct);
-		}, Ct);
-		return R;
+		TDbFnCtx Ctx = default;
+		try{
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			var Xxx = await FnXxx(Ctx, Ct);
+			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+				return await Xxx(Arg0, Ct);
+			}, Ct);
+			await Ctx.DisposeAsync();
+			return R;
+		}catch(Exception e){
+			if(Ctx is not null){
+				await Ctx.Txn.Rollback(Ct);
+				await Ctx.DisposeAsync();
+			}
+			throw e;
+		}
 	}
 	//2
 	public async Task<TRet> Wrap<TArg0, TArg1, TRet>(
@@ -62,12 +82,22 @@ public partial class TxnWrapper<TDbFnCtx>
 		,TArg1 Arg1
 		,CT Ct
 	){
-		await using var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
-		var Xxx = await FnXxx(Ctx, Ct);
-		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
-			return await Xxx(Arg0, Arg1, Ct);
-		}, Ct);
-		return R;
+		TDbFnCtx Ctx = default;
+		try{
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			var Xxx = await FnXxx(Ctx, Ct);
+			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+				return await Xxx(Arg0, Arg1, Ct);
+			}, Ct);
+			await Ctx.DisposeAsync();
+			return R;
+		}catch(Exception e){
+			if(Ctx is not null){
+				await Ctx.Txn.Rollback(Ct);
+				await Ctx.DisposeAsync();
+			}
+			throw e;
+		}
 	}
 
 	//3
@@ -84,12 +114,22 @@ public partial class TxnWrapper<TDbFnCtx>
 		,TArg2 Arg2
 		,CT Ct
 	){
-		await using var Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
-		var Xxx = await FnXxx(Ctx, Ct);
-		var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
-			return await Xxx(Arg0, Arg1, Arg2, Ct);
-		}, Ct);
-		return R;
+		TDbFnCtx Ctx = default;
+		try{
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			var Xxx = await FnXxx(Ctx, Ct);
+			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
+				return await Xxx(Arg0, Arg1, Arg2, Ct);
+			}, Ct);
+			await Ctx.DisposeAsync();
+			return R;
+		}catch(Exception e){
+			if(Ctx is not null){
+				await Ctx.Txn.Rollback(Ct);
+				await Ctx.DisposeAsync();
+			}
+			throw e;
+		}
 	}
 
 #if false

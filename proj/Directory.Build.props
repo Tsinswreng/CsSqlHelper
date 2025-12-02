@@ -8,7 +8,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<!-- <PublishAot>true</PublishAot> -->
 		<!-- <PublishTrimmed>true</PublishTrimmed> -->
-		<NoWarn>CS1998</NoWarn>
+		<NoWarn>CS1998;CS8669</NoWarn>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>obj/Generated</CompilerGeneratedFilesOutputPath>
 		<!-- <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath> -->
