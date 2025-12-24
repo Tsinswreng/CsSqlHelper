@@ -25,39 +25,70 @@ public partial interface IBaseDbFnCtx
 }
 
 public static partial class ExtnIBaseDbFnCtx{
-	private static TSelf _AddToDispose<TSelf>(
-		this TSelf z
-		,obj? Disposable
-	)where TSelf: IBaseDbFnCtx{
-		z.ObjsToDispose??=new List<obj?>();
-		z.ObjsToDispose.Add(Disposable);
-		return z;
-	}
-
-	public static TSelf AddToDispose<TSelf>(
-		this TSelf z
-		,IDisposable Disposable
-	)where TSelf: IBaseDbFnCtx{
-		return z._AddToDispose(Disposable);
-	}
-
-	public static TSelf AddToDisposeAsy<TSelf>(
-		this TSelf z
-		,IAsyncDisposable Disposable
-	)where TSelf: IBaseDbFnCtx{
-		return z._AddToDispose(Disposable);
-	}
-
-	public static TSelf AddToDispose<TSelf>(
-		this TSelf z
-		,IEnumerable<obj?> DisposableObjs
-	)where TSelf: IBaseDbFnCtx{
-		z.ObjsToDispose??=new List<obj?>();
-		foreach(var obj in DisposableObjs){
-			z.ObjsToDispose.Add(obj);
+	extension<TSelf>(TSelf z)
+		where TSelf: IBaseDbFnCtx
+	{
+		private TSelf _AddToDispose(
+			obj? Disposable
+		){
+			z.ObjsToDispose??=new List<obj?>();
+			z.ObjsToDispose.Add(Disposable);
+			return z;
 		}
-		return z;
+
+		public TSelf AddToDispose(
+			IDisposable Disposable
+		){
+			return z._AddToDispose(Disposable);
+		}
+
+		public TSelf AddToDisposeAsy(
+			IAsyncDisposable Disposable
+		){
+			return z._AddToDispose(Disposable);
+		}
+
+		public TSelf AddToDispose(
+			IEnumerable<obj?> DisposableObjs
+		){
+			z.ObjsToDispose??=new List<obj?>();
+			foreach(var obj in DisposableObjs){
+				z.ObjsToDispose.Add(obj);
+			}
+			return z;
+		}
 	}
+
+	extension<TSelf>(TSelf z)
+		where TSelf: IBaseDbFnCtx
+	{
+		/// <summary>
+		/// Prepare並AddToDispose
+		/// </summary>
+		/// <typeparam name="TSelf"></typeparam>
+		/// <param name="z"></param>
+		/// <param name="CmdMkr"></param>
+		/// <param name="Sql"></param>
+		/// <param name="Ct"></param>
+		/// <returns></returns>
+		public async Task<ISqlCmd> PrepareToDispose(
+			ISqlCmdMkr CmdMkr
+			,str Sql
+			,CT Ct
+		){
+			var R = await CmdMkr.Prepare(z, Sql, Ct);
+			z?.AddToDispose(R);
+			return R;
+		}
+		public ISqlCmd RunCmd(
+			ISqlCmd Cmd
+			,IArgDict Arg
+		){
+			Cmd.WithCtx(z).Args(Arg);
+			return Cmd;
+		}
+	}
+
 
 	// public static async Task<ISqlCmd> Prepare(
 	// 	this IBaseDbFnCtx z
