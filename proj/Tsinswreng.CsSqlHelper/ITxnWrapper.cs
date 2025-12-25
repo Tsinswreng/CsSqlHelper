@@ -26,7 +26,7 @@ public partial class TxnWrapper<TDbFnCtx>
 		>>> FnXxx
 		,CT Ct
 	){
-		TDbFnCtx Ctx = default;
+		TDbFnCtx Ctx = default!;
 		try{
 			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
@@ -35,12 +35,12 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch(Exception e){
+		}catch{
 			if(Ctx is not null){
-				await Ctx.Txn.Rollback(Ct);
+				await Ctx.Txn!.Rollback(Ct);
 				await Ctx.DisposeAsync();
 			}
-			throw e;
+			throw;
 		}
 	}
 	//1
@@ -53,7 +53,7 @@ public partial class TxnWrapper<TDbFnCtx>
 		,TArg0 Arg0
 		,CT Ct
 	){
-		TDbFnCtx Ctx = default;
+		TDbFnCtx Ctx = default!;
 		try{
 			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
@@ -62,12 +62,12 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch(Exception e){
+		}catch{
 			if(Ctx is not null){
-				await Ctx.Txn.Rollback(Ct);
+				await Ctx.Txn!.Rollback(Ct);
 				await Ctx.DisposeAsync();
 			}
-			throw e;
+			throw;
 		}
 	}
 	//2
@@ -82,7 +82,7 @@ public partial class TxnWrapper<TDbFnCtx>
 		,TArg1 Arg1
 		,CT Ct
 	){
-		TDbFnCtx Ctx = default;
+		TDbFnCtx Ctx = default!;
 		try{
 			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
@@ -91,12 +91,12 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch(Exception e){
+		}catch{
 			if(Ctx is not null){
-				await Ctx.Txn.Rollback(Ct);
+				await Ctx.Txn!.Rollback(Ct);
 				await Ctx.DisposeAsync();
 			}
-			throw e;
+			throw;
 		}
 	}
 
@@ -114,7 +114,7 @@ public partial class TxnWrapper<TDbFnCtx>
 		,TArg2 Arg2
 		,CT Ct
 	){
-		TDbFnCtx Ctx = default;
+		TDbFnCtx Ctx = default!;
 		try{
 			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
@@ -123,12 +123,12 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch(Exception e){
+		}catch{
 			if(Ctx is not null){
-				await Ctx.Txn.Rollback(Ct);
+				await Ctx.Txn!.Rollback(Ct);
 				await Ctx.DisposeAsync();
 			}
-			throw e;
+			throw;
 		}
 	}
 
