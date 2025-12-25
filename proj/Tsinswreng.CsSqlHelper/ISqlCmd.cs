@@ -44,7 +44,7 @@ public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 	/// </summary>
 	/// <param name="DbFnCtx"></param>
 	/// <returns></returns>
-	public ISqlCmd WithCtx(IBaseDbFnCtx? DbFnCtx);
+	public ISqlCmd AttachCtxTxn(IBaseDbFnCtx? DbFnCtx);
 
 
 	public async Task<IList<

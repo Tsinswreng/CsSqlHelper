@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 public static class ExtnSqlCmd{
-	
+
 
 	public static async Task<IDictionary<str, obj?>> DictFirst(
 		this ISqlCmd z, CT Ct
@@ -23,6 +23,15 @@ public static class ExtnSqlCmd{
 
 
 	extension(ISqlCmd z){
+		public ISqlCmd WithCtx(IBaseDbFnCtx? Ctx){
+			if(Ctx is null){
+				return z;
+			}
+			z.AttachCtxTxn(Ctx);
+			Ctx.AddToDispose(z);
+			return z;
+		}
+
 		public async Task<IAsyncEnumerable<T>> IterAsyE<T>(
 			ITable Tbl, CT Ct
 		)where T:new()

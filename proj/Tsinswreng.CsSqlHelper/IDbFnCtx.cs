@@ -77,14 +77,14 @@ public static partial class ExtnIBaseDbFnCtx{
 			,CT Ct
 		){
 			var R = await CmdMkr.Prepare(z, Sql, Ct);
-			z?.AddToDispose(R);
+			//z?.AddToDispose(R); //2025_1225_105738 MkCmd中已有AddToDispose
 			return R;
 		}
 		public ISqlCmd RunCmd(
 			ISqlCmd Cmd
 			,IArgDict Arg
 		){
-			Cmd.WithCtx(z).Args(Arg);
+			Cmd.AttachCtxTxn(z).Args(Arg);
 			return Cmd;
 		}
 	}

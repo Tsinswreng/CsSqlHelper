@@ -32,7 +32,7 @@ public abstract partial class BaseSqlCmd<
 		return this;
 	}
 
-	public virtual ISqlCmd WithCtx(IDbFnCtx? Ctx){
+	public virtual ISqlCmd AttachCtxTxn(IDbFnCtx? Ctx){
 		if(Ctx?.Txn is not null){
 			AttachCtxTxn(Ctx.Txn);
 		}
