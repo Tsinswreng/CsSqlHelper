@@ -38,6 +38,12 @@ public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 	public ISqlCmd Args(IArgDict Args){
 		return this.RawArgs(Args.ToDict());
 	}
+
+	/// <summary>
+	/// 只關聯事務、不做AddToDispose
+	/// </summary>
+	/// <param name="DbFnCtx"></param>
+	/// <returns></returns>
 	public ISqlCmd WithCtx(IBaseDbFnCtx? DbFnCtx);
 
 

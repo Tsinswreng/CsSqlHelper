@@ -24,6 +24,11 @@ public partial class SqliteCmdMkr
 		this.DbConnGetter = DbConnGetter;
 	}
 
+
+	[Doc($"""
+	若不潙空則返ʹ {nameof(ISqlCmd)} 會 {nameof(ISqlCmd.WithCtx)}
+	{nameof(ISqlCmd.WithCtx)} 只設交易、不 {nameof(ExtnIBaseDbFnCtx.AddToDispose)}
+	""")]
 	[Impl(typeof(ISqlCmdMkr))]
 	public async Task<ISqlCmd> MkCmd(
 		IDbFnCtx? DbFnCtx

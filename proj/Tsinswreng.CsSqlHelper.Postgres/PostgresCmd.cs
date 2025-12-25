@@ -2,11 +2,33 @@
 namespace Tsinswreng.CsSqlHelper.Postgres;
 
 using System.Collections;
+using System.Data.Common;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Npgsql;
 using Tsinswreng.CsCore;
 
+public partial class PostgresCmd : BaseSqlCmd<NpgsqlCommand, NpgsqlTransaction> {
+	public PostgresCmd(NpgsqlCommand RawCmd):base(RawCmd){
+
+	}
+	public override nil ParamAddWithValue(DbParameterCollection Params, string? parameterName, object? value) {
+		if(Params is not NpgsqlParameterCollection prm){
+			throw new ArgumentException("Params is not SqliteParameterCollection");
+		}
+		if(parameterName is null || value is null){
+			throw new ArgumentNullException("parameterName is null || value is null");
+		}
+		prm.AddWithValue(parameterName, value);
+		return NIL;
+	}
+
+	public override string ToResolvedArg(string RawArg) {
+		return "@"+RawArg;
+	}
+}
+
+#if false//OldVer
 public partial class PostgresCmd: ISqlCmd{
 	public IList<Func<Task<nil>>> FnsOnDispose{get;set;} = new List<Func<Task<nil>>>();
 	public NpgsqlCommand RawCmd{get;set;}
@@ -148,3 +170,5 @@ public partial class PostgresCmd: ISqlCmd{
 	}
 
 }
+
+#endif

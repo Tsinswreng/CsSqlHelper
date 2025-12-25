@@ -1,156 +1,166 @@
-// using System.Collections.Generic;
-// using System.Data;
-// using System.Runtime.CompilerServices;
-// using System.Threading;
-// using System.Threading.Tasks;
-// using Tsinswreng.CsCore;
+using System.Data;
+using System.Data.Common;
+using System.Runtime.CompilerServices;
+using Microsoft.Data.Sqlite;
+using Tsinswreng.CsCore;
+using Tsinswreng.CsTools;
 
-// namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSqlHelper;
+using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 
-// using IDbFnCtx = IBaseDbFnCtx;
+public abstract partial class BaseSqlCmd<
+	TRawCmd ,TRawTxn
+>
+	:ISqlCmd
+	,IAsyncDisposable
+	where TRawCmd : DbCommand
+	where TRawTxn : DbTransaction
+{
+	public TRawCmd RawCmd{get;set;}
+	public IList<Func<Task<nil>>> FnsOnDispose{get;set;} = new List<Func<Task<nil>>>();
+	public str? Sql{get;set;}
+	public BaseSqlCmd(TRawCmd DbCmd){
+		RawCmd = DbCmd;
+	}
 
-// public abstract class BaseSqlCmd<TCommand> : ISqlCmd
-//     where TCommand : class, IDbCommand, IDisposable
-// {
-//     public IList<Func<Task<nil>>> FnsOnDispose { get; set; } = new List<Func<Task<nil>>>();
-//     public TCommand RawCmd { get; protected set; }
-//     public str? Sql { get; set; }
+	public virtual ISqlCmd AttachCtxTxn(ITxn Txn)
+	{
+		if(Txn.RawTxn is not TRawTxn RawTxn){
+			throw new ArgumentException("Txn.RawTxn is not TRawTxn RawTxn");
+		}
+		RawCmd.Transaction = RawTxn;
+		return this;
+	}
 
-//     protected BaseSqlCmd(TCommand dbCmd)
-//     {
-//         RawCmd = dbCmd;
-//     }
+	public virtual ISqlCmd WithCtx(IDbFnCtx? Ctx){
+		if(Ctx?.Txn is not null){
+			AttachCtxTxn(Ctx.Txn);
+		}
+		return this;
+	}
 
-//     public virtual ISqlCmd WithCtx(IDbFnCtx? Ctx)
-//     {
-//         if (Ctx?.Txn?.RawTxn != null)
-//         {
-//             SetTransaction((dynamic)Ctx.Txn.RawTxn);
-//         }
-//         return this;
-//     }
+	public abstract nil ParamAddWithValue(
+		DbParameterCollection Params, string? parameterName, object? value
+	);
 
-//     [Impl]
-//     public virtual ISqlCmd ResolvedArgs(IDictionary<str, obj?> Args)
-//     {
-//         ClearParameters();//不清空舊參數 續ˣ珩DbCmd蜮報錯
-//         foreach (var (k, v) in Args)
-//         {
-//             AddParameter(k, CodeValToDbVal(v));
-//         }
-//         return this;
-//     }
+	public abstract str ToResolvedArg(str RawArg);
+	//e.g return "@"+RawArg
 
-//     /// <summary>
-//     /// 傳入之字典不帶@名稱 佔位
-//     /// </summary>
-//     /// <param name="Args"></param>
-//     /// <returns></returns>
-//     [Impl]
-//     public virtual ISqlCmd RawArgs(IDictionary<str, obj?> Args)
-//     {
-//         ClearParameters();//不清空舊參數 續ˣ珩DbCmd蜮報錯
-//         foreach (var (k, v) in Args)
-//         {
-//             AddParameter("@" + k, CodeValToDbVal(v));
-//         }
-//         return this;
-//     }
+	[Impl]
+	public ISqlCmd ResolvedArgs(IDictionary<str, obj?> Args){
+		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
+		foreach(var (k,v) in Args){
+			this.ParamAddWithValue(
+				RawCmd.Parameters
+				,k, CodeValToDbVal(v)
+			);
+		}
+		return this;
+	}
 
-//     /// <summary>
-//     /// @0, @1, @2 ...
-//     /// </summary>
-//     /// <param name="Params"></param>
-//     /// <returns></returns>
-//     public virtual ISqlCmd Args(IEnumerable<obj?> Params)
-//     {
-//         ClearParameters();
-//         var i = 0;
-//         foreach (var v in Params)
-//         {
-//             AddParameter("@" + i, CodeValToDbVal(v));
-//             i++;
-//         }
-//         return this;
-//     }
 
-//     /// <summary>
-//     /// 若含null則做DBNull與null之轉、否則原樣返
-//     /// </summary>
-//     /// <param name="DbVal"></param>
-//     /// <returns></returns>
-//     public virtual obj? DbValToCodeVal(obj? DbVal)
-//     {
-//         if (DbVal is DBNull)
-//         {
-//             return null!;
-//         }
-//         return DbVal;
-//     }
+	/// <summary>
+	/// 傳入之字典不帶@名稱 佔位
+	/// </summary>
+	/// <param name="Args"></param>
+	/// <returns></returns>
+	[Impl]
+	public ISqlCmd RawArgs(IDictionary<str, obj?> Args){
+		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
+		foreach(var (k,v) in Args){
+			this.ParamAddWithValue(
+				RawCmd.Parameters
+				,ToResolvedArg(k), CodeValToDbVal(v)
+			);
+		}
+		return this;
+	}
 
-//     public virtual obj? CodeValToDbVal(obj? CodeVal)
-//     {
-//         if (CodeVal == null)
-//         {
-//             return DBNull.Value;
-//         }
-//         return CodeVal;
-//     }
+/// <summary>
+/// @0, @1, @2 ...
+/// </summary>
+/// <param name="Params"></param>
+/// <returns></returns>
+	public ISqlCmd Args(IEnumerable<obj?> Params){
+		RawCmd.Parameters.Clear();
+		var i = 0;
+		foreach(var v in Params){
+			//RawCmd.Parameters.AddWithValue("@"+i, CodeValToDbVal(v));
+			this.ParamAddWithValue(
+				RawCmd.Parameters
+				,ToResolvedArg(i+""), CodeValToDbVal(v)
+			);
+		i++;}
+		return this;
+	}
 
-//     /// <summary>
-//     /// 异步枚举读取结果
-//     /// </summary>
-//     public async IAsyncEnumerable<IDictionary<str, obj?>> IterAsyE(
-//         [EnumeratorCancellation]
-//         CancellationToken Ct
-//     )
-//     {
-//         using var reader = await RawCmd.ExecuteReaderAsync(Ct).ConfigureAwait(false);
-//         while (await reader.ReadAsync(Ct).ConfigureAwait(false))
-//         {
-//             var row = new Dictionary<str, obj?>();
-//             for (var i = 0; i < reader.FieldCount; i++)
-//             {
-//                 row.Add(reader.GetName(i), DbValToCodeVal(reader.GetValue(i)));
-//             }
-//             yield return row;
-//         }
-//     }
+	/// <summary>
+	/// 若含null則做DBNull與null之轉、否則原樣返
+	/// </summary>
+	/// <param name="DbVal"></param>
+	/// <returns></returns>
+	public virtual obj? DbValToCodeVal(obj? DbVal){
+		if(DbVal is DBNull){
+			return null!;
+		}
+		return DbVal;
+	}
 
-//     /// <summary>
-//     /// 读取所有结果到列表
-//     /// </summary>
-//     public async Task<IList<IDictionary<str, obj?>>> All(CancellationToken Ct)
-//     {
-//         using var reader = await RawCmd.ExecuteReaderAsync(Ct).ConfigureAwait(false);
-//         var result = new List<IDictionary<str, obj?>>();
+	public virtual obj? CodeValToDbVal(obj? CodeVal){
+		if(CodeVal == null){
+			return DBNull.Value;
+		}
+		return CodeVal;
+	}
 
-//         while (await reader.ReadAsync(Ct).ConfigureAwait(false))
-//         {
-//             var row = new Dictionary<str, obj?>(reader.FieldCount);
-//             for (var i = 0; i < reader.FieldCount; i++)
-//             {
-//                 row[reader.GetName(i)] = DbValToCodeVal(reader.GetValue(i));
-//             }
-//             result.Add(row);
-//         }
-//         return result;
-//     }
+	public virtual async IAsyncEnumerable<IDictionary<str, obj?>> IterAsyE(
+		[EnumeratorCancellation]
+		CT Ct
+	){
+		using var Dl = new DisposableList();
+		DbDataReader Reader = null!;
+		try{
+			Reader = await RawCmd.ExecuteReaderAsync(Ct);
+			Dl.Add(Reader);
+		}
+		catch (System.Exception e){
+			var Err = new DbErr(
+				e.Message
+				+"\nSql:\n"+Sql
+				+"\nParams"+RawCmd.Parameters.ToReadableString()
+				,e
+			);
+			Dl.Dispose();
+			throw Err;
+		}
+		while(await Reader.ReadAsync(Ct)){
+			var RawDict = new Dictionary<str, obj?>();
+			for(var i = 0; i < Reader.FieldCount; i++){
+				RawDict.Add(Reader.GetName(i), DbValToCodeVal(Reader.GetValue(i)));
+			}
+			yield return RawDict;
+		}
+	}
 
-//     public virtual void Dispose()
-//     {
-//         RawCmd.Dispose();
-//     }
+	public virtual async Task<IList<IDictionary<str, obj?>>> All(CT Ct){
+		using var reader = await RawCmd.ExecuteReaderAsync(Ct);
+		var result = new List<IDictionary<str, obj?>>();
 
-//     public virtual ValueTask DisposeAsync()
-//     {
-//         RawCmd.Dispose();
-//         return default;
-//     }
+		while (await reader.ReadAsync(Ct)){
+			var row = new Dictionary<str, obj?>(reader.FieldCount);
+			for (var i = 0; i < reader.FieldCount; i++)
+				row[reader.GetName(i)] = DbValToCodeVal(reader.GetValue(i));
+			result.Add(row);
+		}
+		return result;
+	}
 
-//     #region 抽象方法（子类实现数据库差异化逻辑）
-//     protected abstract void ClearParameters();
-//     protected abstract void AddParameter(string name, object? value);
-//     protected abstract void SetTransaction(dynamic transaction);
-//     #endregion
-// }
+	public void Dispose(){
+		RawCmd.Dispose();
+	}
+
+	public ValueTask DisposeAsync() {
+		RawCmd.Dispose();
+		return default;
+	}
+}
