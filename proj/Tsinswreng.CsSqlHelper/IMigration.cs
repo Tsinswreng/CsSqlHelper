@@ -22,19 +22,31 @@ public class SqlMigration{
 	public IList<str> SqlsUp{get;} = [];
 	public IList<str> SqlsDown{get;} = [];
 
-	public SqlMigration(){
-
+	ITblMgr TblMgr;
+	ISqlCmdMkr SqlCmdMkr;
+	public SqlMigration(
+		ITblMgr TblMgr
+		,ISqlCmdMkr SqlCmdMkr
+	){
+		this.TblMgr = TblMgr;
+		this.SqlCmdMkr = SqlCmdMkr;
 	}
 
-	async Task<nil> RunSql(str Sql, CT Ct){
-
-		return NIL;
+	async Task<Func<
+		CT, Task<nil>
+	>> FnRunSql(IBaseDbFnCtx Ctx, str Sql, CT Ct){
+		//IBaseDbFnCtx Ctx = new BaseDbFnCtx();
+		var Cmd = await SqlCmdMkr.MkCmd(Ctx, Sql, Ct);
+		return async(Ct)=>{
+			await Cmd.All(Ct);
+			return NIL;
+		};
 	}
 
 	public async Task<Func<
 		CT, Task<nil>
 	>> FnUpAsy(IBaseDbFnCtx Ctx, CT Ct){
-
+		
 		return async(Ct)=>{
 
 			return NIL;

@@ -91,10 +91,12 @@ public partial class SqliteCmdMkr
 	public async Task<ITxn> GetTxnAsy(
 		IBaseDbFnCtx Ctx, CT Ct
 	){
-		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+		var DbConnection = Ctx.DbConn??await DbConnGetter.GetConnAsy(Ct); //事務過後 Ctx會Dispose 故每次開Ctx旹其DbConn必取自DbConnGetter
+		//var DbConnection = await DbConnGetter.GetConnAsy(Ct);
 		Ctx.DbConn = DbConnection;
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
+		Ctx.Txn = Ans;
 		return Ans;
 	}
 }

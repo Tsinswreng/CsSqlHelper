@@ -8,10 +8,6 @@ public partial class PostgresCmdMkr
 	:ISqlCmdMkr
 	,I_GetTxnAsy
 {
-	// public IDbConnection DbConnection{get;set;}
-	// public PostgresCmdMkr(IDbConnection DbConnection){
-	// 	this.DbConnection = DbConnection;
-	// }
 
 	public IDbConnMgr DbConnGetter{get;set;}
 	public PostgresCmdMkr(IDbConnMgr DbConnGetter){
@@ -81,13 +77,18 @@ public partial class PostgresCmdMkr
 	// 	return Ans;
 	// }
 
+
 	public async Task<ITxn> GetTxnAsy(
 		IBaseDbFnCtx Ctx, CT Ct
 	){
-		var DbConnection = await DbConnGetter.GetConnAsy(Ct);
+		// pg中同一交易中 ʹ多條命令 須屬于同一連接。後MkCmd旹所用ʹ連接 亦 優先從Ctx.DbConn中取
+		//事務過後 Ctx會Dispose 故每次開Ctx旹其DbConn必取自DbConnGetter
+		var DbConnection = Ctx.DbConn??await DbConnGetter.GetConnAsy(Ct);
+		//var DbConnection = await DbConnGetter.GetConnAsy(Ct);
 		Ctx.DbConn = DbConnection;
 		var Tx = DbConnection.BeginTransaction();
 		var Ans = new AdoTxn(Tx);
+		Ctx.Txn = Ans;
 		return Ans;
 	}
 }
