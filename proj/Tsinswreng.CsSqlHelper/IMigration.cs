@@ -3,34 +3,61 @@ using Tsinswreng.CsCore;
 namespace Tsinswreng.CsSqlHelper;
 
 public interface I_CreatedMs{
-	public i64 CreatedMs{get;set;}
+	public i64 CreatedMs{get;}
 }
 
-public interface ISqlMigration:I_CreatedMs{
-	public IList<str> SqlsUp{get;}
-	public IList<str> SqlsDown{get;}
-}
 
 public partial interface IMigration:I_CreatedMs{
 	public Task<nil> UpAsy(CT Ct);
 	public Task<nil> DownAsy(CT Ct);
 }
 
-public class SqlMigration :IMigration, ISqlMigration{
-	public i64 CreatedMs{get;set;}
-	public IList<str> SqlsUp{get;} = [];
-	public IList<str> SqlsDown{get;} = [];
+public interface ISqlMigrationInfo:I_CreatedMs{
+	public IList<str> SqlsUp{get;}
+	public IList<str> SqlsDown{get;}
+}
 
-	ITblMgr TblMgr;
-	ISqlCmdMkr SqlCmdMkr;
-	I_GetTxnAsy TxnGetter;
-	public SqlMigration(
-		ITblMgr TblMgr
-		,ISqlCmdMkr SqlCmdMkr
-		,I_GetTxnAsy TxnGetter
+public class SqlMigrationInfo:ISqlMigrationInfo{
+	public virtual i64 CreatedMs{get;set;}
+	public virtual IList<str> SqlsUp{get;set;} = [];
+	public virtual IList<str> SqlsDown{get;set;} = [];
+}
+
+
+
+public class SqlMigration
+	:ISqlMigrationInfo
+	,IMigration
+{
+
+	//PassArgsByNameBecauseArgsCntMayChange
+	public static SqlMigration MkSqlMigration(
+		ISqlCmdMkr SqlCmdMkr
+		,I_GetTxnAsy MkrTxn
+		,ISqlMigrationInfo SqlMigrationInfo
 	){
-		this.TblMgr = TblMgr;
+		var R = new SqlMigration(
+			SqlCmdMkr: SqlCmdMkr
+			,MkrTxn: MkrTxn
+		);
+		R.CreatedMs = SqlMigrationInfo.CreatedMs;
+		R.SqlsUp = SqlMigrationInfo.SqlsUp;
+		R.SqlsDown = SqlMigrationInfo.SqlsDown;
+		return R;
+	}
+
+	public i64 CreatedMs{get;set;}
+	public IList<str> SqlsUp{get;set;} = [];
+	public IList<str> SqlsDown{get;set;} = [];
+
+	ISqlCmdMkr SqlCmdMkr;
+	I_GetTxnAsy MkrTxn;
+	public SqlMigration(
+		ISqlCmdMkr SqlCmdMkr
+		,I_GetTxnAsy MkrTxn
+	){
 		this.SqlCmdMkr = SqlCmdMkr;
+		this.MkrTxn = MkrTxn;
 	}
 
 	async Task<nil> RunSql(IBaseDbFnCtx Ctx, str Sql, CT Ct){
@@ -54,7 +81,7 @@ public class SqlMigration :IMigration, ISqlMigration{
 	[Impl(typeof(IMigration))]
 	public async Task<nil> UpAsy(CT Ct){
 		IBaseDbFnCtx Ctx = new BaseDbFnCtx();
-		Ctx.Txn = await TxnGetter.GetTxnAsy(Ctx, Ct);
+		Ctx.Txn = await MkrTxn.GetTxnAsy(Ctx, Ct);
 		try{
 			var Fn = await FnUpAsy(Ctx, Ct);
 			await Fn(Ct);

@@ -1,3 +1,5 @@
+using Tsinswreng.CsCore;
+
 namespace Tsinswreng.CsSqlHelper;
 
 //TODO配置忽略之字段
@@ -6,7 +8,6 @@ public partial interface ITblMgr{
 	public str DbSrcType{get;set;}
 	public ISqlMkr SqlMkr{get;set;}
 
-	
 	public void AddTbl(ITable Tbl){
 		Tbl.SqlMkr = SqlMkr;
 		Tbl.TblMgr = this;
