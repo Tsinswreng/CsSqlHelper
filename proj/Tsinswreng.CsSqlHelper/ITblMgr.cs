@@ -15,7 +15,14 @@ public partial interface ITblMgr{
 		EntityType_Tbl[Tbl.CodeEntityType] = Tbl;
 	}
 
-	public ITable GetTbl<T_Po>(){
-		return EntityType_Tbl[typeof(T_Po)];
+	public ITable<TPo> GetTbl<TPo>(){
+		if(!EntityType_Tbl.TryGetValue(typeof(TPo), out var T)){
+			throw new Exception($"GetTbl<> Failed. {typeof(TPo)} is not registered.");
+		}
+		var R = T as ITable<TPo>;
+		if(R is null){
+			throw new Exception($"Table is not generic ITable<{typeof(TPo)}> ");
+		}
+		return R;
 	}
 }

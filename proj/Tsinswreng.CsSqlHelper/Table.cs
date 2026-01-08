@@ -5,9 +5,14 @@ using System.Linq.Expressions;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsPage;
+using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 
+
+public partial class Table<T>: Table, ITable<T>{
+
+}
 
 public partial class Table:ITable{
 	public ITblMgr? TblMgr{get;set;}
@@ -54,31 +59,32 @@ public partial class Table:ITable{
 /// <param name="DbTblName">table name in db</param>
 /// <param name="Key_Type"></param>
 /// <returns></returns>
-	public static ITable Mk<TEntity>(
+	public static ITable<TEntity> Mk<TEntity>(
 		IDictMapperShallow DictMapper
 		,str DbTblName
 		,IDictionary<str, Type> Key_Type
 	){
-		return Mk(typeof(TEntity), DictMapper, DbTblName, Key_Type);
+		return Mk<TEntity>(typeof(TEntity), DictMapper, DbTblName, Key_Type);
 	}
 
-	public static ITable Mk(
+	public static ITable<TEntity> Mk<TEntity>(
 		Type EntityClrType
 		,IDictMapperShallow DictMapper
 		,str DbTblName
 		,IDictionary<str, Type> Key_Type
 	){
-		ITable ans = new Table{
+		var t = new Table<TEntity>{
 			DictMapper = DictMapper
 			,DbTblName = DbTblName
 			,CodeCol_UpperType = Key_Type
 			,CodeEntityType = EntityClrType
-		}.Init();
-		return ans;
+		};
+		t.Init();
+		return t;
 	}
 
-	public static Func<str, ITable> FnMkTbl<T>(IDictMapperShallow DictMapper){
- 		ITable Mk<T2>(str DbTblName){
+	public static Func<str, ITable<T>> FnMkTbl<T>(IDictMapperShallow DictMapper){
+ 		ITable<T2> Mk<T2>(str DbTblName){
 			var TypeDict = DictMapper.GetTypeDictShallowT<T2>();
 			return Table.Mk<T2>(
 				DictMapper
@@ -541,7 +547,17 @@ CREATE TABLE IF NOT EXISTS {z.Qt(z.DbTblName)}(
 		return R;
 	}
 
-	public IField Fld(Expression<Func<>>){
+	extension<T>(ITable<T> z){
+		public IField Fld(Expression<Func<T, obj?>> GetMember){
+			var memberName = ToolExpr.GetMemberName<T>(GetMember);
+			var R = new Field(z, memberName);
+			return R;
+		}
+		public ISqlSplicer<T> Splicer(){
+			var R = new SqlSplicer<T>();
+			R.Tbl = z;
+			return R;
+		}
 
 	}
 }
