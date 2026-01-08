@@ -71,4 +71,25 @@ ORDER BY {T.Fld(PCreatedMs)} DESC
 
 		return undeployed;
 	}
+
+	// public async Task<nil> UpAsy(CT Ct){
+	// 	IBaseDbFnCtx Ctx = new BaseDbFnCtx();
+	// 	Ctx.Txn = await MkrTxn.GetTxnAsy(Ctx, Ct);
+	// 	try{
+	// 		var Fn = await FnUpAsy(Ctx, Ct);
+	// 		await Fn(Ct);
+	// 	}
+	// 	catch (System.Exception){
+	// 		await Ctx.Txn.Rollback(Ct);
+	// 		throw;
+	// 	}
+	// 	await Ctx.DisposeAsync();
+	// 	return NIL;
+	// }
+
+	// public async Task<nil> SetupOneMigration(
+	// 	IBaseDbFnCtx Ctx, IMigration Migration, CT Ct
+	// ){
+	// 	await Migration.UpAsy(Ct);
+	// }
 }

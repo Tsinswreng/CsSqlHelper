@@ -19,7 +19,10 @@ public partial class SchemaHistory{
 	public str? Name{get;set;}
 	public str? Descr{get;set;}
 	public i64 ProductVersionTime{get;set;} = Version.Time;
+
 }
+
+
 
 [DictType(typeof(SchemaHistory))]
 public partial class SqlHelperDictMapper{

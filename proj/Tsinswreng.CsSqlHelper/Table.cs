@@ -1,6 +1,7 @@
 #define Impl
 namespace Tsinswreng.CsSqlHelper;
 
+using System.Linq.Expressions;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsPage;
@@ -540,7 +541,7 @@ CREATE TABLE IF NOT EXISTS {z.Qt(z.DbTblName)}(
 		return R;
 	}
 
+	public IField Fld(Expression<Func<>>){
 
-
-
+	}
 }

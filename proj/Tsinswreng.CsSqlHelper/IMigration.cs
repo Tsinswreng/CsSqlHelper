@@ -8,8 +8,13 @@ public interface I_CreatedMs{
 
 
 public partial interface IMigration:I_CreatedMs{
-	public Task<nil> UpAsy(CT Ct);
-	public Task<nil> DownAsy(CT Ct);
+	public Task<Func<
+		CT, Task<nil>
+	>> FnUpAsy(IBaseDbFnCtx Ctx, CT Ct);
+
+	public Task<Func<
+		CT, Task<nil>
+	>> FnDownAsy(IBaseDbFnCtx Ctx, CT Ct);
 }
 
 public interface ISqlMigrationInfo:I_CreatedMs{
@@ -67,6 +72,7 @@ public class SqlMigration
 		return NIL;
 	}
 
+	[Impl(typeof(IMigration))]
 	public async Task<Func<
 		CT, Task<nil>
 	>> FnUpAsy(IBaseDbFnCtx Ctx, CT Ct){
@@ -79,23 +85,9 @@ public class SqlMigration
 	}
 
 	[Impl(typeof(IMigration))]
-	public async Task<nil> UpAsy(CT Ct){
-		IBaseDbFnCtx Ctx = new BaseDbFnCtx();
-		Ctx.Txn = await MkrTxn.GetTxnAsy(Ctx, Ct);
-		try{
-			var Fn = await FnUpAsy(Ctx, Ct);
-			await Fn(Ct);
-			await Ctx.DisposeAsync();
-		}
-		catch (System.Exception){
-
-			throw;
-		}
-		return NIL;
-	}
-
-	[Impl(typeof(IMigration))]
-	public async Task<nil> DownAsy(CT Ct){
+	public Task<Func<
+		CT, Task<nil>
+	>> FnDownAsy(IBaseDbFnCtx Ctx, CT Ct){
 		throw new NotImplementedException();
 	}
 }

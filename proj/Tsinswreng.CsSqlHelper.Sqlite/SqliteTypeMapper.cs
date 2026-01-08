@@ -39,6 +39,12 @@ public static SqliteTypeMapper Inst => _Inst??= new SqliteTypeMapper();
 		if(CodeType_Name.TryGetValue(Type, out str? result)){
 			return result;
 		}
+		System.Console.Error.WriteLine("Already registered types:");
+		CodeType_Name.Select(x=>{
+			//TODO 潙可空值類型旹 則輸出 似Nullable`1: INTEGER
+			System.Console.Error.WriteLine(x.Key.Name+": "+x.Value);
+			return x;
+		}).ToList();
 		throw new NotImplementedException($"Type {Type.Name} is not supported and cannot be mapped to a Sqlite type name.");
 	}
 
