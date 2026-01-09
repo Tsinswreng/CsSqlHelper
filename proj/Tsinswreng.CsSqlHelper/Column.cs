@@ -3,7 +3,7 @@ namespace Tsinswreng.CsSqlHelper;
 
 
 //類型映射與字段映射
-public  partial class Column: IColumn{
+public partial class Column: IColumn{
 	/// <summary>
 	/// 在數據庫中 字段ʹ名
 	/// </summary>
@@ -21,3 +21,11 @@ public  partial class Column: IColumn{
 	// public Func<object?,object?>? RawToUpper{get;set;} = (x)=>x;
 }
 
+
+public class Column<TTbl, TRaw, TUpper> : Column, IColumn<TTbl, TRaw, TUpper>{
+
+}
+
+// public class Column<T> : Column<T, T>, IColumn<T>{
+
+// }

@@ -28,6 +28,8 @@ public partial interface ITxn : IDisposable{
 	/// <param name="Ct"></param>
 	/// <returns>null</returns>
 	public Task<nil> Rollback(CT Ct);
+
+	public Task<nil> Rollback(Func<Exception, nil> OnErr, CT Ct);
 }
 
 

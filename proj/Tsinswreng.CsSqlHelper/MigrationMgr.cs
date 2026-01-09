@@ -18,7 +18,7 @@ public class MigrationMgr: IMigrationMgr{
 	public async Task<Func<
 		CT
 		,Task<SchemaHistory?>
-	>> FnGetLastHistory(IBaseDbFnCtx Ctx, CT Ct){
+	>> FnGetLastHistory(IDbFnCtx Ctx, CT Ct){
 		var T = TblMgr.GetTbl<SchemaHistory>();
 		var PCreatedMs = T.Prm(nameof(SchemaHistory.CreatedMs));
 		var Sql =
@@ -45,7 +45,7 @@ ORDER BY {T.Fld(PCreatedMs)} DESC
 	}
 
 	public async Task<SchemaHistory?> GetLastHistory(CT Ct){
-		var Ctx = new BaseDbFnCtx();
+		var Ctx = new DbFnCtx();
 		var Fn = await FnGetLastHistory(Ctx, Ct);
 		var R = await Fn(Ct);
 		return R;

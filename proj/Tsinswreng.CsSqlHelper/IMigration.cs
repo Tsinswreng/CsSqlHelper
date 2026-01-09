@@ -10,11 +10,11 @@ public interface I_CreatedMs{
 public partial interface IMigration:I_CreatedMs{
 	public Task<Func<
 		CT, Task<nil>
-	>> FnUpAsy(IBaseDbFnCtx Ctx, CT Ct);
+	>> FnUpAsy(IDbFnCtx Ctx, CT Ct);
 
 	public Task<Func<
 		CT, Task<nil>
-	>> FnDownAsy(IBaseDbFnCtx Ctx, CT Ct);
+	>> FnDownAsy(IDbFnCtx Ctx, CT Ct);
 }
 
 public interface ISqlMigrationInfo:I_CreatedMs{
@@ -38,7 +38,7 @@ public class SqlMigration
 	//PassArgsByNameBecauseArgsCntMayChange
 	public static SqlMigration MkSqlMigration(
 		ISqlCmdMkr SqlCmdMkr
-		,I_GetTxnAsy MkrTxn
+		,IMkrTxn MkrTxn
 		,ISqlMigrationInfo SqlMigrationInfo
 	){
 		var R = new SqlMigration(
@@ -56,16 +56,16 @@ public class SqlMigration
 	public IList<str> SqlsDown{get;set;} = [];
 
 	ISqlCmdMkr SqlCmdMkr;
-	I_GetTxnAsy MkrTxn;
+	IMkrTxn MkrTxn;
 	public SqlMigration(
 		ISqlCmdMkr SqlCmdMkr
-		,I_GetTxnAsy MkrTxn
+		,IMkrTxn MkrTxn
 	){
 		this.SqlCmdMkr = SqlCmdMkr;
 		this.MkrTxn = MkrTxn;
 	}
 
-	async Task<nil> RunSql(IBaseDbFnCtx Ctx, str Sql, CT Ct){
+	async Task<nil> RunSql(IDbFnCtx Ctx, str Sql, CT Ct){
 		//IBaseDbFnCtx Ctx = new BaseDbFnCtx();
 		var Cmd = await SqlCmdMkr.MkCmd(Ctx, Sql, Ct);
 		await Cmd.All(Ct);
@@ -75,7 +75,7 @@ public class SqlMigration
 	[Impl(typeof(IMigration))]
 	public async Task<Func<
 		CT, Task<nil>
-	>> FnUpAsy(IBaseDbFnCtx Ctx, CT Ct){
+	>> FnUpAsy(IDbFnCtx Ctx, CT Ct){
 		return async(Ct)=>{
 			foreach(var sql in SqlsUp){
 				await RunSql(Ctx, sql, Ct);
@@ -87,7 +87,7 @@ public class SqlMigration
 	[Impl(typeof(IMigration))]
 	public Task<Func<
 		CT, Task<nil>
-	>> FnDownAsy(IBaseDbFnCtx Ctx, CT Ct){
+	>> FnDownAsy(IDbFnCtx Ctx, CT Ct){
 		throw new NotImplementedException();
 	}
 }

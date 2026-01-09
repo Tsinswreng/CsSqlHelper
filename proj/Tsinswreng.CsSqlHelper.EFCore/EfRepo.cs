@@ -2,7 +2,7 @@ namespace Tsinswreng.CsSqlHelper.EFCore;
 
 using Microsoft.EntityFrameworkCore;
 using Tsinswreng.CsPage;
-using IDbFnCtx = IBaseDbFnCtx;
+using IDbFnCtx = IDbFnCtx;
 
 public partial class EfRepo<TEntity, TId>
 	: IRepo<TEntity, TId>
@@ -13,13 +13,13 @@ public partial class EfRepo<TEntity, TId>
 		this.EfDbCtx = EfDbCtx;
 	}
 
-	public async Task<Func<CT, Task<ulong>>> FnCount(IBaseDbFnCtx? Ctx, CT Ct) {
+	public async Task<Func<CT, Task<ulong>>> FnCount(IDbFnCtx? Ctx, CT Ct) {
 		throw new NotImplementedException();
 	}
 
 	public async Task<Func<
 		IEnumerable<TEntity>, CT, Task<nil>
-	>> FnInsertMany(IBaseDbFnCtx? Ctx, CT Ct) {
+	>> FnInsertMany(IDbFnCtx? Ctx, CT Ct) {
 		var Fn = async(IEnumerable<TEntity> Entitys, CT Ct)=>{
 			await EfDbCtx.Set<TEntity>().AddRangeAsync(Entitys, Ct);
 			await EfDbCtx.SaveChangesAsync(Ct);
@@ -28,12 +28,12 @@ public partial class EfRepo<TEntity, TId>
 		return Fn;
 	}
 
-	public async Task<Func<TId, CT, Task<TEntity?>>> FnSlctOneById(IBaseDbFnCtx? Ctx, CT Ct) {
+	public async Task<Func<TId, CT, Task<TEntity?>>> FnSlctOneById(IDbFnCtx? Ctx, CT Ct) {
 		throw new NotImplementedException();
 	}
 
 	public async Task<Func<IEnumerable<Id_Dict<TId>>, CT, Task<object>>> FnUpdManyByIdOld(
-		IBaseDbFnCtx? Ctx
+		IDbFnCtx? Ctx
 		,IEnumerable<str> FieldsToUpdate
 		,CT Ct
 	){
@@ -45,7 +45,7 @@ public partial class EfRepo<TEntity, TId>
 		,CT
 		,Task<nil>
 	>> FnSoftDelManyByKeys(
-		IBaseDbFnCtx? Ctx
+		IDbFnCtx? Ctx
 		,str KeyNameInCode
 		,u64 CountPerBatch
 		,CT Ct
@@ -58,7 +58,7 @@ public partial class EfRepo<TEntity, TId>
 		,CT
 		,Task<nil>
 	>> FnSoftDelManyByKeys<TKey>(
-		IBaseDbFnCtx? Ctx
+		IDbFnCtx? Ctx
 		,str KeyNameInCode
 		,u64 CountPerBatch
 		,CT Ct
@@ -71,7 +71,7 @@ public partial class EfRepo<TEntity, TId>
 		,CT
 		,Task<nil>
 	>> FnInsertManyNoPrepare(
-		IBaseDbFnCtx? Ctx
+		IDbFnCtx? Ctx
 		,CT ct
 	){
 		throw new NotImplementedException();

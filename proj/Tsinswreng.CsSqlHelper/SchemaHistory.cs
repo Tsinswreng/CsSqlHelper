@@ -35,7 +35,7 @@ public partial class SchemaHistoryTblMkr{
 	public ITable MkTbl(){
 		var Key_Type = SqlHelperDictMapper.Inst.GetTypeDictShallowT<SchemaHistory>();
 		ITable R = Table.Mk<SchemaHistory>(SqlHelperDictMapper.Inst, TblName, Key_Type);
-		R.SetCol(nameof(SchemaHistory.Id)).AdditionalSqls(["PRIMARY KEY"]);
+		R.Col(nameof(SchemaHistory.Id)).AdditionalSqls(["PRIMARY KEY"]);
 		return R;
 	}
 

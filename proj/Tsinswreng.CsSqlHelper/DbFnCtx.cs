@@ -4,7 +4,7 @@ using System.Data;
 
 
 
-public partial class BaseDbFnCtx:IBaseDbFnCtx{
+public partial class DbFnCtx:IDbFnCtx{
 	public ITxn? Txn{get;set;}
 	public IDbConnection? DbConn{get;set;}
 	public IDictionary<str, object?>? Props{get;set;}

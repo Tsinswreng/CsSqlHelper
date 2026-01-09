@@ -45,7 +45,9 @@ public static SqliteTypeMapper Inst => _Inst??= new SqliteTypeMapper();
 			System.Console.Error.WriteLine(x.Key.Name+": "+x.Value);
 			return x;
 		}).ToList();
-		throw new NotImplementedException($"Type {Type.Name} is not supported and cannot be mapped to a Sqlite type name.");
+		throw new NotImplementedException(
+$"Type {Type.Name} is not supported and cannot be mapped to a Sqlite type name."
+);
 	}
 
 }

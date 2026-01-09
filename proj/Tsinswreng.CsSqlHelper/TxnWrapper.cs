@@ -1,18 +1,21 @@
 namespace Tsinswreng.CsSqlHelper;
 
-
-[Obsolete("宜用無泛型版")]
-public partial class TxnWrapper<TDbFnCtx>
-	where TDbFnCtx: IDbFnCtx, new()
-{
-	public IMkrDbFnCtx<TDbFnCtx> DbFnCtxMkr{get;set;}
+using TDbFnCtx = IDbFnCtx;
+public partial class TxnWrapper{
+	public IMkrDbFnCtx DbFnCtxMkr{get;set;}
 	public ITxnRunner TxnRunner{get;set;}
 	public TxnWrapper(
-		IMkrDbFnCtx<TDbFnCtx> DbFnCtxMkr
+		IMkrDbFnCtx DbFnCtxMkr
 		,ITxnRunner TxnRunner
 	){
 		this.DbFnCtxMkr = DbFnCtxMkr;
 		this.TxnRunner = TxnRunner;
+	}
+
+	Func<Exception, nil> OnErr = (e)=>null!;
+	async Task<nil> Rollback(IDbFnCtx Ctx, CT Ct){
+		await Ctx.Txn!.Rollback(OnErr, Ct);
+		return NIL;
 	}
 
 
@@ -36,11 +39,16 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch{
-			if(Ctx is not null){
-				await Ctx.Txn!.Rollback(Ct);
-				await Ctx.DisposeAsync();
+		}catch(Exception Ex){
+			try{
+				if(Ctx is not null){
+					await Rollback(Ctx, Ct);
+					await Ctx.DisposeAsync();
+				}
+			}catch(Exception Ex2){
+				throw new AggregateException(Ex2, Ex);
 			}
+
 			throw;
 		}
 	}
@@ -63,11 +71,16 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch{
-			if(Ctx is not null){
-				await Ctx.Txn!.Rollback(Ct);
-				await Ctx.DisposeAsync();
+		}catch(Exception Ex){
+			try{
+				if(Ctx is not null){
+					await Rollback(Ctx, Ct);
+					await Ctx.DisposeAsync();
+				}
+			}catch(Exception Ex2){
+				throw new AggregateException(Ex2, Ex);
 			}
+
 			throw;
 		}
 	}
@@ -92,11 +105,16 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch{
-			if(Ctx is not null){
-				await Ctx.Txn!.Rollback(Ct);
-				await Ctx.DisposeAsync();
+		}catch(Exception Ex){
+			try{
+				if(Ctx is not null){
+					await Rollback(Ctx, Ct);
+					await Ctx.DisposeAsync();
+				}
+			}catch(Exception Ex2){
+				throw new AggregateException(Ex2, Ex);
 			}
+
 			throw;
 		}
 	}
@@ -124,11 +142,16 @@ public partial class TxnWrapper<TDbFnCtx>
 			}, Ct);
 			await Ctx.DisposeAsync();
 			return R;
-		}catch{
-			if(Ctx is not null){
-				await Ctx.Txn!.Rollback(Ct);
-				await Ctx.DisposeAsync();
+		}catch(Exception Ex){
+			try{
+				if(Ctx is not null){
+					await Rollback(Ctx, Ct);
+					await Ctx.DisposeAsync();
+				}
+			}catch(Exception Ex2){
+				throw new AggregateException(Ex2, Ex);
 			}
+
 			throw;
 		}
 	}

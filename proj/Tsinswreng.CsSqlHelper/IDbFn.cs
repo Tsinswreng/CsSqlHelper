@@ -2,12 +2,12 @@
 namespace Tsinswreng.CsSqlHelper;
 
 public interface IDbFn:IAsyncDisposable{
-	public IBaseDbFnCtx? Ctx{get;set;}
+	public IDbFnCtx? Ctx{get;set;}
 }
 
 public class DbFn : IDbFn {
 	public ISqlCmd? SqlCmd{get;set;}
-	public IBaseDbFnCtx? Ctx{get;set;}
+	public IDbFnCtx? Ctx{get;set;}
 	public ICollection<obj?> ObjsToDispose{get;set;} = new List<obj?>();
 	public async ValueTask DisposeAsync() {
 		if(SqlCmd is IAsyncDisposable disposable){

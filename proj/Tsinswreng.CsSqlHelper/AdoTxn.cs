@@ -26,6 +26,16 @@ public partial class AdoTxn:ITxn{
 		_RawTxn.Rollback();
 		return NIL;
 	}
+
+	public async Task<nil> Rollback(Func<Exception, nil> OnErr, CT Ct){
+		try{
+			await Rollback(Ct);
+		}catch(Exception e){
+			OnErr(e);
+		}
+		return NIL;
+	}
+
 	public void Dispose(){
 		_RawTxn.Dispose();
 	}

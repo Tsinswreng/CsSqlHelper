@@ -2,11 +2,11 @@ namespace Tsinswreng.CsSqlHelper.Postgres;
 using System.Data;
 using Npgsql;
 using Tsinswreng.CsCore;
-using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
+using IDbFnCtx = Tsinswreng.CsSqlHelper.IDbFnCtx;
 
 public partial class PostgresCmdMkr
 	:ISqlCmdMkr
-	,I_GetTxnAsy
+	,IMkrTxn
 {
 
 	public IDbConnMgr DbConnGetter{get;set;}
@@ -78,8 +78,8 @@ public partial class PostgresCmdMkr
 	// }
 
 
-	public async Task<ITxn> GetTxnAsy(
-		IBaseDbFnCtx Ctx, CT Ct
+	public async Task<ITxn> MkTxnAsy(
+		IDbFnCtx Ctx, CT Ct
 	){
 		// pg中同一交易中 ʹ多條命令 須屬于同一連接。後MkCmd旹所用ʹ連接 亦 優先從Ctx.DbConn中取
 		//事務過後 Ctx會Dispose 故每次開Ctx旹其DbConn必取自DbConnGetter

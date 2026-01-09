@@ -4,10 +4,10 @@ using Microsoft.Data.Sqlite;
 using Tsinswreng.CsCore;
 
 
-using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
+using IDbFnCtx = Tsinswreng.CsSqlHelper.IDbFnCtx;
 public partial class SqliteCmdMkr
 	:ISqlCmdMkr
-	,I_GetTxnAsy
+	,IMkrTxn
 {
 	// [Obsolete]
 	// public IDbConnection? DbConnection{get;set;}
@@ -87,9 +87,9 @@ public partial class SqliteCmdMkr
 	// 	return Ans;
 	// }
 
-	[Impl(typeof(I_GetTxnAsy))]
-	public async Task<ITxn> GetTxnAsy(
-		IBaseDbFnCtx Ctx, CT Ct
+	[Impl(typeof(IMkrTxn))]
+	public async Task<ITxn> MkTxnAsy(
+		IDbFnCtx Ctx, CT Ct
 	){
 		var DbConnection = Ctx.DbConn??await DbConnGetter.GetConnAsy(Ct); //事務過後 Ctx會Dispose 故每次開Ctx旹其DbConn必取自DbConnGetter
 		//var DbConnection = await DbConnGetter.GetConnAsy(Ct);

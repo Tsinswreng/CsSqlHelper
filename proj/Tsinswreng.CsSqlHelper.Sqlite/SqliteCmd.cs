@@ -7,7 +7,7 @@ using Tsinswreng.CsCore;
 using Tsinswreng.CsTools;
 
 namespace Tsinswreng.CsSqlHelper.Sqlite;
-using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
+using IDbFnCtx = Tsinswreng.CsSqlHelper.IDbFnCtx;
 
 public partial class SqliteCmd : BaseSqlCmd<SqliteCommand, SqliteTransaction> {
 	public SqliteCmd(SqliteCommand RawCmd):base(RawCmd){

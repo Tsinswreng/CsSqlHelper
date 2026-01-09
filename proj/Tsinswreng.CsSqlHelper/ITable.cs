@@ -10,6 +10,29 @@ public partial interface ITable<T>:ITable{
 
 }
 
+public enum ERelationType{
+	Unknown,
+	OneToOne,
+	OneToMany,
+	ManyToMany,
+	ManyToOne,
+}
+
+public class JoinCond{
+	public IColumn Left{get;set;}
+	public IColumn Right{get;set;}
+}
+
+public class Relation{
+	public ERelationType Type{get;set;}
+	public ITable TargetTbl{get;set;}
+	//public
+}
+
+public class Relations{
+
+}
+
 /// <summary>
 /// Table in database
 /// </summary>

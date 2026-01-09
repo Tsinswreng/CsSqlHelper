@@ -2,7 +2,7 @@ namespace Tsinswreng.CsSqlHelper;
 
 using System.Data;
 
-using IDbFnCtx = IBaseDbFnCtx;
+
 using Tsinswreng.CsCore;
 using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;

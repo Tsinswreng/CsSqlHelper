@@ -12,13 +12,13 @@ public partial interface ISqlCmdMkr{
 	public Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct);
 
 	public Task<ISqlCmd> Prepare(
-		IBaseDbFnCtx? DbFnCtx
+		IDbFnCtx? DbFnCtx
 		,str Sql
 		,CT Ct
 	);
 
 	public Task<ISqlCmd> Prepare(
-		IBaseDbFnCtx? DbFnCtx
+		IDbFnCtx? DbFnCtx
 		,ISql Sql
 		,CT Ct
 	){
@@ -33,7 +33,7 @@ public partial interface ISqlCmdMkr{
 /// <param name="Ct"></param>
 /// <returns></returns>
 	public Task<ISqlCmd> MkCmd(
-		IBaseDbFnCtx? DbFnCtx
+		IDbFnCtx? DbFnCtx
 		,str Sql
 		,CT Ct
 	);

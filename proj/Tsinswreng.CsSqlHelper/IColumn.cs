@@ -73,3 +73,10 @@ public partial interface IColumn{
 
 }
 
+public interface IColumn<TTbl, TRaw, TUpper>:IColumn{
+
+}
+
+// public interface IColumn<T>:IColumn<T,T>{
+
+// }

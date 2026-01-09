@@ -6,7 +6,6 @@ using Tsinswreng.CsCore;
 using Tsinswreng.CsTools;
 
 namespace Tsinswreng.CsSqlHelper;
-using IDbFnCtx = Tsinswreng.CsSqlHelper.IBaseDbFnCtx;
 
 public abstract partial class BaseSqlCmd<
 	TRawCmd ,TRawTxn
@@ -32,7 +31,7 @@ public abstract partial class BaseSqlCmd<
 		return this;
 	}
 
-	public virtual ISqlCmd AttachCtxTxn(IDbFnCtx? Ctx){
+	public virtual ISqlCmd AttachCtxTxn(IDbFnCtx Ctx){
 		if(Ctx?.Txn is not null){
 			AttachCtxTxn(Ctx.Txn);
 		}

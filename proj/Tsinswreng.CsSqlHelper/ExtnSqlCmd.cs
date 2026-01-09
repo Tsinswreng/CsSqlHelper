@@ -23,7 +23,7 @@ public static class ExtnSqlCmd{
 
 
 	extension(ISqlCmd z){
-		public ISqlCmd WithCtx(IBaseDbFnCtx? Ctx){
+		public ISqlCmd WithCtx(IDbFnCtx? Ctx){
 			if(Ctx is null){
 				return z;
 			}

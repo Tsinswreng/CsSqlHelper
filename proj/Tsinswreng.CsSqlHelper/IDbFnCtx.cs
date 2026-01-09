@@ -2,7 +2,7 @@ using System.Data;
 
 namespace Tsinswreng.CsSqlHelper;
 
-public partial interface IBaseDbFnCtx
+public partial interface IDbFnCtx
 	:IAsyncDisposable
 {
 	public ITxn? Txn{get;set;}
@@ -26,7 +26,7 @@ public partial interface IBaseDbFnCtx
 
 public static partial class ExtnIBaseDbFnCtx{
 	extension<TSelf>(TSelf z)
-		where TSelf: IBaseDbFnCtx
+		where TSelf: IDbFnCtx
 	{
 		private TSelf _AddToDispose(
 			obj? Disposable
@@ -60,7 +60,7 @@ public static partial class ExtnIBaseDbFnCtx{
 	}
 
 	extension<TSelf>(TSelf z)
-		where TSelf: IBaseDbFnCtx
+		where TSelf: IDbFnCtx
 	{
 		/// <summary>
 		/// Prepare並AddToDispose
