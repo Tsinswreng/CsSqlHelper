@@ -10,24 +10,37 @@ public class ISqlSplicer<T>{
 		Segs.Add(Seg);
 		return this;
 	}
+
+	/// s -> "s"
 	str Qt(str s){
 		return Tbl.Qt(s);
 	}
+
+	// CodeCol -> "DbCol"
 	str Fld(str s){
-		//return Tbl.Fld(s);
-		return Tbl.Qt(Tbl.DbTblName+"."+Tbl.ColNameToDb(s));
+		return Tbl.Fld(s);
+		//return Tbl.Qt(Tbl.DbTblName+"."+Tbl.ColNameToDb(s));
 	}
+
+	/// p -> @p
 	IParam Prm(str s){
 		return Tbl.Prm(s);
 	}
+
+	/// x=>x.Memb -> Memb (string)
 	str Memb<T2>(Expression<Func<T2, obj?>> Memb){
 		return ToolExpr.GetMemberName(Memb);
 	}
+
+	/// x=>x.Memb -> Tbl.Memb
 	str TblWithMemb<T2>(Expression<Func<T2, obj?>> ExprMemb){
 		return Tbl.DbTblName+"."+Memb(ExprMemb);
 	}
+
+	/// x=>x.Memb -> "Tbl"."Memb"
 	str QtTblWithMemb<T2>(Expression<Func<T2, obj?>> ExprMemb){
-		return Tbl.Qt(TblWithMemb(ExprMemb));
+		//Tbl.Qt(TblWithMemb(ExprMemb)); 此謬。如"Tbl.Field"實示 完整ʹ字段。璫用"Tbl"."Field"
+		return Tbl.Qt(Tbl.DbTblName)+"."+Tbl.Qt(Memb(ExprMemb));
 	}
 
 	public ISqlSplicer<T> Raw(str Raw){
@@ -86,9 +99,6 @@ public class ISqlSplicer<T>{
 
 
 	public ISqlSplicer<T> Bool(Expression<Func<T, obj?>> GetMember, str Op, IParam Param){
-		if(Dbg.Cnt == 18){
-			System.Console.WriteLine();
-		}
 		var memb = Memb(GetMember);
 		AddSeg($"{Fld(memb)} {Op} {Param}");
 		return this;
@@ -102,7 +112,7 @@ public class ISqlSplicer<T>{
 
 
 
-	public ISqlSplicer<T> BoolOp(
+	public ISqlSplicer<T> Bool(
 		str BoolOp
 		,Expression<Func<T, obj?>> GetMember, str Op, out IParam Param
 	){
@@ -110,7 +120,7 @@ public class ISqlSplicer<T>{
 		return Bool(GetMember, Op, out Param);
 	}
 	public ISqlSplicer<T> And(Expression<Func<T, obj?>> GetMember, str Op, out IParam Param){
-		BoolOp("AND", GetMember, Op, out Param);
+		Bool("AND", GetMember, Op, out Param);
 		return this;
 	}
 
