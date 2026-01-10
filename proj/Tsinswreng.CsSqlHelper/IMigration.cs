@@ -68,7 +68,7 @@ public class SqlMigration
 	async Task<nil> RunSql(IDbFnCtx Ctx, str Sql, CT Ct){
 		//IBaseDbFnCtx Ctx = new BaseDbFnCtx();
 		var Cmd = await SqlCmdMkr.MkCmd(Ctx, Sql, Ct);
-		await Cmd.All(Ct);
+		await Cmd.All1d(Ct);
 		return NIL;
 	}
 

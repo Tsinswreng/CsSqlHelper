@@ -11,8 +11,8 @@ public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 	/// </summary>
 	public IList<Func<Task<nil>>> FnsOnDispose{get;set;}
 	public str? Sql{get;set;}
-	public IAsyncEnumerable<IDictionary<str, obj?>> IterAsyE(CT Ct);
-	public Task<IList<IDictionary<str, obj?>>> All(CT Ct);
+	public IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(CT Ct);
+	public Task<IList<IDictionary<str, obj?>>> All1d(CT Ct);
 
 	/// <summary>
 	/// raw arg name to value

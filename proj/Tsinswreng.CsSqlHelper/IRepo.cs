@@ -8,7 +8,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnInsertMany(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,CT Ct
 	);
 
@@ -17,7 +17,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnInsertOne(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,CT Ct
 	);
 
@@ -26,7 +26,7 @@ public partial interface IRepo<TEntity, TId>{
 		CT
 		,Task<u64>
 	>> FnCount(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,CT Ct
 	);
 
@@ -35,7 +35,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<TEntity?>
 	>> FnSlctOneById(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,CT Ct
 	);
 
@@ -43,7 +43,7 @@ public partial interface IRepo<TEntity, TId>{
 	public Task<Func<
 		IPageQry
 		,CT, Task<IPageAsyE<IDictionary<str, obj?>>>
-	>> FnPageAllDict(IDbFnCtx? Ctx, CT Ct);
+	>> FnPageAllDict(IDbFnCtx Ctx, CT Ct);
 
 	public Task<Func<
 		IPageQry
@@ -56,7 +56,7 @@ public partial interface IRepo<TEntity, TId>{
 		,TEntity
 		,CT, Task<nil>
 	>> FnUpdByIdOld(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,IEnumerable<str>? FieldsToUpdate
 		,CT Ct
 	);
@@ -67,7 +67,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnUpdManyByIdOld(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,IEnumerable<str> FieldsToUpdate
 		,CT Ct
 	);
@@ -77,7 +77,7 @@ public partial interface IRepo<TEntity, TId>{
 		TEntity
 		,CT, Task<nil>
 	>> FnUpdOneById(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,IEnumerable<str>? UpperFieldsToUpdate
 		,CT Ct
 	);
@@ -87,7 +87,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnUpdManyById(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,IEnumerable<str>? UpperFieldsToUpdate
 		,CT Ct
 	);
@@ -97,7 +97,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnAsyEUpdManyById(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,IEnumerable<str>? UpperFieldsToUpdate
 		,CT Ct
 	);
@@ -108,7 +108,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnSoftDelManyByKeys(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,str KeyNameInCode
 		,u64 CountPerBatch
 		,CT Ct
@@ -120,7 +120,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnSoftDelManyByKeys<TKey>(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,str KeyNameInCode
 		,u64 CountPerBatch
 		,CT Ct
@@ -137,7 +137,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT
 		,Task<nil>
 	>> FnInsertManyNoPrepare(
-		IDbFnCtx? Ctx
+		IDbFnCtx Ctx
 		,CT ct
 	);
 

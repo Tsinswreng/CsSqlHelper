@@ -112,47 +112,79 @@ public abstract partial class BaseSqlCmd<
 		return CodeVal;
 	}
 
-	public virtual async IAsyncEnumerable<IDictionary<str, obj?>> IterAsyE(
+	public virtual async IAsyncEnumerable<
+		IAsyncEnumerable<IDictionary<str, obj?>>
+	> AsyE2d(
 		[EnumeratorCancellation]
 		CT Ct
 	){
 		using var Dl = new DisposableList();
 		DbDataReader Reader = null!;
 		try{
+			// 执行查询获取Reader，和原代码逻辑完全一致
 			Reader = await RawCmd.ExecuteReaderAsync(Ct);
 			Dl.Add(Reader);
 		}
 		catch (System.Exception e){
+			// 原代码的异常封装逻辑，一行不改
 			var Err = new DbErr(
 				e.Message
-				+"\nSql:\n"+Sql
-				+"\nParams"+RawCmd.Parameters.ToReadableString()
-				,e
+				+ "\nSql:\n" + Sql
+				+ "\nParams" + RawCmd.Parameters.ToReadableString()
+				, e
 			);
 			Dl.Dispose();
 			throw Err;
 		}
-		while(await Reader.ReadAsync(Ct)){
+
+		// do-while 是多结果集的标准循环，先读第一个结果集，再切换
+		do{
+			// ★ 核心：为【当前结果集】创建一个「内层异步枚举器」，读取当前结果集的所有行
+			// 外层直接 yield return 这个内层枚举器，完美实现二维IAsyncEnumerable
+			yield return ReadCurrentResultSetRowsAsync(Reader, Ct);
+
+			// ★ 切换到下一个结果集，带取消令牌，无则退出循环
+		} while (await Reader.NextResultAsync(Ct));
+	}
+
+	// ★ 私有内层方法：负责读取【单个结果集】的所有行，返回单行数据的异步枚举
+	private async IAsyncEnumerable<IDictionary<str, obj?>> ReadCurrentResultSetRowsAsync(
+		DbDataReader reader,
+		[EnumeratorCancellation]
+		CT ct
+	){
+		// 读取当前结果集的每一行，和你原IterAsyE的单行读取逻辑完全一致
+		while (await reader.ReadAsync(ct)){
 			var RawDict = new Dictionary<str, obj?>();
-			for(var i = 0; i < Reader.FieldCount; i++){
-				RawDict.Add(Reader.GetName(i), DbValToCodeVal(Reader.GetValue(i)));
+			for (var i = 0; i < reader.FieldCount; i++){
+				RawDict.Add(reader.GetName(i), DbValToCodeVal(reader.GetValue(i)));
 			}
 			yield return RawDict;
 		}
 	}
 
-	public virtual async Task<IList<IDictionary<str, obj?>>> All(CT Ct){
-		using var reader = await RawCmd.ExecuteReaderAsync(Ct);
-		var result = new List<IDictionary<str, obj?>>();
-
-		while (await reader.ReadAsync(Ct)){
-			var row = new Dictionary<str, obj?>(reader.FieldCount);
-			for (var i = 0; i < reader.FieldCount; i++)
-				row[reader.GetName(i)] = DbValToCodeVal(reader.GetValue(i));
-			result.Add(row);
+	/// <summary>
+	/// 多個結果集ʹ內容ˇ 皆扁平化
+	/// </summary>
+	/// <param name="Ct"></param>
+	/// <returns></returns>
+	public virtual async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(
+		[EnumeratorCancellation]
+		CT Ct
+	){
+		var d2 = AsyE2d(Ct);
+		await foreach (var d1 in d2){
+			await foreach (var row in d1){
+				yield return row;
+			}
 		}
-		return result;
 	}
+
+
+	public virtual async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
+		return await AsyE1d(Ct).ToListAsync(Ct);
+	}
+
 
 	public void Dispose(){
 		RawCmd.Dispose();
