@@ -22,8 +22,7 @@ public abstract partial class BaseSqlCmd<
 		RawCmd = DbCmd;
 	}
 
-	public virtual ISqlCmd AttachCtxTxn(ITxn Txn)
-	{
+	public virtual ISqlCmd AttachCtxTxn(ITxn Txn){
 		if(Txn.RawTxn is not TRawTxn RawTxn){
 			throw new ArgumentException("Txn.RawTxn is not TRawTxn RawTxn");
 		}
@@ -151,10 +150,10 @@ public abstract partial class BaseSqlCmd<
 	private async IAsyncEnumerable<IDictionary<str, obj?>> ReadCurrentResultSetRowsAsync(
 		DbDataReader reader,
 		[EnumeratorCancellation]
-		CT ct
+		CT Ct
 	){
 		// 读取当前结果集的每一行，和你原IterAsyE的单行读取逻辑完全一致
-		while (await reader.ReadAsync(ct)){
+		while (await reader.ReadAsync(Ct)){
 			var RawDict = new Dictionary<str, obj?>();
 			for (var i = 0; i < reader.FieldCount; i++){
 				RawDict.Add(reader.GetName(i), DbValToCodeVal(reader.GetValue(i)));
