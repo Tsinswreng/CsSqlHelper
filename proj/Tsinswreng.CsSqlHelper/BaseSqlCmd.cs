@@ -156,6 +156,8 @@ public abstract partial class BaseSqlCmd<
 		while (await reader.ReadAsync(Ct)){
 			var RawDict = new Dictionary<str, obj?>();
 			for (var i = 0; i < reader.FieldCount; i++){
+//TODO 優化異常ʹ訊
+// reader.GetName(i)ʃ得ʹ列名ˋ不帶表名、如Select* 後作多表join 遇同名列則褈添ⁿ致錯、Select A.Id, B.Id旹亦然
 				RawDict.Add(reader.GetName(i), DbValToCodeVal(reader.GetValue(i)));
 			}
 			yield return RawDict;

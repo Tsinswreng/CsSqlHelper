@@ -9,7 +9,8 @@ using Tsinswreng.CsTools;
 using Tsinswreng.CsPage;
 using System.Collections;
 using System.Diagnostics;
-
+using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
+using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 
 //using T = Bo_Word;
 //TODO 拆分ⁿ使更通用化
@@ -153,6 +154,18 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		};
 	}
 
+	public Task<Func<
+		IAsyncEnumerable<TEntity>
+		,CT
+		,Task<nil>
+	>> FnInsertAsyE(
+		IDbFnCtx Ctx
+		,CT Ct
+	){
+		throw new NotImplementedException();
+	}
+
+
 	public class CfgInsertMany{
 		public bool Prepare = true;
 		/// <summary>
@@ -166,13 +179,13 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		//public u64 BatchSize = 4;
 	}
 
+//TODO 500一批、可用緩衝區、不足一批者 則手動建ʹsql 一次發送。參數可用 Ulid 64進制
 	protected async Task<Func<
 		IEnumerable<TEntity>,CT,Task<nil>
 	>> _FnInsertMany(
 		IDbFnCtx Ctx,CfgInsertMany? Cfg, CT Ct
 	){
 		Cfg??=new();
-		var T = TblMgr.GetTbl<TEntity>();
 
 		if(T.TblMgr?.DbSrcType == ConstDbSrcType.Sqlite){
 			var old = await _FnInsertManyLoop(Ctx, Cfg.Prepare, Ct);
@@ -510,7 +523,6 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 	}
 
 
-
 	[Obsolete]
 	[Impl]
 	public async Task<Func<
@@ -603,10 +615,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 """;
 		var ValToSet = T.SoftDelCol.FnDelete(null);
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
-		var Fn = async(
-			IEnumerable<object?> Keys
-			,CT Ct
-		)=>{
+		return async(Keys, Ct)=>{
 			await using BatchCollector<object?, nil> BatchList = new(async (x, Ct)=>{
 				IList<object?> Args = [ValToSet, ..x];
 				Args.FillUpTo(CountPerBatch+1, null);
@@ -620,7 +629,6 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 			await BatchList.End(Ct);
 			return NIL;
 		};
-		return Fn;
 	}
 
 	[Impl]
@@ -634,17 +642,12 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		,u64 ParamNum
 		,CT Ct
 	){
-		var T = TblMgr.GetTbl<TEntity>();
 		var NonGeneric = await FnSoftDelManyByKeys(Ctx, KeyNameInCode, ParamNum, Ct);
-		var Fn = async(
-			IEnumerable<TKey> Keys
-			,CT Ct
-		)=>{
+		return async(Keys,Ct)=>{
 			var Args = Keys.Select(K=>T.UpperToRaw(K, KeyNameInCode));
 			await NonGeneric(Args, Ct);
 			return NIL;
 		};
-		return Fn;
 	}
 
 /// TODO 用Where Id IN (@0, @1, @2...) 㕥減次芝往返
@@ -776,7 +779,168 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		return Fn;
 	}
 
+	// static str SqlFilterDel(
+	// 	ITable Tbl,
+	// 	bool IncludeDel
+	// ){
+	// 	return IncludeDel
+	// 		? ""
+	// 		: $"AND {Tbl.SqlIsNonDel()}";
+	// }
 
+	public async Task<Func<
+		IList<obj?>
+		,CT
+		,Task<IAsyncEnumerable<IStr_Any>>
+	>> FnScltAllByFieldInVals(
+		IDbFnCtx Ctx
+		,ITable Tbl
+		,str CodeCol
+		,OptQry? OptQry
+		,CT Ct
+	){
+
+		var numParams = T.NumParams(OptQry?.InParamCnt??1);
+		var Sql =
+$"""
+SELECT * FROM {Tbl.Qt(Tbl.DbTblName)}
+WHERE 1=1
+AND {T.Fld(CodeCol)} IN ({str.Join(",", numParams)})
+""";
+		var SqlCmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
+		return async(Args ,Ct)=>{
+			if(Args.Count < numParams.Count){
+				throw new Exception("Args.Count < numParams.Count");
+			}
+			var Arg = ArgDict.Mk(T)
+			.AddManyT(numParams, Args, Alt: null);
+			var DbDict = Ctx.RunCmd(SqlCmd, Arg).AsyE1d(Ct);
+			return DbDict;
+		};
+	}
+
+
+	public async Task<Func<
+		IList<TField>
+		,CT
+		,Task<IAsyncEnumerable<TEntity2>>
+	>> FnScltAllByFieldInVals<TEntity2, TField>(
+		IDbFnCtx Ctx
+		,ITable Tbl
+		,str CodeCol
+		,OptQry? OptQry
+		,CT Ct
+	)
+		where TEntity2 : class, new()
+	{
+		var T = Tbl;
+		OptQry??=new();
+		var numParams = Tbl.NumParams(OptQry.InParamCnt-1);
+		var Sql =
+$"""
+SELECT * FROM {Tbl.Qt(Tbl.DbTblName)}
+WHERE 1=1
+AND {Tbl.Fld(CodeCol)} IN ({str.Join(",", numParams)})
+""";
+		var SqlCmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
+		return async(Args ,Ct)=>{
+			if(Args.Count < numParams.Count){
+				throw new Exception("Args.Count < numParams.Count");
+			}
+			var Arg = ArgDict.Mk(Tbl)
+			.AddManyT(numParams, Args, Alt: null);
+			var DbDict = Ctx.RunCmd(SqlCmd, Arg).AsyE1d(Ct);
+			return DbDict.Select(x=>Tbl.DbDictToEntity<TEntity2>(x));
+		};
+	}
+
+
+	/// <summary>
+	/// 【通用】批量查询关联表数据，并按「外键」分组为字典
+	/// 核心复用方法：替代你代码中 mkFn + 查询 + 转实体 + GroupBy 的全部逻辑
+	/// </summary>
+	/// <typeparam name="TJoinEntity">关联表实体类型(PoWordProp/PoWordLearn)</typeparam>
+	/// <typeparam name="TMainId">主表主键类型(IdWord)</typeparam>
+	/// <param name="Ctx">数据库上下文</param>
+	/// <param name="JoinTable">关联表的ITable对象</param>
+	/// <param name="OptQry">查询配置(是否包含删除/批量参数个数)</param>
+	/// <param name="MainIds">主表ID集合</param>
+	/// <param name="FkFieldName">关联表中的「外键字段名」如：nameof(PoWordProp.WordId)</param>
+	/// <param name="Ct">取消令牌</param>
+	/// <returns>Key=主表ID, Value=该ID对应的所有关联数据</returns>
+	public async Task<Dictionary<TMainId, List<TJoinEntity>>>
+	BatchQueryJoinDataAndGroupByFk<TJoinEntity, TMainId>(
+		IDbFnCtx Ctx,
+		ITable JoinTable,
+		OptQry OptQry,
+		IList<TMainId> MainIds,
+		Func<TJoinEntity, TMainId> FkSelector, // ✅ 核心新增：外键选择器委托，比如 x => x.WordId
+		string FkFieldName,
+		CT Ct
+	)
+		where TJoinEntity : class, new() {
+		// 复用你原有的 FnScltAllByWordIds 逻辑，通用化外键字段
+		var fnQuery = await FnScltAllByFieldInVals<TJoinEntity, TMainId>(
+			Ctx, JoinTable, FkFieldName, OptQry, Ct
+		);
+		var joinDictAsync = await fnQuery(MainIds, Ct);
+		//var joinDictList = await joinDictAsync.ToListAsync(ct);
+
+		// 转实体 + 按外键分组 → 直接返回字典，业务层无需再写分组逻辑
+		var joinEntities = await joinDictAsync.ToListAsync(Ct);
+		var joinGroupDict = joinEntities
+			.GroupBy(FkSelector)
+			.ToDictionary(g => g.Key, g => g.ToList());
+
+		return joinGroupDict;
+	}
+
+	/// <summary>
+	/// 【通用】批量组装聚合对象的核心方法
+	/// 遍历主表数据，匹配关联字典，返回聚合对象的异步枚举
+	/// 复用你原有的 BatchCollector + yield return 全部逻辑
+	/// </summary>
+	/// <typeparam name="TMain">主表实体</typeparam>
+	/// <typeparam name="TMainId">主表主键</typeparam>
+	/// <typeparam name="TJoinResult">聚合对象</typeparam>
+	/// <param name="mainList">主表数据列表</param>
+	/// <param name="makeJoinResult">业务层传入「聚合对象构造逻辑」- 唯一的业务代码</param>
+	/// <param name="ct">取消令牌</param>
+	/// <returns></returns>
+	public async IAsyncEnumerable<TJoinResult> BatchMakeJoinResult<TMain, TMainId, TJoinResult>(
+		IEnumerable<TMain> mainList,
+		Func<TMain, Task<TJoinResult>> makeJoinResult,
+		CancellationToken ct)
+		where TMain : class
+		where TMainId : notnull
+		where TJoinResult : class {
+		await using var batch = new BatchCollector<TMain, IList<TJoinResult>>(async (mainBatch, ct) => {
+			var result = new List<TJoinResult>();
+			foreach (var main in mainBatch) {
+				result.Add(await makeJoinResult(main));
+			}
+			return result;
+		});
+
+		await foreach (var list in batch.AddRangeAsyE(mainList, ct)) {
+			if (list != null) {
+				foreach (var item in list) yield return item;
+			}
+		}
+
+		var lastList = await batch.End(ct);
+		if (lastList != null) {
+			foreach (var item in lastList) yield return item;
+		}
+	}
+
+
+	/// <summary>
+	/// 【通用】从主表实体中提取主键的快捷方法
+	/// </summary>
+	public IList<TMainId> ExtractMainIds<TMain, TMainId>(IEnumerable<TMain> mainList, Func<TMain, TMainId> idSelector) {
+		return mainList.Select(idSelector).ToList();
+	}
 
 
 	// public async Task<Func<

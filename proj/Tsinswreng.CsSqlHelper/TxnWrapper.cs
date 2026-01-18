@@ -32,7 +32,7 @@ public partial class TxnWrapper{
 	){
 		TDbFnCtx Ctx = default!;
 		try{
-			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtx(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
 			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
 				return await Xxx(Ct);
@@ -64,7 +64,7 @@ public partial class TxnWrapper{
 	){
 		TDbFnCtx Ctx = default!;
 		try{
-			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtx(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
 			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
 				return await Xxx(Arg0, Ct);
@@ -98,7 +98,7 @@ public partial class TxnWrapper{
 	){
 		TDbFnCtx Ctx = default!;
 		try{
-			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtx(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
 			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
 				return await Xxx(Arg0, Arg1, Ct);
@@ -135,7 +135,7 @@ public partial class TxnWrapper{
 	){
 		TDbFnCtx Ctx = default!;
 		try{
-			Ctx = await DbFnCtxMkr.MkTxnDbFnCtxAsy(Ct);
+			Ctx = await DbFnCtxMkr.MkTxnDbFnCtx(Ct);
 			var Xxx = await FnXxx(Ctx, Ct);
 			var R = await TxnRunner.RunTxn(Ctx.Txn, async(Ct)=>{
 				return await Xxx(Arg0, Arg1, Arg2, Ct);

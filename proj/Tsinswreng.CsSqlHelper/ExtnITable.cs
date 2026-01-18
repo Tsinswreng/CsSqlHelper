@@ -25,7 +25,7 @@ public static class ExtnITable{
 		/// 宜用此㕥取列 無旹自有報錯ʹ訊
 		public IColumn GetCol(str CodeColName){
 			if(!z.Columns.TryGetValue(CodeColName, out var Col)){
-				throw new Exception($"No such column: {CodeColName}\nAvailable columns: {string.Join(", ", z.Columns.Keys)}");
+				throw new Exception($"In Table {z.DbTblName}, No such column: {CodeColName}\nAvailable columns: {string.Join(", ", z.Columns.Keys)}");
 			}
 			return Col;
 		}
@@ -139,11 +139,13 @@ public static class ExtnITable{
 			obj? UpperValue
 			,str CodeColName
 		){
-			return z.Columns[CodeColName].UpperToRaw?.Invoke(UpperValue)??UpperValue;
+			var Col = z.GetCol(CodeColName);
+			return Col.UpperToRaw?.Invoke(UpperValue)??UpperValue;
 		}
 
-		public obj? UpperToRaw<T>(
-			T UpperValue
+		public obj? UpperToRaw(
+			obj? UpperValue
+			,Type UpperType
 			,str? CodeColName = null
 		){
 			if(CodeColName != null
@@ -151,11 +153,19 @@ public static class ExtnITable{
 			){
 				return Col.UpperToRaw?.Invoke(UpperValue)??UpperValue;
 			}
-			if(z.UpperType_DfltMapper.TryGetValue(typeof(T), out var Mapper)){
+			if(z.UpperType_DfltMapper.TryGetValue(UpperType, out var Mapper)){
 				return Mapper.UpperToRaw?.Invoke(UpperValue)??UpperValue;
 			}
 			return UpperValue;
 			//throw new Exception("No UpperTypeMapperFn for type: "+ typeof(T));
+		}
+
+
+		public obj? UpperToRaw<T>(
+			T UpperValue
+			,str? CodeColName = null
+		){
+			return z.UpperToRaw(UpperValue, typeof(T), CodeColName);
 		}
 
 		public obj? RawToUpper(
@@ -247,14 +257,28 @@ public static class ExtnITable{
 			return z.Prm(Field+"__"+Num);
 		}
 
+		/// Num:0 -> @_0
+		public IParam NumParam(
+			u64 Num
+		){
+			return z.Prm("_"+Num);
+		}
 
-	/// <summary>
-	/// (@0, @1, @2 ...)
-	/// </summary>
-	/// <param name="z"></param>
-	/// <param name="Count"></param>
-	/// <returns></returns>
 
+		/// (EndPos: 2, StartPos: 0) -> [@_0, @_1, @_2]
+		/// StartPos<=x<=EndPos
+		public IList<IParam> NumParams(
+			u64 EndPos, u64 StartPos = 0
+		){
+			var R = new List<IParam>();
+			for(u64 i = StartPos; i <= EndPos; i++){
+				var Param = z.NumParam(i);
+				R.Add(Param);
+			}
+			return R;
+		}
+
+		/// (@0, @1, @2 ...)
 		public str NumParamClause(
 			u64 EndPos
 			,u64 StartPos = 0

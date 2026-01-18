@@ -8,7 +8,7 @@ public partial class EfTxnMkr(
 
 	:IMkrTxn
 {
-	public async Task<ITxn> MkTxnAsy(IDbFnCtx Ctx, CT Ct){
+	public async Task<ITxn> MkTxn(IDbFnCtx Ctx, CT Ct){
 		var Tx = await DbContext.Database.BeginTransactionAsync(Ct);
 		var R = new EfTxn(Tx);
 		return R;

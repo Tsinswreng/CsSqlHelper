@@ -96,6 +96,9 @@ public static partial class DbTypeConvFns{
 		var R = new UpperTypeMapFn();
 		R.UpperToRaw = (x)=>{
 			try{
+				if(x is null){
+					return null; // 2026_0117_100146
+				}
 				if(UpperToRaw == null){return x;}
 				if(ObjToUpper != null){
 					return UpperToRaw(ObjToUpper(x));
@@ -109,6 +112,9 @@ public static partial class DbTypeConvFns{
 		};
 		R.RawToUpper = (x)=>{
 			try{
+				if(x is null){
+					return null; // 2026_0117_100146
+				}
 				if(RawToUpper == null){return x;}
 				if(ObjToRaw != null){
 					return RawToUpper(ObjToRaw(x));

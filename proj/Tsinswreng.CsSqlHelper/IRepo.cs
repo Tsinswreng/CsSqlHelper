@@ -13,6 +13,16 @@ public partial interface IRepo<TEntity, TId>{
 	);
 
 	public Task<Func<
+		IAsyncEnumerable<TEntity>
+		,CT
+		,Task<nil>
+	>> FnInsertAsyE(
+		IDbFnCtx Ctx
+		,CT Ct
+	);
+
+
+	public Task<Func<
 		TEntity
 		,CT
 		,Task<nil>

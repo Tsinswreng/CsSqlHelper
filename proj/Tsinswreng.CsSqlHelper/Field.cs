@@ -13,6 +13,7 @@ public class Field:IField{
 	public str DbName{get;set;}
 	str QuotedDbName = "";
 
+	//"db_name"  不帶表名前綴
 	public override string ToString() {
 		return QuotedDbName;
 	}

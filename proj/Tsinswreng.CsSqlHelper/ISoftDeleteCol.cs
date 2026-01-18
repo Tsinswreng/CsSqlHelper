@@ -12,4 +12,6 @@ public  partial interface ISoftDeleteCol{
 	/// 參數用DbColType 勿用CodeType
 	/// </summary>
 	public Func<obj?, obj?> FnRestore{get;set;}
+
+	//TODO 增字段 如 str SqlIdDel; str SqlIsNonDel 等
 }

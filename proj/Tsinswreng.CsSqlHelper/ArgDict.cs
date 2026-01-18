@@ -30,11 +30,6 @@ public partial class ArgDict: IArgDict{
 	/// <summary>
 	/// 嘗試 Upper ->Raw轉換、轉不得則添 Upper
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <param name="Param"></param>
-	/// <param name="Upper"></param>
-	/// <param name="CodeColName"></param>
-	/// <returns></returns>
 	public IArgDict AddT<T>(IParam Param, T Upper, str? CodeColName=null){
 		if(Tbl is null){
 			return AddRaw(Param, Upper);
@@ -44,6 +39,30 @@ public partial class ArgDict: IArgDict{
 		return this;
 	}
 
+
+	public IArgDict AddManyT<T>(
+		IList<IParam> Params, IList<T> Uppers
+		,str? CodeColName=null, obj? Alt=null
+	){
+		var z = this;
+		if(z.Tbl is null){
+			throw new NullReferenceException("Tbl is null");
+		}
+		for(var i = 0; i < Params.Count; i++){
+			var Param = Params[i];
+
+			if(i >= Uppers.Count){
+				var Raw = z.Tbl.UpperToRaw(Alt, typeof(T), CodeColName);
+				ParamName_RawValue.TryAdd(Param.Name, Raw);
+			}else{
+				var Raw = z.Tbl.UpperToRaw(Uppers[i], CodeColName);
+				ParamName_RawValue.TryAdd(Param.Name, Raw);
+			}
+		}
+		return this;
+	}
+
+
 	[Impl]
 	public IDictionary<str, obj?> ToDict(){
 		return ParamName_RawValue;
@@ -52,15 +71,17 @@ public partial class ArgDict: IArgDict{
 
 
 public static class ExtnArgDict{
-	public static IArgDict AddPageQry(
-		this IArgDict z
-		,IPageQry PageQry
-		,IParam PrmLmt
-		,IParam PrmOfst
-	){
-		z.AddRaw(PrmLmt, PageQry.PageSize)
-		.AddRaw(PrmOfst, PageQry.Offset_());
-		return z;
+	extension(IArgDict z){
+		public IArgDict AddPageQry(
+			IPageQry PageQry
+			,IParam PrmLmt
+			,IParam PrmOfst
+		){
+			z.AddRaw(PrmLmt, PageQry.PageSize)
+			.AddRaw(PrmOfst, PageQry.Offset_());
+			return z;
+		}
+
 	}
 
 	// public static IArgDict Map(

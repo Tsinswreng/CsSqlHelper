@@ -5,6 +5,7 @@ namespace Tsinswreng.CsSqlHelper;
 public class ISqlSplicer<T>{
 	public ITable<T> Tbl{get;set;}
 	public IList<str> Segs{get;set;} = [];
+
 	ISqlSplicer<T> AddSeg(str Seg){
 		Seg = " "+Seg+" ";
 		Segs.Add(Seg);
@@ -173,6 +174,13 @@ public class ISqlSplicer<T>{
 
 	public ISqlSplicer<T> UpdateSet(){
 		return AddSeg($"UPDATE {Qt(Tbl.DbTblName)} SET");
+	}
+
+	public ISqlSplicer<T> With(str Raw){
+		return AddSeg("WITH").AddSeg(Raw);
+	}
+	public ISqlSplicer<T> As(){
+		return AddSeg("AS");
 	}
 
 	public ISqlSplicer<T> C(){
