@@ -64,6 +64,12 @@ public static class ExtnITable{
 			return R;
 		}
 
+		public ISqlSplicer SqlSplicer(){
+			var R = new SqlSplicer();
+			R.Tbl = z;
+			return R;
+		}
+
 
 	/// <summary>
 	/// 映射到數據庫表ʹ字段名 並加引號/括號
@@ -82,6 +88,17 @@ public static class ExtnITable{
 		){
 			return z.SqlMkr.Param(Name);
 		}
+
+		// _ + 64進制 ULID 如 "@_1ccGi7C87H-LETKfaB_JX"
+		public IParam Prm(){
+			//TODO 抽作獨ʹ工具
+			var bytes = Ulid.NewUlid().ToByteArray();
+			var id = ToolUInt128.ByteArrToUInt128(bytes);
+			var Name = ToolUInt128.ToLow64Base(id);
+			return z.SqlMkr.Param("_"+Name);
+		}
+
+
 
 		// [Obsolete]
 		// public str PrmStr(

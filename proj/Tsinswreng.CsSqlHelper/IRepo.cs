@@ -162,6 +162,29 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
+	public Task<Func<
+		IList<TCol>
+		,CT
+		,Task<IAsyncEnumerable<TEntity2>>
+	>> FnScltAllByColInVals<TEntity2, TCol>(
+		IDbFnCtx Ctx
+		,ITable Tbl
+		,str CodeCol
+		,OptQry? OptQry
+		,CT Ct
+	)where TEntity2 : class, new();
+
+	public Task<IDictionary<TKey, IList<TPo>>> IncludeEntitysByKeys<TPo, TKey>(
+		IDbFnCtx Ctx
+		,str CodeCol
+		,OptQry? OptQry
+		,IEnumerable<TKey> Keys
+		,Func<TPo, TKey> FnMemb
+		,ITable<TPo> Tbl
+		,CT Ct
+	)where TPo: new();
+
+
 
 
 }

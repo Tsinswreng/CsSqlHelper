@@ -813,7 +813,7 @@ AND {T.Fld(CodeCol)} IN ({str.Join(",", numParams)})
 				throw new Exception("Args.Count < numParams.Count");
 			}
 			var Arg = ArgDict.Mk(T)
-			.AddManyT(numParams, Args, Alt: null);
+			.AddManyT(numParams, Args);
 			var DbDict = Ctx.RunCmd(SqlCmd, Arg).AsyE1d(Ct);
 			return DbDict;
 		};
@@ -866,19 +866,26 @@ Func<
 		return await fn(Tbl, FnMemb, Keys, Ct);
 	}
 
-
-
-
-
-
-
-
+	public async Task<IDictionary<TKey, IList<TPo>>> IncludeEntitysByKeys<TPo, TKey>(
+		IDbFnCtx Ctx
+		,str CodeCol
+		,OptQry? OptQry
+		,IEnumerable<TKey> Keys
+		,Func<TPo, TKey> FnMemb
+		,ITable<TPo> Tbl
+		,CT Ct
+	)where TPo: new(){
+		//var keyList = Keys.AsOrToList();
+		// 自動把OptQry之ParamCnt設成 Keys.Count?
+		var fn = await FnIncludeEntitysByKeys<TPo, TKey>(Ctx, Tbl, CodeCol, OptQry, Ct);
+		return await fn(Tbl, FnMemb, Keys, Ct);
+	}
 
 	public async Task<Func<
-		IList<TField>
+		IList<TCol>
 		,CT
 		,Task<IAsyncEnumerable<TEntity2>>
-	>> FnScltAllByFieldInVals<TEntity2, TField>(
+	>> FnScltAllByColInVals<TEntity2, TCol>(
 		IDbFnCtx Ctx
 		,ITable Tbl
 		,str CodeCol
@@ -902,99 +909,12 @@ AND {Tbl.Fld(CodeCol)} IN ({str.Join(",", numParams)})
 				throw new Exception("Args.Count < numParams.Count");
 			}
 			var Arg = ArgDict.Mk(Tbl)
-			.AddManyT(numParams, Args, Alt: null);
+			.AddManyT(numParams, Args);
 			var DbDict = Ctx.RunCmd(SqlCmd, Arg).AsyE1d(Ct);
 			return DbDict.Select(x=>Tbl.DbDictToEntity<TEntity2>(x));
 		};
 	}
 
-
-	/// <summary>
-	/// 【通用】批量查询关联表数据，并按「外键」分组为字典
-	/// 核心复用方法：替代你代码中 mkFn + 查询 + 转实体 + GroupBy 的全部逻辑
-	/// </summary>
-	/// <typeparam name="TJoinEntity">关联表实体类型(PoWordProp/PoWordLearn)</typeparam>
-	/// <typeparam name="TMainId">主表主键类型(IdWord)</typeparam>
-	/// <param name="Ctx">数据库上下文</param>
-	/// <param name="JoinTable">关联表的ITable对象</param>
-	/// <param name="OptQry">查询配置(是否包含删除/批量参数个数)</param>
-	/// <param name="MainIds">主表ID集合</param>
-	/// <param name="FkFieldName">关联表中的「外键字段名」如：nameof(PoWordProp.WordId)</param>
-	/// <param name="Ct">取消令牌</param>
-	/// <returns>Key=主表ID, Value=该ID对应的所有关联数据</returns>
-	public async Task<Dictionary<TMainId, List<TJoinEntity>>>
-	BatchQueryJoinDataAndGroupByFk<TJoinEntity, TMainId>(
-		IDbFnCtx Ctx,
-		ITable JoinTable,
-		OptQry OptQry,
-		IList<TMainId> MainIds,
-		Func<TJoinEntity, TMainId> FkSelector, // ✅ 核心新增：外键选择器委托，比如 x => x.WordId
-		string FkFieldName,
-		CT Ct
-	)
-		where TJoinEntity : class, new() {
-		// 复用你原有的 FnScltAllByWordIds 逻辑，通用化外键字段
-		var fnQuery = await FnScltAllByFieldInVals<TJoinEntity, TMainId>(
-			Ctx, JoinTable, FkFieldName, OptQry, Ct
-		);
-		var joinDictAsync = await fnQuery(MainIds, Ct);
-		//var joinDictList = await joinDictAsync.ToListAsync(ct);
-
-		// 转实体 + 按外键分组 → 直接返回字典，业务层无需再写分组逻辑
-		var joinEntities = await joinDictAsync.ToListAsync(Ct);
-		var joinGroupDict = joinEntities
-			.GroupBy(FkSelector)
-			.ToDictionary(g => g.Key, g => g.ToList());
-
-		return joinGroupDict;
-	}
-
-	/// <summary>
-	/// 【通用】批量组装聚合对象的核心方法
-	/// 遍历主表数据，匹配关联字典，返回聚合对象的异步枚举
-	/// 复用你原有的 BatchCollector + yield return 全部逻辑
-	/// </summary>
-	/// <typeparam name="TMain">主表实体</typeparam>
-	/// <typeparam name="TMainId">主表主键</typeparam>
-	/// <typeparam name="TJoinResult">聚合对象</typeparam>
-	/// <param name="mainList">主表数据列表</param>
-	/// <param name="makeJoinResult">业务层传入「聚合对象构造逻辑」- 唯一的业务代码</param>
-	/// <param name="ct">取消令牌</param>
-	/// <returns></returns>
-	public async IAsyncEnumerable<TJoinResult> BatchMakeJoinResult<TMain, TMainId, TJoinResult>(
-		IEnumerable<TMain> mainList,
-		Func<TMain, Task<TJoinResult>> makeJoinResult,
-		CancellationToken ct)
-		where TMain : class
-		where TMainId : notnull
-		where TJoinResult : class {
-		await using var batch = new BatchCollector<TMain, IList<TJoinResult>>(async (mainBatch, ct) => {
-			var result = new List<TJoinResult>();
-			foreach (var main in mainBatch) {
-				result.Add(await makeJoinResult(main));
-			}
-			return result;
-		});
-
-		await foreach (var list in batch.AddRangeAsyE(mainList, ct)) {
-			if (list != null) {
-				foreach (var item in list) yield return item;
-			}
-		}
-
-		var lastList = await batch.End(ct);
-		if (lastList != null) {
-			foreach (var item in lastList) yield return item;
-		}
-	}
-
-
-	/// <summary>
-	/// 【通用】从主表实体中提取主键的快捷方法
-	/// </summary>
-	public IList<TMainId> ExtractMainIds<TMain, TMainId>(IEnumerable<TMain> mainList, Func<TMain, TMainId> idSelector) {
-		return mainList.Select(idSelector).ToList();
-	}
 
 
 	// public async Task<Func<
