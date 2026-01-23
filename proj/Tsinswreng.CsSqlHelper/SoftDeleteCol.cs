@@ -15,6 +15,8 @@ public partial class SoftDelol: ISoftDeleteCol{
 	/// 舊值未必會被注入
 	/// </summary>
 	public Func<obj?, obj?> FnRestore{get;set;} = (a)=>NIL;
+	public Func<str> FnSqlIsDel{get;set;} = ()=> "";
+	public Func<str> FnSqlIsNonDel{get;set;} = ()=> "";
 
 
 }

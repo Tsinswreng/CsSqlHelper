@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public  partial interface ISoftDeleteCol{
+public partial interface ISoftDeleteCol{
 	public str CodeColName{get;set;}
 	/// <summary>
 	/// FnDelete(舊值)=>新值
@@ -12,6 +12,10 @@ public  partial interface ISoftDeleteCol{
 	/// 參數用DbColType 勿用CodeType
 	/// </summary>
 	public Func<obj?, obj?> FnRestore{get;set;}
+
+	//返值爲 sql 中 ʃᶤ篩 被刪者 之表達式 (不帶AND) 如 DelAt <> 0
+	public Func<str> FnSqlIsDel{get;set;}
+	public Func<str> FnSqlIsNonDel{get;set;}
 
 	//TODO 增字段 如 str SqlIdDel; str SqlIsNonDel 等
 }

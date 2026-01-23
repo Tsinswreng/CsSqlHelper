@@ -789,17 +789,17 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 	// }
 
 	public async Task<Func<
-		IList<obj?>
+		IList<TVal>
 		,CT
 		,Task<IAsyncEnumerable<IStr_Any>>
-	>> FnScltAllByFieldInVals(
+	>> FnScltAllByColInVals<TVal>(
 		IDbFnCtx Ctx
 		,ITable Tbl
 		,str CodeCol
 		,OptQry? OptQry
 		,CT Ct
 	){
-
+		var T = Tbl;
 		var numParams = T.NumParams(OptQry?.InParamCnt??1);
 		var Sql =
 $"""
@@ -819,6 +819,60 @@ AND {T.Fld(CodeCol)} IN ({str.Join(",", numParams)})
 		};
 	}
 
+	public delegate Task<IDictionary<TKey, IList<TPo>>> TFnIncludeEntitysByKeys<TKey, TPo>(
+		ITable Tbl, Func<TPo, TKey> FnMemb, IEnumerable<TKey> Keys, CT Ct
+	);
+
+/*
+Func<
+		ITable, Func<TPo, TKey>, IEnumerable<TKey>
+		,CT, Task<IDictionary<TKey, IList<TPo>>>
+	>
+ */
+	protected async Task<TFnIncludeEntitysByKeys<TKey, TPo>> FnIncludeEntitysByKeys<TPo, TKey>(
+		IDbFnCtx Ctx
+		,ITable Tbl
+		,str CodeCol
+		,OptQry? OptQry
+		,CT Ct
+	)where TPo: new(){
+		var fn = await FnScltAllByColInVals<TKey>(Ctx, Tbl, CodeCol, OptQry, Ct);
+		return async(Tbl, Memb, Keys, Ct)=>{
+			var KeyList = Keys.AsOrToList();
+			var poPage = await fn(KeyList, Ct);
+			var dicts = await poPage.ToListAsync(Ct);
+			var pos = dicts.Select(x=>Tbl.DbDictToEntity<TPo>(x));
+			IDictionary<TKey, IList<TPo>> posByKey = pos.GroupBy(Memb).ToDictionary(g=>g.Key, g=>(IList<TPo>)g.ToList());
+			return posByKey;
+		};
+	}
+
+//public delegate Task<IDictionary<TKey, IList<TPo>>> TFnIncludeEntitysByKeys<TKey, TPo>(
+//		ITable Tbl, Func<TPo, TKey> FnMemb, IEnumerable<TKey> Keys, CT Ct
+//	);
+
+	public async Task<IDictionary<TKey, IList<TPo>>> IncludeEntitysByKeys<TPo, TKey>(
+		IDbFnCtx Ctx
+		,str CodeCol
+		,OptQry? OptQry
+		,IEnumerable<TKey> Keys
+		,Func<TPo, TKey> FnMemb
+		,ITable Tbl
+		,CT Ct
+	)where TPo: new(){
+		//var keyList = Keys.AsOrToList();
+		// 自動把OptQry之ParamCnt設成 Keys.Count?
+		var fn = await FnIncludeEntitysByKeys<TPo, TKey>(Ctx, Tbl, CodeCol, OptQry, Ct);
+		return await fn(Tbl, FnMemb, Keys, Ct);
+	}
+
+
+
+
+
+
+
+
 
 	public async Task<Func<
 		IList<TField>
@@ -835,7 +889,7 @@ AND {T.Fld(CodeCol)} IN ({str.Join(",", numParams)})
 	{
 		var T = Tbl;
 		OptQry??=new();
-		var numParams = Tbl.NumParams(OptQry.InParamCnt-1);
+		var numParams = Tbl.NumParamsEndStart(OptQry.InParamCnt-1);
 		var Sql =
 $"""
 SELECT * FROM {Tbl.Qt(Tbl.DbTblName)}

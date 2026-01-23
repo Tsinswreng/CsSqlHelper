@@ -3,7 +3,7 @@ using Tsinswreng.CsTools;
 namespace Tsinswreng.CsSqlHelper;
 
 public class ISqlSplicer<T>{
-	public ITable<T> Tbl{get;set;}
+	public ITable Tbl{get;set;}
 	public IList<str> Segs{get;set;} = [];
 
 	ISqlSplicer<T> AddSeg(str Seg){

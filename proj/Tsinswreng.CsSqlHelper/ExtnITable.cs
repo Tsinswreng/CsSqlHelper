@@ -52,6 +52,18 @@ public static class ExtnITable{
 			return z.SqlMkr.Quote(dbColName);
 		}
 
+		//"db_name"  不帶表名前綴
+		public IField Fld<T>(Expression<Func<T, obj?>> ExprMemb){
+			var memberName = ToolExpr.GetMemberName<T>(ExprMemb);
+			var R = new Field(z, memberName);
+			return R;
+		}
+		public ISqlSplicer<T> SqlSplicer<T>(){
+			var R = new SqlSplicer<T>();
+			R.Tbl = z;
+			return R;
+		}
+
 
 	/// <summary>
 	/// 映射到數據庫表ʹ字段名 並加引號/括號
@@ -267,7 +279,7 @@ public static class ExtnITable{
 
 		/// (EndPos: 2, StartPos: 0) -> [@_0, @_1, @_2]
 		/// StartPos<=x<=EndPos
-		public IList<IParam> NumParams(
+		public IList<IParam> NumParamsEndStart(
 			u64 EndPos, u64 StartPos = 0
 		){
 			var R = new List<IParam>();
@@ -277,6 +289,26 @@ public static class ExtnITable{
 			}
 			return R;
 		}
+
+		/// (StartPos: 0, EndPos: 2) -> [@_0, @_1, @_2]
+		/// StartPos<=x<=EndPos
+		public IList<IParam> NumParams(
+			u64 StartPos, u64 EndPos
+		){
+			var R = new List<IParam>();
+			for(u64 i = StartPos; i <= EndPos; i++){
+				var Param = z.NumParam(i);
+				R.Add(Param);
+			}
+			return R;
+		}
+
+		public IList<IParam> NumParams(
+			u64 Cnt
+		){
+			return z.NumParams(0, Cnt-1);
+		}
+
 
 		/// (@0, @1, @2 ...)
 		public str NumParamClause(
