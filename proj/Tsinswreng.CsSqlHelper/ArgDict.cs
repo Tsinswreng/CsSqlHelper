@@ -72,6 +72,9 @@ public partial class ArgDict: IArgDict{
 
 public static class ExtnArgDict{
 	extension(IArgDict z){
+		[Doc(@$"
+		#Params([Page Query], [Param for Limit], [Param for Offset])
+		")]
 		public IArgDict AddPageQry(
 			IPageQry PageQry
 			,IParam PrmLmt
@@ -84,11 +87,4 @@ public static class ExtnArgDict{
 
 	}
 
-	// public static IArgDict Map(
-	// 	this IArgDict z
-	// 	,ITable Tbl
-	// 	,str ParamName
-	// ){
-
-	// }
 }

@@ -2,12 +2,19 @@ namespace Tsinswreng.CsSqlHelper;
 using Tsinswreng.CsCore;
 
 public partial interface I_AddParamPrefix{
+	[Doc(@$"Add prefix to the parameter name, e.g @ for sqlite or [] for SqlServer.")]
 	public str AddParamPrefix(str Name);
 }
 
+[Doc(@$"Represent a parameter in sql.
+must override ToString() to return the parameter suitable for sql syntax,
+e.g @+ParamName for sqlite's sql syntax or [ParamName] for SqlServer's syntax.
+#Child[{nameof(Param)}][Default impl]`
+")]
 public partial interface IParam
 	//:I_ShallowCloneSelf
 {
+	[Doc(@$"Raw Param name. without param token like @ or : or [] etc.")]
 	public str Name{get;set;}
 	public I_AddParamPrefix ParamPrefixAdder{get;set;}
 

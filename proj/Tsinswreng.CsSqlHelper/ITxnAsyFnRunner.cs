@@ -10,7 +10,7 @@ namespace Tsinswreng.CsSqlHelper;
 // }
 
 
-public  partial interface ITxnRunner{
+public partial interface ITxnRunner{
 	public Task<TRet> RunTxn<TRet>(
 		ITxn? Txn
 		,Func<
