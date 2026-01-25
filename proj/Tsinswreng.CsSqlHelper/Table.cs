@@ -14,12 +14,18 @@ public partial class Table<T>: Table, ITable<T>{
 
 }
 
+
 public partial class Table:ITable{
+
 	public ITblMgr? TblMgr{get;set;}
+
 	public IDictMapperShallow DictMapper{get;set;}
+
 	public Type CodeEntityType{get;set;}
+
 	#pragma warning disable CS8618
 	public Table(){}
+
 	public Table(
 		IDictMapperShallow DictMapper
 		,str Name
@@ -52,13 +58,7 @@ public partial class Table:ITable{
 		return this;
 	}
 
-/// <summary>
-/// 建構一個Table實體
-/// </summary>
-/// <param name="DictMapper"></param>
-/// <param name="DbTblName">table name in db</param>
-/// <param name="Key_Type"></param>
-/// <returns></returns>
+
 	public static ITable<TEntity> Mk<TEntity>(
 		IDictMapperShallow DictMapper
 		,str DbTblName
@@ -66,6 +66,7 @@ public partial class Table:ITable{
 	){
 		return Mk<TEntity>(typeof(TEntity), DictMapper, DbTblName, Key_Type);
 	}
+
 
 	public static ITable<TEntity> Mk<TEntity>(
 		Type EntityClrType
@@ -82,6 +83,7 @@ public partial class Table:ITable{
 		t.Init();
 		return t;
 	}
+
 
 	public static Func<str, ITable<T>> FnMkTbl<T>(IDictMapperShallow DictMapper){
  		ITable<T2> Mk<T2>(str DbTblName){
@@ -102,6 +104,7 @@ public partial class Table:ITable{
 	#endif
 
 	[Impl]
+
 	public IDictionary<str, IColumn> Columns{get;set;}
 	#if Impl
 	= new Dictionary<str, IColumn>();
@@ -130,27 +133,23 @@ public partial class Table:ITable{
 
 	[Impl]
 	public ISqlMkr SqlMkr{get;set;}
-	/// <summary>
-	/// 在CREATE TABLE() 塊內
-	/// </summary>
+
 	[Impl]
 	public IList<str> InnerAdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();
 #endif
-	/// <summary>
-	/// 在CREATE TABLE() 塊外
-	/// </summary>
+
 	[Impl]
 	public IList<str> OuterAdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();
 #endif
+
 	public IDictionary<Type, IUpperTypeMapFn> UpperType_DfltMapper{get;set;}
 #if Impl
 	= new Dictionary<Type, IUpperTypeMapFn>();
 #endif
 }
-
 
 #pragma warning disable CS8601

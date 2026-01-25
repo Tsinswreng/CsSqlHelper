@@ -1,50 +1,46 @@
 namespace Tsinswreng.CsSqlHelper;
 
-/// <summary>
-/// Stands for a column in a table or a property in an entity
-/// </summary>
 public partial interface IColumn{
-	/// <summary>
-	/// Column name in database table
-	/// </summary>
+	[Doc(@$"
+	#Sum[Column name in database table. aka DbColName.
+	Entity field name in C# code aka CodeColName.
+	]
+	")]
 	public str DbName { get; set; }
-	/// <summary>
-	/// Should be full type name like `TEXT`, `VARCHAR(64)`; only `VARCHAR` is unsupported
-	/// </summary>
+	[Doc(@$"
+	#Sum[Should be full type name like `TEXT`, `VARCHAR(64)`; only `VARCHAR` is unsupported]
+	")]
 	public str DbType{get;set;}
-	/// <summary>
-	/// 有自封裝ʹ類型旹 即其內ʹ原始類型
-	/// Type of the data that is retrieved from the database
-	/// </summary>
+	[Doc(@$"
+	#Sum[Type of the data that is retrieved from the database]
+	#See[{nameof(UpperCodeType)}]
+	")]
 	public Type? RawCodeType{get;set;}
-	/// <summary>
 	/// 自封裝ʹ類型
-	/// Type defined in entity
-	/// e.g, when you use strongly typed id struct encapsulating an int64,
-	/// in this way `RawClrType` is `long` and `UpperClrType` is your custom struct
-	///
-	/// </summary>
+	[Doc(@$"
+	Type defined in entity class.
+	e.g, when you use strongly typed id struct encapsulating an int64,
+	in this way {nameof(RawCodeType)} is `long` and {nameof(UpperCodeType)} is your custom struct
+	")]
 	public Type? UpperCodeType{get;set;}
-	/// <summary>
-	/// Additional SQL statements to be executed when creating the column
-	/// e.g `UNIQUE(Email)`
-	/// </summary>
+	[Doc(@$"Additional SQL statements to be executed when creating the column
+	e.g `UNIQUE(Email)`")]
 	public IList<str> AdditionalSqls{get;set;}
 #if Impl
 	= new List<str>();
 #endif
 
-	/// <summary>
-	/// if set true, the column will be marked as `NOT NULL` in the database
-	/// </summary>
+
+	[Doc("if set true, the column will be marked as `NOT NULL` in the database")]
 	public bool NotNull{get;set;}
 
 	public IUpperTypeMapFn? UpperTypeMapper{get;set;}
 
-	/// <summary>
-	/// Convert from `UpperClrType` to `RawClrType`
-	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
-	/// </summary>
+	[Doc(@$"
+	Convert from {nameof(UpperCodeType)} to {nameof(RawCodeType)}
+	better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
+	#See[{nameof(RawToUpper)}]
+	")]
 	public Func<obj?,obj?>? UpperToRaw{
 		get{return UpperTypeMapper?.UpperToRaw;}
 		set{
@@ -56,10 +52,7 @@ public partial interface IColumn{
 	= (x)=>x;
 #endif
 
-	/// <summary>
-	/// Convert from `RawClrType` to `UpperClrType`
-	/// better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
-	/// </summary>
+	[Doc(@$"#See[{nameof(UpperToRaw)}]")]
 	public Func<obj?,obj?>? RawToUpper{
 		get{return UpperTypeMapper?.RawToUpper;}
 		set{
@@ -72,11 +65,3 @@ public partial interface IColumn{
 #endif
 
 }
-
-public interface IColumn<TTbl, TRaw, TUpper>:IColumn{
-
-}
-
-// public interface IColumn<T>:IColumn<T,T>{
-
-// }

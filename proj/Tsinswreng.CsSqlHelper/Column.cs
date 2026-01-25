@@ -21,11 +21,3 @@ public partial class Column: IColumn{
 	// public Func<object?,object?>? RawToUpper{get;set;} = (x)=>x;
 }
 
-
-public class Column<TTbl, TRaw, TUpper> : Column, IColumn<TTbl, TRaw, TUpper>{
-
-}
-
-// public class Column<T> : Column<T, T>, IColumn<T>{
-
-// }

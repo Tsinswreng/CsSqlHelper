@@ -7,15 +7,10 @@ using Tsinswreng.CsPage;
 using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
-public static class ExtnITable{
+public static partial class ExtnITable{
 
 	extension(ITable z){
-		/// <summary>
 		/// quote field name for SQL, e.g. in sqlite: "field_name"; in mysql: `field_name`;
-		/// </summary>
-		/// <param name="z"></param>
-		/// <param name="s"></param>
-		/// <returns></returns>
 		public str Qt(
 			str s
 		){
@@ -23,6 +18,11 @@ public static class ExtnITable{
 		}
 
 		/// 宜用此㕥取列 無旹自有報錯ʹ訊
+		[Doc(@$" You Should use this instead of directly reading from {nameof(ITable.Columns)}
+		#Example[ If you have an entity class named `PoUser` which has `UserName` field,
+		use fn(nameof(PoUser.UserName)) to get the {nameof(IColumn)} object of the `UserName` field.
+		]
+		")]
 		public IColumn GetCol(str CodeColName){
 			if(!z.Columns.TryGetValue(CodeColName, out var Col)){
 				throw new Exception($"In Table {z.DbTblName}, No such column: {CodeColName}\nAvailable columns: {string.Join(", ", z.Columns.Keys)}");
@@ -58,6 +58,7 @@ public static class ExtnITable{
 			var R = new Field(z, memberName);
 			return R;
 		}
+
 		public ISqlSplicer<T> SqlSplicer<T>(){
 			var R = new SqlSplicer<T>();
 			R.Tbl = z;
@@ -71,10 +72,8 @@ public static class ExtnITable{
 		}
 
 
-	/// <summary>
-	/// 映射到數據庫表ʹ字段名 並加引號/括號
-	/// IParam CodeColNameParam 其Name須同於數據庫字段名
-	/// </summary>
+		/// 映射到數據庫表ʹ字段名 並加引號/括號
+		/// IParam CodeColNameParam 其Name須同於數據庫字段名
 		public str Fld(
 			IParam CodeColNameParam
 		){
@@ -89,7 +88,7 @@ public static class ExtnITable{
 			return z.SqlMkr.Param(Name);
 		}
 
-		// _ + 64進制 ULID 如 "@_1ccGi7C87H-LETKfaB_JX"
+		/// _ 加上 64進制 ULID 如 "@_1ccGi7C87H-LETKfaB_JX"
 		public IParam Prm(){
 			//TODO 抽作獨ʹ工具
 			var bytes = Ulid.NewUlid().ToByteArray();
@@ -97,16 +96,6 @@ public static class ExtnITable{
 			var Name = ToolUInt128.ToLow64Base(id);
 			return z.SqlMkr.Param("_"+Name);
 		}
-
-
-
-		// [Obsolete]
-		// public str PrmStr(
-		//
-		// 	,str Name
-		// ){
-		// 	return z.SqlMkr.PrmStr(Name);
-		// }
 
 		public IStr_Any ToCodeDict(
 			IStr_Any DbDict
@@ -212,6 +201,7 @@ public static class ExtnITable{
 		// 	var CodeColName = ToolExpr.GetMemberName(ExprMemb);
 		// 	return z.RawToUpper<T>(RawValue, CodeColName);
 		// }
+
 
 		public T RawToUpper<T>(
 			obj? RawValue
