@@ -17,6 +17,7 @@ public partial interface IDbFnCtx
 	[Doc(@$"default is 1, which means non batch mode
 	If set to > 1, then duplication of same sql with distinct parameters will be built and attach to SqlCmd.CommandText
 	")]
+	[Obsolete]
 	public u64 BatchSize{get;set;}
 #if Impl
 	= 1;

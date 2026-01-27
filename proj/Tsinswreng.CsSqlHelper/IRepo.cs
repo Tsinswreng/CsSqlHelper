@@ -222,3 +222,14 @@ public partial interface IRepo<TEntity, TId>{
 		where TEntity2 : class, new();
 
 }
+
+/*
+
+幾種批量方案:
+總ʹ思路: 同結構多Sql拼接、以分號分隔、讀多個結果集
+1: 不直接構建Sql字符串、內ʸ用現成ʹ庫㕥建Sql AST。末把.ToSqlStr() 改成 .ToSqlStrMany(Opt)時 依OptʹBatchSize以生成多組sql。
+弊: 參數綁定麻煩。需改out var IParam
+2. 把out var IParam 全改潙 out var IList<IParam>。 內ʸAddSeg時勿直ᵈ拼sql片段 而是 拼 自定義對象。自定義對象中 區分 參數與 sql片段字符串。
+需批量拼sql旹 傳入批次大小、IList<IParam>.Count即其批次大小。不需批量旹 綁參數可用 Params[0]、只多寫一個[0]、亦不麻煩。
+再使ArgDict.AddT適配IList<IParam>、不批量時自動取IParam[0]等 則更不需變寫法。
+ */

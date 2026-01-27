@@ -12,6 +12,7 @@ public partial class DbFnCtx:IDbFnCtx{
 #if Impl
 	 = new List<obj?>();
 #endif
+	[Obsolete]
 	public u64 BatchSize{get;set;} = 1;
 
 }

@@ -3,45 +3,15 @@ using Tsinswreng.CsTools;
 namespace Tsinswreng.CsSqlHelper;
 
 
-public class ISqlSplicer<E>{
+public interface I_DuplicateSql{
+	public str DuplicateSql(u64 Cnt);
+}
+
+
+public class ISqlSplicer<E>:I_DuplicateSql{
 	public ITable Tbl{get;set;}
 	public IList<obj> Segs{get;set;} = [];
 
-
-	[Doc($@"
-#Sum[生成重複的SQL語句]
-#Params([重複次數])
-#Rtn[包含多個SQL語句的字符串，每個語句以分號結尾]
-#See([{nameof(ToSqlStrAtOfst)}],[{nameof(IParam.ToOfst)}])
-")
-	]
-	public str RepeatSql(u64 Cnt){
-		var R = new List<str>();
-		for(u64 i=0;i<Cnt;i++){
-			R.Add(ToSqlStrAtOfst(i));
-			R.Add(";");
-		}
-		return string.Join("", R);
-	}
-
-	[Doc($@"
-#Sum[將SQL段轉換為帶有偏移量的SQL字符串]
-#Params([參數偏移量])
-#Rtn[完整的SQL字符串，其中所有參數都已調整為指定的偏移量]
-#See([{nameof(RepeatSql)}],[{nameof(IParam.ToOfst)}])
-")
-	]
-	public str ToSqlStrAtOfst(u64 Ofst){
-		var L = new List<str>();
-		foreach(var seg in Segs){
-			if(seg is IParam p){
-				L.Add(p.ToOfst(Ofst)+"");
-			}else if(seg is str s){
-				L.Add(s);
-			}
-		}
-		return string.Join("", L);
-	}
 
 	//變 實體
 	public ISqlSplicer<T2> T<T2>(ITable<T2> Tbl2){
@@ -55,6 +25,13 @@ public class ISqlSplicer<E>{
 	ISqlSplicer<E> AddSeg(str Seg){
 		Seg = " "+Seg+" ";
 		Segs.Add(Seg);
+		return this;
+	}
+
+	ISqlSplicer<E> AddSeg(IParam P){
+		Segs.Add(" ");
+		Segs.Add(P);
+		Segs.Add(" ");
 		return this;
 	}
 
@@ -153,8 +130,7 @@ public class ISqlSplicer<E>{
 
 	public ISqlSplicer<E> Bool(Expression<Func<E, obj?>> GetMember, str Op, IParam Param){
 		var memb = Memb(GetMember);
-		AddSeg($"{Fld(memb)} {Op} {Param}");
-		return this;
+		return AddSeg(Fld(memb)).AddSeg(Op).AddSeg(Param);
 	}
 
 	public ISqlSplicer<E> Bool(Expression<Func<E, obj?>> GetMember, str Op, out IParam Param){
@@ -162,9 +138,6 @@ public class ISqlSplicer<E>{
 		Param = Prm(memb);//TODO 維護dict參數表㕥判褈名
 		return Bool(GetMember, Op, Param);
 	}
-
-
-
 
 
 	public ISqlSplicer<E> Bool(
@@ -182,6 +155,10 @@ public class ISqlSplicer<E>{
 	public ISqlSplicer<E> AndEq(Expression<Func<E, obj?>> GetMember, out IParam Param){
 		return And(GetMember, "=", out Param);
 	}
+
+	// public ISqlSplicer<E> AndEq<T>(Expression<Func<E, obj?>> GetMember, IEnumerable<T> Args){
+	// 	return And(GetMember, "=", out Param);
+	// }
 
 
 
@@ -218,13 +195,13 @@ public class ISqlSplicer<E>{
 	}
 
 	public ISqlSplicer<E> Eq(Expression<Func<E, obj?>> ExprMemb, IParam Right){
-		return Eq(QtTblWithMemb(ExprMemb), Right.ToString()??"");
+		return AddSeg(QtTblWithMemb(ExprMemb)).AddSeg("=").AddSeg(Right);
 	}
 
 	public ISqlSplicer<E> Eq(Expression<Func<E, obj?>> ExprMemb, out IParam Right){
 		var memb = Memb(ExprMemb);
 		Right = Prm(memb);
-		return Eq(QtTblWithMemb(ExprMemb), Right.ToString()??"");
+		return AddSeg(QtTblWithMemb(ExprMemb)).AddSeg("=").AddSeg(Right);
 	}
 
 	public ISqlSplicer<E> UpdateSet(){
@@ -249,9 +226,47 @@ public class ISqlSplicer<E>{
 		return AddSeg(")");
 	}
 
-	public str ToSqlStr(u64 RepeatCnt = 1){
-		return RepeatSql(RepeatCnt);
+	[Doc($@"
+#Sum[Generate repeated SQL statements]
+#Params([Repeat count])
+#Rtn[String containing multiple SQL statements, each ending with a semicolon]
+#See([{nameof(ToSqlStrAtOfst)}],[{nameof(IParam.ToOfst)}])
+")]
+	public str DuplicateSql(u64 Cnt){
+		var R = new List<str>();
+		for(u64 i=0;i<Cnt;i++){
+			R.Add(ToSqlStrAtOfst(i));
+			R.Add(";");
+		}
+		return string.Join("", R);
 	}
+
+	[Doc($@"
+#Sum[Convert SQL segments to SQL string with offset]
+#Params([Parameter offset])
+#Rtn[Complete SQL string where all parameters are adjusted to the specified offset]
+#See([{nameof(DuplicateSql)}],[{nameof(IParam.ToOfst)}])
+")]
+	public str ToSqlStrAtOfst(u64 Ofst){
+		var L = new List<str>();
+		foreach(var seg in Segs){
+			if(seg is IParam p){
+				L.Add(p.ToOfst(Ofst)+"");
+			}else if(seg is str s){
+				L.Add(s);
+			}
+		}
+		return string.Join("", L);
+	}
+
+
+	public str ToSqlStr(u64 RepeatCnt = 1){
+		return DuplicateSql(RepeatCnt);
+	}
+
+	// public str ToSqlStr(IDbFnCtx Ctx){
+	// 	return DuplicateSql(Ctx.BatchSize);
+	// }
 
 }
 public class ISqlSplicer: ISqlSplicer<obj>{}
