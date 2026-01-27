@@ -5,12 +5,21 @@ namespace Tsinswreng.CsSqlHelper;
 public partial interface IDbFnCtx
 	:IAsyncDisposable
 {
+	[Doc(@$"Transaction")]
 	public ITxn? Txn{get;set;}
 	public IDbConnection? DbConn{get;set;}
 	public IDictionary<str, obj?>? Props{get;set;}
+	[Doc(@$"Use {nameof(ExtnIDbFnCtx.AddToAsyDispose)} instead of directory operate on {nameof(ObjsToDispose)}")]
 	public ICollection<obj?>? ObjsToDispose{get;set;}
 #if Impl
 	 = new List<obj?>();
+#endif
+	[Doc(@$"default is 1, which means non batch mode
+	If set to > 1, then duplication of same sql with distinct parameters will be built and attach to SqlCmd.CommandText
+	")]
+	public u64 BatchSize{get;set;}
+#if Impl
+	= 1;
 #endif
 	async ValueTask IAsyncDisposable.DisposeAsync(){
 		if(ObjsToDispose == null){return;}
@@ -24,7 +33,7 @@ public partial interface IDbFnCtx
 	}
 }
 
-public static partial class ExtnIBaseDbFnCtx{
+public static partial class ExtnIDbFnCtx{
 	extension<TSelf>(TSelf z)
 		where TSelf: IDbFnCtx
 	{
@@ -42,7 +51,7 @@ public static partial class ExtnIBaseDbFnCtx{
 			return z._AddToDispose(Disposable);
 		}
 
-		public TSelf AddToDisposeAsy(
+		public TSelf AddToAsyDispose(
 			IAsyncDisposable Disposable
 		){
 			return z._AddToDispose(Disposable);

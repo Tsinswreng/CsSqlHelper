@@ -13,8 +13,17 @@ public partial interface IArgDict{
 	#Param[{nameof(Alt)}][if the length of {nameof(Uppers)} is not equal to {nameof(Params)}, use this value to replace missing values.]
 	")]
 	public IArgDict AddManyT<T>(
-		IList<IParam> Params, IList<T> Uppers
+		IEnumerable<IParam> Params, IEnumerable<T> Uppers
 		,str? CodeColName=null, obj? Alt=null
+	);
+
+	[Doc(@$"
+	#See[{nameof(IParam.NumSuffixName)}]
+	#See[{nameof(IParam)}.this[u64]]
+	")]
+	public IArgDict AddManyT<T>(
+		IParam Param, IEnumerable<T> Uppers
+		,str? CodeColName=null
 	);
 	public IDictionary<str, obj?> ToDict();
 }

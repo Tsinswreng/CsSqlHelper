@@ -9,11 +9,16 @@ using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 public static class ExtnITableT{
 	extension<T>(ITable<T> z){
-		//"db_name"  不帶表名前綴
+		//"db_col_name"  不帶表名前綴
 		public IField Fld(Expression<Func<T, obj?>> ExprMemb){
 			var t = (ITable)z;
 			return t.Fld<T>(ExprMemb);
 		}
+
+		public str Memb(Expression<Func<T, obj?>> ExprMemb){
+			return z.Memb<T>(ExprMemb);
+		}
+
 		public ISqlSplicer<T> SqlSplicer(){
 			var t = (ITable)z;
 			return t.SqlSplicer<T>();

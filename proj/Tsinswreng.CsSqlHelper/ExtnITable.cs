@@ -42,9 +42,7 @@ public static partial class ExtnITable{
 			return DbColName;
 		}
 
-		/// <summary>
 		/// 映射到數據庫表ʹ字段名 並加引號/括號
-		/// </summary>
 		public str Fld(
 			str CodeColName
 		){
@@ -52,7 +50,14 @@ public static partial class ExtnITable{
 			return z.SqlMkr.Quote(dbColName);
 		}
 
-		//"db_name"  不帶表名前綴
+		[Doc(@$"
+		#Example[fn<PoUser>(x=>x.UserName) returns string UserName]
+		")]
+		public str Memb<T>(Expression<Func<T, obj?>> ExprMemb){
+			return ToolExpr.GetMemberName(ExprMemb);
+		}
+
+		//"db_col_name"  不帶表名前綴
 		public IField Fld<T>(Expression<Func<T, obj?>> ExprMemb){
 			var memberName = ToolExpr.GetMemberName<T>(ExprMemb);
 			var R = new Field(z, memberName);
@@ -270,6 +275,11 @@ public static partial class ExtnITable{
 			return sqlFieldsValus+" "+string.Join(", ", R);
 		}
 
+		[Doc(@$"
+		Usually used in batch operation, the number affix is used to mark its batch number and avoid duplication param name
+		#See[{nameof(IParam.NumSuffixName)}]
+		#See[{nameof(IParam)}.this[u64]]
+		")]
 		public IParam NumFieldParam(
 			str Field, u64 Num
 		){
@@ -310,6 +320,10 @@ public static partial class ExtnITable{
 			return R;
 		}
 
+		[Doc(@$"
+		generate numbered params from 0 to {nameof(Cnt)}-1
+		#Example[fn(2) -> [@_0, @_1]]
+		")]
 		public IList<IParam> NumParams(
 			u64 Cnt
 		){
@@ -335,14 +349,9 @@ public static partial class ExtnITable{
 			return string.Join("", R);
 		}
 
-
-	/// <summary>
-	/// [@0, @1, @2 ...]
-	/// ,</summary>
-	/// <param name="z"></param>
-	/// <param name="Start">含</param>
-	/// <param name="End">含</param>
-	/// <returns></returns>
+		[Doc(@$"
+		#Example[[@0, @1, @2 ...]]
+		")]
 		public IList<IParam> Prm(
 			u64 Start
 			,u64 End
@@ -355,42 +364,21 @@ public static partial class ExtnITable{
 			return R;
 		}
 
-
+		[Doc(@$"generate sql like DbColName = @Param.Name")]
 		public str Eq(
 			str DbColName, IParam Param
 		){
 			return z.SqlMkr.Eq(DbColName, Param);
 		}
 
+		[Doc(@$"generate sql like Param.Name = Param.ToString()")]
 		public str Eq(IParam Param){
 			return z.Eq(Param.Name, Param);
 		}
 
 
-	/// <summary>
-	/// [@0, @1, @2 ...]
-	/// ,</summary>
-	/// <param name="z"></param>
-	/// <param name="Start">含</param>
-	/// <param name="End">含</param>
-	/// <returns></returns>
-		// [Obsolete]
-		// public IList<str> PrmStrArr(
-		//
-		// 	,u64 Start
-		// 	,u64 End
-		// ){
-		// 	var R = new List<str>();
-		// 	for(u64 i = Start; i <= End; i++){
-		// 		var Param = z.PrmStr(i+"");
-		// 		R.Add(Param);
-		// 	}
-		// 	return R;
-		// }
-
-		public str SqlMkTbl(
-
-		){
+		[Doc(@$"generate sql for create table")]
+		public str SqlMkTbl(){
 			str OneCol(ITable Tbl, IColumn Col){
 				var R = new List<str>();
 				R.Add(Tbl.Qt(Col.DbName));
@@ -450,6 +438,7 @@ public static partial class ExtnITable{
 		}
 
 
+		[Doc(@$"Set {nameof(PageQry.PageSize)} to MaxValue, not real select all")]
 		public IPageQry PageSlctAll(){
 			var R = new PageQry();
 			if(z.TblMgr?.DbSrcType == ConstDbSrcType.Postgres){

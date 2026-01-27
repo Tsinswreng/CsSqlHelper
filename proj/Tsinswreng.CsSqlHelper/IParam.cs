@@ -18,9 +18,34 @@ public partial interface IParam
 	public str Name{get;set;}
 	public I_AddParamPrefix ParamPrefixAdder{get;set;}
 
-	public IParam this[u64 i]{get;}
 
-	public static str NumSuffixParam(str Name, u64 i){
+	// [Obsolete(@$"Use {nameof(ToOfst)}")]
+	// public IParam this[u64 Ofst]{get{
+	// 	return new Param(NumOfstName(Name, Ofst), ParamPrefixAdder);
+	// }}
+
+
+	[Doc(@$"Copy a {nameof(IParam)} object with a specified number offset.
+	Usually used in batch operation, the number offset is used to mark its batch number and avoid duplication param name
+	#Param[{nameof(Ofst)}][*when is 0, no suffix would be attached to the name,* in order to make compatible with both single sql and batch sql.]
+	#See[{nameof(NumOfstName)}]
+	")]
+	public IParam ToOfst(u64 Ofst){
+		return new Param(NumOfstName(Name, Ofst), ParamPrefixAdder);
+	}
+
+	[Doc(@$"Usually used in batch operation, the number affix is used to mark its batch number and avoid duplication param name
+	#Param[{nameof(Ofst)}][*when is 0, no suffix would be attached to the name,* in order to make compatible with both single sql and batch sql.]
+	")]
+	public static str NumOfstName(str Name, u64 Ofst){
+		if(Ofst == 0){
+			return Name;
+		}
+		return Name+"__"+Ofst;
+	}
+
+	[Doc(@$"Usually used in batch operation, the number affix is used to mark its batch number and avoid duplication param name")]
+	public static str NumSuffixName(str Name, u64 i){
 		return Name+"__"+i;
 	}
 }
@@ -33,12 +58,12 @@ public class Param:IParam{
 	public str Name{get;set;}
 	public I_AddParamPrefix ParamPrefixAdder{get;set;}
 
-	public static str NumSuffixParam(str Name, u64 i){
+	public static str NumSuffixName(str Name, u64 i){
 		return Name+"__"+i;
 	}
-	public IParam this[u64 i]{get{
-		return new Param(NumSuffixParam(Name, i), ParamPrefixAdder);
-	}}
+	// public IParam this[u64 i]{get{
+	// 	return new Param(NumSuffixParam(Name, i), ParamPrefixAdder);
+	// }}
 
 	public override str ToString(){
 		return ParamPrefixAdder.AddParamPrefix(Name);

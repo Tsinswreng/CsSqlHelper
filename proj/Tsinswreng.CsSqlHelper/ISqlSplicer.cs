@@ -5,7 +5,43 @@ namespace Tsinswreng.CsSqlHelper;
 
 public class ISqlSplicer<E>{
 	public ITable Tbl{get;set;}
-	public IList<str> Segs{get;set;} = [];
+	public IList<obj> Segs{get;set;} = [];
+
+
+	[Doc($@"
+#Sum[生成重複的SQL語句]
+#Params([重複次數])
+#Rtn[包含多個SQL語句的字符串，每個語句以分號結尾]
+#See([{nameof(ToSqlStrAtOfst)}],[{nameof(IParam.ToOfst)}])
+")
+	]
+	public str RepeatSql(u64 Cnt){
+		var R = new List<str>();
+		for(u64 i=0;i<Cnt;i++){
+			R.Add(ToSqlStrAtOfst(i));
+			R.Add(";");
+		}
+		return string.Join("", R);
+	}
+
+	[Doc($@"
+#Sum[將SQL段轉換為帶有偏移量的SQL字符串]
+#Params([參數偏移量])
+#Rtn[完整的SQL字符串，其中所有參數都已調整為指定的偏移量]
+#See([{nameof(RepeatSql)}],[{nameof(IParam.ToOfst)}])
+")
+	]
+	public str ToSqlStrAtOfst(u64 Ofst){
+		var L = new List<str>();
+		foreach(var seg in Segs){
+			if(seg is IParam p){
+				L.Add(p.ToOfst(Ofst)+"");
+			}else if(seg is str s){
+				L.Add(s);
+			}
+		}
+		return string.Join("", L);
+	}
 
 	//變 實體
 	public ISqlSplicer<T2> T<T2>(ITable<T2> Tbl2){
@@ -129,6 +165,8 @@ public class ISqlSplicer<E>{
 
 
 
+
+
 	public ISqlSplicer<E> Bool(
 		str BoolOp
 		,Expression<Func<E, obj?>> GetMember, str Op, out IParam Param
@@ -144,6 +182,7 @@ public class ISqlSplicer<E>{
 	public ISqlSplicer<E> AndEq(Expression<Func<E, obj?>> GetMember, out IParam Param){
 		return And(GetMember, "=", out Param);
 	}
+
 
 
 	public ISqlSplicer<E> OrderBy(str Raw){
@@ -210,10 +249,10 @@ public class ISqlSplicer<E>{
 		return AddSeg(")");
 	}
 
-
-	public str ToSqlStr(){
-		return string.Join("\n", Segs);
+	public str ToSqlStr(u64 RepeatCnt = 1){
+		return RepeatSql(RepeatCnt);
 	}
+
 }
 public class ISqlSplicer: ISqlSplicer<obj>{}
 public class SqlSplicer<T>:ISqlSplicer<T>{}
