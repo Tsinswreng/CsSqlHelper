@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="../Tsinswreng.CsSqlHelper/Tsinswreng.CsSqlHelper.csproj" />
+		<PackageReference Include="SQLite" Version="3.13.0" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
+	</ItemGroup>
+
+</Project>
