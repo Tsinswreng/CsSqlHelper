@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Npgsql;
 using Tsinswreng.CsCore;
-
+using Tsinswreng.CsSqlHelper.BaseImpl;
 public partial class PostgresCmd : BaseSqlCmd<NpgsqlCommand, NpgsqlTransaction> {
 	public PostgresCmd(NpgsqlCommand RawCmd):base(RawCmd){
 

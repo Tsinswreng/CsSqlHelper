@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsTools;
-
+using Tsinswreng.CsSqlHelper.BaseImpl;
 namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IDbFnCtx;
 

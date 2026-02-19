@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<ItemGroup>
 		<ProjectReference Include="../Tsinswreng.CsSqlHelper/Tsinswreng.CsSqlHelper.csproj" />
+		<ProjectReference Include="../Tsinswreng.CsSqlHelper.BaseImpl/Tsinswreng.CsSqlHelper.BaseImpl.csproj" />
 	</ItemGroup>
 </Project>
