@@ -1,7 +1,12 @@
 namespace Tsinswreng.CsSqlHelper;
 
+[Doc(@$"Maker of Database Function Context")]
 public partial interface IMkrDbFnCtx{
 	public IMkrTxn TxnGetter{get;set;}
+	[Doc(@$"Make Database Function Context with Transaction attached
+	For Sqlite, Do not use for select statement, or it may cause nested transaction error.
+	You just need `new {nameof(DbFnCtx)}` for select statement.
+	")]
 	public async Task<IDbFnCtx> MkTxnDbFnCtx(CT Ct){
 		var R = new DbFnCtx();
 		R.Txn = await TxnGetter.MkTxn(R, Ct);

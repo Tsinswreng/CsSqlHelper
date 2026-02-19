@@ -56,8 +56,18 @@ public partial class SqliteCmdMkr
 		if(Cmd is not SqliteCmd SqlCmd){
 			throw new InvalidOperationException("ISqlCmd is not SqliteCmd");
 		}
-		SqlCmd.RawCmd.Prepare();
-		return Cmd;
+		try{
+			SqlCmd.RawCmd.Prepare();
+			return Cmd;
+		}
+		catch (System.Exception e){
+			throw new Exception(
+				"Prepare failed"
+				+$" Sql:\n{Cmd.Sql}\n"
+				,e
+			);
+		}
+
 	}
 
 

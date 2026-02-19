@@ -57,6 +57,20 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
+	[Doc(@$"using `Id IN (...)` Clause,
+	which would ignore unexisted Id and returned list may be unordered.
+	")]
+	public Task<IAsyncEnumerable<TEntity?>> SlctManyInIds(
+		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		,CT Ct
+	);
+
+	[Doc(@$"Got Entities are corresponding to the given Ids. if not found, the place will be null.")]
+	public Task<IAsyncEnumerable<TEntity?>> BatSlctById(
+		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		,CT Ct
+	);
+
 
 	public Task<Func<
 		IPageQry

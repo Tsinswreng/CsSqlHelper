@@ -24,5 +24,12 @@ public static class ExtnITableT{
 			return t.SqlSplicer<T>();
 		}
 
+		public TPo DbDictToEntity<TPo>(
+			IStr_Any DbDict
+		)where TPo:new(){
+			var t = (ITable)z;
+			return t.DbDictToEntity<TPo>(DbDict);
+		}
+
 	}
 }

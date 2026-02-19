@@ -3,9 +3,7 @@ using Tsinswreng.CsTools;
 namespace Tsinswreng.CsSqlHelper;
 
 
-public interface I_DuplicateSql{
-	public str DuplicateSql(u64 Cnt);
-}
+
 
 
 public class ISqlSplicer<E>:I_DuplicateSql{
@@ -155,6 +153,7 @@ public class ISqlSplicer<E>:I_DuplicateSql{
 	public ISqlSplicer<E> AndEq(Expression<Func<E, obj?>> GetMember, out IParam Param){
 		return And(GetMember, "=", out Param);
 	}
+
 
 	// public ISqlSplicer<E> AndEq<T>(Expression<Func<E, obj?>> GetMember, IEnumerable<T> Args){
 	// 	return And(GetMember, "=", out Param);

@@ -5,7 +5,7 @@ public class AutoBatch<TItem, TRet> : BatchCollector<TItem, TRet> {
 	public AutoBatch() {
 
 	}
-	public static new u64 DfltBatchSize { get; set; } = 100;
+	public static new u64 DfltBatchSize { get; set; } = 50;
 	public I_DuplicateSql SqlDuplicator { get; set; }
 	//public u64 BatchSize;
 	public ISqlCmd FullBatch { get; set; } = null!;
@@ -29,6 +29,9 @@ public class AutoBatch<TItem, TRet> : BatchCollector<TItem, TRet> {
 			BatchSize = DfltBatchSize;
 		}
 		var R = new AutoBatch<TItem, TRet>();
+		R.Ctx = Ctx;
+		R.SqlCmdMkr = SqlCmdMkr;
+		R.SqlDuplicator = SqlDuplicator;
 		var ArgFn = FnAsy;
 		R.FnAsy = async (Items, Ct) => {
 			var size = (u64)Items.Count;

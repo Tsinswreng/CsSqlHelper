@@ -373,6 +373,51 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		};
 	}
 
+
+	public async Task<IAsyncEnumerable<TEntity?>> SlctManyInIds(
+		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		,CT Ct
+	){
+		IList<IParam> Params = [];
+		var sqlD = FnSqlDuplicator.Mk((Cnt)=>{
+			Params = T.NumParams(Cnt);
+			return $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} IN ({str.Join(", ", Params)})" ;
+		});
+		var bat = AutoBatch<TId, IAsyncEnumerable<TEntity?>>.Mk(
+			Ctx, SqlCmdMkr, sqlD,
+			async(z, Ids, Ct)=>{
+				var Args = ArgDict.Mk(T).AddManyT(Params, Ids, T.CodeIdName);
+				var RawDicts = z.SqlCmd.Args(Args).AsyE1d(Ct);
+				return RawDicts.Select(x=>T.DbDictToEntity<TEntity>(x));
+			}
+		);
+		var R = bat.AddToEnd(Ids, Ct);
+		return R.Flat();
+	}
+
+	public async Task<IAsyncEnumerable<TEntity?>> BatSlctById(
+		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		,CT Ct
+	){
+		var PId = T.Prm(T.CodeIdName);
+		var Sql = T.SqlSplicer().Select("*").From().Where1()
+		.Raw("And "+T.Fld(T.CodeIdName)+"="+PId);
+
+		var bat = AutoBatch<TId, IAsyncEnumerable<TEntity?>>.Mk(
+			Ctx, SqlCmdMkr, Sql,
+			async(z, Ids, Ct)=>{
+				var Args = ArgDict.Mk(T).AddManyT(PId, Ids, T.CodeIdName);
+				var RawDicts = z.SqlCmd.Args(Args).AsyE1d(Ct);
+				return RawDicts.Select(x=>T.DbDictToEntity<TEntity>(x));
+			}
+		);
+		var R = bat.AddToEnd(Ids, Ct);
+		return R.Flat();
+	}
+
+
+
+
 	[Impl]
 	public async Task<Func<
 		IEnumerable<TId>
