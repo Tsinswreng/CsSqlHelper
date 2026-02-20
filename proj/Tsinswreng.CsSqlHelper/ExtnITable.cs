@@ -426,7 +426,7 @@ public static partial class ExtnITable {
 		[Doc($@"
 				#Sum[Generate numbered parameters from 0 to Cnt-1]
 				#Params([Count of parameters])
-				#Rtn[List of IParam from @_0 to @_{Cnt - 1}]
+				#Rtn[List of IParam from @_0 to @_{{Cnt - 1}}]
 				#Example[fn(2) -> [@_0, @_1]]
 				")]
 		public IList<IParam> NumParams(
