@@ -10,7 +10,10 @@ using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 public static partial class ExtnITable{
 
 	extension(ITable z){
-		/// quote field name for SQL, e.g. in sqlite: "field_name"; in mysql: `field_name`;
+		[Doc("""
+		quote field name for SQL, e.g. in sqlite: "field_name"; in mysql: `field_name`;
+		"""
+		)]
 		public str Qt(
 			str s
 		){
@@ -31,9 +34,10 @@ public static partial class ExtnITable{
 		}
 
 
-		/// <summary>
-		/// 映射到數據庫表ʹ字段名
-		/// </summary>
+		[Doc(@$"#Sum[Map entity field name to database column name.]
+		#Params([Column name C# code (entity field)])
+		#Rtn[Column name in database table]
+		")]
 		public str ColNameToDb(
 			str CodeColName
 		){
@@ -42,7 +46,9 @@ public static partial class ExtnITable{
 			return DbColName;
 		}
 
-		/// 映射到數據庫表ʹ字段名 並加引號/括號
+		[Doc(@$"#Sum[Map entity field name to quoted database column name.]
+		#See[{nameof(ColNameToDb)} then {nameof(ExtnITable.Qt)}]
+		")]
 		public str Fld(
 			str CodeColName
 		){
