@@ -7,7 +7,7 @@ using Tsinswreng.CsPage;
 using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
-public static partial class ExtnITable {
+public static class ExtnITable {
 
 	extension(ITable z) {
 		[Doc($@"
