@@ -8,7 +8,7 @@ using Str_Any = System.Collections.Generic.Dictionary<string, object?>;
 
 
 public partial interface ITable<T>:ITable{
-
+	public IdxMkr<T> IdxMkr{get;set;}
 }
 
 [Obsolete("Unfinished yet. Do not use.")]
