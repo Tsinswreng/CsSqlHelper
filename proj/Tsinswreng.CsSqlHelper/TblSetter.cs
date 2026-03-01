@@ -13,6 +13,7 @@ public interface ITblSetter<T>{
 		fn(null, [nameof(E.Key)], [(nameof(E.Owner)), nameof(E.Head)]) ->
 		
 		means create two indexs, one is (E.Key), the other is (E.Owner, E.Head)
+
 	])
 	""")]
 	public ITable<T> Idx(
@@ -43,7 +44,45 @@ public class TblSetter<T>:ITblSetter<T>{
 	}
 	public ITable<T> Tbl{get;set;}
 	
-	
+	/// <summary>
+	/// Define index using member expressions
+	/// </summary>
+	public ITable<T> IdxExpr(
+		IOptMkIdx? Opt,
+		params Expression<Func<T, obj?>>[] Exprs
+	) {
+		var colSets = new List<IEnumerable<str>>();
+		foreach (var expr in Exprs) {
+			var colNames = ToolExpr.GetMemberNames(expr);
+			colSets.Add(colNames);
+		}
+		return Idx(Opt, colSets.ToArray());
+	}
+
+	/// <summary>
+	/// Define index using code column names
+	/// </summary>
+	public ITable<T> Idx(
+		IOptMkIdx? Opt,
+		params IEnumerable<str>[] Cols
+	) {
+		var tbl = Tbl;
+		
+		foreach (var colSet in Cols) {
+			var colList = colSet.ToList();
+			var isUnique = Opt?.Unique ?? false;
+			var whereCondition = str.IsNullOrEmpty(Opt?.Where) ? null : new[] { Opt.Where };
+			
+			// Generate index name: Idx_{TableName}_{Col1}_{Col2}... or Ux_{TableName}_{Col1}_{Col2}...
+			var prefix = isUnique ? "Ux" : "Idx";
+			var colNamePart = string.Join("_", colList);
+			var indexName = $"{prefix}_{tbl.DbTblName}_{colNamePart}";
+			
+			tbl.AddIndexByCodeCols(indexName, colList, isUnique, whereCondition);
+		}
+		
+		return tbl;
+	}
 }
 
 public static class ExtnITblSetter {
