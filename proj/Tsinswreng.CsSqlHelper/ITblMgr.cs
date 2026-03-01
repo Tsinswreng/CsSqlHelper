@@ -6,12 +6,11 @@ namespace Tsinswreng.CsSqlHelper;
 public partial interface ITblMgr{
 	public IDictionary<Type, ITable> EntityType_Tbl{get;set;}
 	public str DbSrcType{get;set;}
+	public IDbStuff DbStuff{get;set;}
 	public ISqlMkr SqlMkr{get;set;}
 
 	public nil AddTbl(ITable Tbl){
-		Tbl.SqlMkr = SqlMkr;
 		Tbl.TblMgr = this;
-		//EntityType_Tbl.Add(Tbl.CodeEntityType, Tbl);
 		EntityType_Tbl[Tbl.CodeEntityType] = Tbl;
 		return NIL;
 	}

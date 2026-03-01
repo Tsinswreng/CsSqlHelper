@@ -39,7 +39,9 @@ public class Relations{
 }
 
 public partial interface ITable{
-	public ITblMgr? TblMgr{get;set;}
+	public ITblMgr TblMgr{get;set;}
+	public IDbStuff DbStuff => TblMgr.DbStuff;
+	public ISqlMkr SqlMkr=>DbStuff.SqlMkr;
 
 	[Doc($@"Mapper to convert between object and dictionary")]
 	public IDictMapperShallow DictMapper{get;set;}
@@ -85,10 +87,6 @@ public partial interface ITable{
 #if Impl
 	= new Dictionary<str, Type>();
 #endif
-
-
-	public ISqlMkr SqlMkr{get;set;}
-
 
 	[Doc($@"Additional SQL statements inside CREATE TABLE() block, e.g., DEFAULT 0")]
 	public IList<str> InnerAdditionalSqls{get;set;}
