@@ -176,6 +176,16 @@ var v = DbValToCodeVal(reader.GetValue(i));
 			}
 		}
 	}
+	
+	public async Task<IList<
+		IList<IDictionary<str, obj?>>>
+	> All2d(CT Ct){
+		var ans = new List<IList<IDictionary<str, obj?>>>();
+		await foreach(var d1 in AsyE2d(Ct).WithCancellation(Ct)){
+			ans.Add(await d1.ToListAsync(Ct));
+		}
+		return ans;
+	}
 
 
 	public virtual async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
