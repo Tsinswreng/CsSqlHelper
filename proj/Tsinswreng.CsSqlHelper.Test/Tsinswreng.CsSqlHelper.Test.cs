@@ -1,4 +1,5 @@
 ﻿using Tsinswreng.CsSqlHelper.Test.Domains;
+using Tsinswreng.CsSqlHelper;
 
 var sqliteSql = TestTblMgrIniter.MkSqliteMgr().SqlMkSchema();
 var postgresSql = TestTblMgrIniter.MkPostgresMgr().SqlMkSchema();

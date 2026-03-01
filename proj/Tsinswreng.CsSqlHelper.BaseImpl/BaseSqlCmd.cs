@@ -58,9 +58,8 @@ public abstract partial class BaseSqlCmd<
 	}
 
 
-	/// <summary>
+
 	/// 傳入之字典不帶@名稱 佔位
-	/// </summary>
 	/// <param name="Args"></param>
 	/// <returns></returns>
 	[Impl]
@@ -75,9 +74,7 @@ public abstract partial class BaseSqlCmd<
 		return this;
 	}
 
-/// <summary>
 /// @0, @1, @2 ...
-/// </summary>
 /// <param name="Params"></param>
 /// <returns></returns>
 	public ISqlCmd Args(IEnumerable<obj?> Params){
@@ -93,9 +90,8 @@ public abstract partial class BaseSqlCmd<
 		return this;
 	}
 
-	/// <summary>
+
 	/// 若含null則做DBNull與null之轉、否則原樣返
-	/// </summary>
 	/// <param name="DbVal"></param>
 	/// <returns></returns>
 	public virtual obj? DbValToCodeVal(obj? DbVal){
@@ -159,17 +155,16 @@ public abstract partial class BaseSqlCmd<
 			for (var i = 0; i < reader.FieldCount; i++){
 //TODO 優化異常ʹ訊
 // reader.GetName(i)ʃ得ʹ列名ˋ不帶表名、如Select* 後作多表join 遇同名列則褈添ⁿ致錯、Select A.Id, B.Id旹亦然
-				RawDict.Add(reader.GetName(i), DbValToCodeVal(reader.GetValue(i)));
+var k = reader.GetName(i);
+var v = DbValToCodeVal(reader.GetValue(i));
+				RawDict.Add(k, v);
 			}
 			yield return RawDict;
 		}
 	}
 
-	/// <summary>
+
 	/// 多個結果集ʹ內容ˇ 皆扁平化
-	/// </summary>
-	/// <param name="Ct"></param>
-	/// <returns></returns>
 	public virtual async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(
 		[EnumeratorCancellation]
 		CT Ct

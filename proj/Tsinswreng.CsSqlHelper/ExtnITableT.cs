@@ -10,13 +10,20 @@ using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 public static partial class ExtnITableT{
 	extension<T>(ITable<T> z){
 		//"db_col_name"  不帶表名前綴
-		public IField Fld(Expression<Func<T, obj?>> ExprMemb){
+		public str DbCol(Expression<Func<T, obj?>> ExprMemb){
 			var t = (ITable)z;
-			return t.Fld<T>(ExprMemb);
+			var memb = ToolExpr.GetMemberName(ExprMemb);
+			return t.DbCol(memb);
+		}
+
+		public IField QtCol(Expression<Func<T, obj?>> ExprMemb){
+			var t = (ITable)z;
+			return t.QtCol<T>(ExprMemb);
 		}
 
 		public str Memb(Expression<Func<T, obj?>> ExprMemb){
-			return z.Memb<T>(ExprMemb);
+			var t = (ITable)z;
+			return t.Memb(ExprMemb);
 		}
 
 		public ISqlSplicer<T> SqlSplicer(){

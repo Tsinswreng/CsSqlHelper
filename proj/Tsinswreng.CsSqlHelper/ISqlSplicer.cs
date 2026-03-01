@@ -40,7 +40,7 @@ public class ISqlSplicer<E>:I_DuplicateSql{
 
 	// CodeCol -> "DbCol"
 	str Fld(str s){
-		return Tbl.Fld(s);
+		return Tbl.QtCol(s);
 		//return Tbl.Qt(Tbl.DbTblName+"."+Tbl.ColNameToDb(s));
 	}
 
@@ -74,7 +74,14 @@ public class ISqlSplicer<E>:I_DuplicateSql{
 
 	public ISqlSplicer<E> Select(Expression<Func<E, obj?>> GetMember){
 		var memb = Memb(GetMember);
-		return AddSeg($"SELECT {Qt(Tbl.DbTblName+"."+Tbl.ColNameToDb(memb))} AS {memb}");
+		//return AddSeg($"SELECT {Qt(Tbl.DbTblName+"."+Tbl.ColNameToDb(memb))} AS {memb}");
+		var seg = "SELECT"
+		+Qt(Tbl.DbTblName)
+		+"."
+		+Qt(Tbl.DbCol(memb))
+		+" AS "
+		+Qt(memb);
+		return AddSeg(seg);
 	}
 
 	public ISqlSplicer<E> From(){

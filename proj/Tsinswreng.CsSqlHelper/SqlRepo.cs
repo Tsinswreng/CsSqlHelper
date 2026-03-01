@@ -324,7 +324,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		,CT Ct
 	){
 		var Params = T.Prm(0,0);
-		var Sql = $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} = {Params[0]}" ;
+		var Sql = $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} = {Params[0]}" ;
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		return async(Id ,Ct)=>{
 			var IdCol = T.Columns[T.CodeIdName];
@@ -351,7 +351,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		IList<IParam> Params = [];
 		var sqlD = FnSqlDuplicator.Mk((Cnt)=>{
 			Params = T.NumParams(Cnt);
-			return $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(T.CodeIdName)} IN ({str.Join(", ", Params)})" ;
+			return $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", Params)})" ;
 		});
 		var bat = AutoBatch<TId, IAsyncEnumerable<TEntity?>>.Mk(
 			Ctx, SqlCmdMkr, sqlD,
@@ -371,7 +371,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 	){
 		var PId = T.Prm(T.CodeIdName);
 		var Sql = T.SqlSplicer().Select("*").From().Where1()
-		.Raw("And "+T.Fld(T.CodeIdName)+"="+PId);
+		.Raw("And "+T.QtCol(T.CodeIdName)+"="+PId);
 
 		var bat = AutoBatch<TId, IAsyncEnumerable<TEntity?>>.Mk(
 			Ctx, SqlCmdMkr, Sql,
@@ -430,7 +430,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Clause = T.UpdateClause(UpperFieldsToUpdate);
 		var FieldsToUpdateMap = UpperFieldsToUpdate.ToHashSet();
 		var Sql =
-$"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
+$"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.QtCol(NId)} = {T.Prm(NId)}";
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		return async(Id, Entity, Ct)=>{
 			var Arg = ArgDict.Mk(T);
@@ -460,7 +460,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		var Clause = T.UpdateClause(UpperFieldsToUpdate);
 		var FieldsToUpdateMap = UpperFieldsToUpdate.ToHashSet();
 		var Sql =
-$"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
+$"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.QtCol(NId)} = {T.Prm(NId)}";
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		return async(Entity, Ct)=>{
 			var Arg = ArgDict.Mk(T);
@@ -530,7 +530,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		var NId = T.CodeIdName;
 		var Clause = T.UpdateClause(FieldsToUpdate);
 		var Sql =
-$"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
+$"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.QtCol(NId)} = {T.Prm(NId)}";
 
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		var Fn = async(
@@ -600,9 +600,9 @@ $"UPDATE {T.Qt(T.DbTblName)} SET ${Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		var Sql =
 $"""
 UPDATE {T.Qt(T.DbTblName)}
-SET {T.Fld(T.SoftDelCol.CodeColName)} = {T.Prm(0,0)[0]}
-WHERE {T.Fld(KeyNameInCode)} IN ({str.Join(",", ParamList)})
-AND {T.Fld(KeyNameInCode)} IS NOT NULL
+SET {T.QtCol(T.SoftDelCol.CodeColName)} = {T.Prm(0,0)[0]}
+WHERE {T.QtCol(KeyNameInCode)} IN ({str.Join(",", ParamList)})
+AND {T.QtCol(KeyNameInCode)} IS NOT NULL
 ;
 """;
 		var ValToSet = T.SoftDelCol.FnDelete(null);
@@ -652,7 +652,7 @@ AND {T.Fld(KeyNameInCode)} IS NOT NULL
 		,CT Ct
 	){
 		var T = TblMgr.GetTbl<TEntity>();
-var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.Fld(T.CodeIdName)} = ?";
+var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.QtCol(T.CodeIdName)} = ?";
 
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		async Task<nil> Fn(
@@ -687,7 +687,7 @@ var Sql = $"DELETE FROM {T.DbTblName} WHERE {T.Fld(T.CodeIdName)} = ?";
 		var Clause = T.NumParamClause(ParamNum-1);
 		var Sql =
 $"""
-DELETE FROM {T.Qt(T.DbTblName)} WHERE {T.Fld(KeyNameInCode)} IN ${Clause}
+DELETE FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(KeyNameInCode)} IN ${Clause}
 AND {T.Qt(KeyNameInCode)} IS NOT NULL;
 """;
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
@@ -755,7 +755,7 @@ var PTarget = T.Prm("__Target");var PId = T.Prm(NId);
 var Sql = $"""
 UPDATE {T.Qt(T.DbTblName)}
 SET {T.Qt(Col)} = {PTarget}
-WHERE {T.Fld(NId)} = {PId}
+WHERE {T.QtCol(NId)} = {PId}
 """;
 var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		Ctx?.AddToDispose(SqlCmd);
@@ -797,7 +797,7 @@ var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 $"""
 SELECT * FROM {Tbl.Qt(Tbl.DbTblName)}
 WHERE 1=1
-AND {T.Fld(CodeCol)} IN ({str.Join(",", numParams)})
+AND {T.QtCol(CodeCol)} IN ({str.Join(",", numParams)})
 """;
 		var SqlCmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		return async(Args ,Ct)=>{
@@ -893,7 +893,7 @@ Func<
 $"""
 SELECT * FROM {Tbl.Qt(Tbl.DbTblName)}
 WHERE 1=1
-AND {Tbl.Fld(CodeCol)} IN ({str.Join(",", numParams)})
+AND {Tbl.QtCol(CodeCol)} IN ({str.Join(",", numParams)})
 """;
 		var SqlCmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		return async(Args ,Ct)=>{

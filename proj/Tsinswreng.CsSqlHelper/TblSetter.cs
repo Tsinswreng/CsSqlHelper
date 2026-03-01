@@ -124,7 +124,7 @@ public class TblSetter<T>:ITblSetter<T>{
 	) {
 		var flds = new List<str>();
 		foreach (var codeCol in CodeColNames) {
-			flds.Add(Tbl.Fld(codeCol));
+			flds.Add(Tbl.QtCol(codeCol));
 		}
 
 		var unique = IsUnique ? "UNIQUE " : "";

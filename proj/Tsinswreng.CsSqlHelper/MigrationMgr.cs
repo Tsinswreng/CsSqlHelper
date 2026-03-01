@@ -25,7 +25,7 @@ public class MigrationMgr: IMigrationMgr{
 $"""
 SELECT * FROM {T.Qt(T.DbTblName)}
 WHERE 1=1
-ORDER BY {T.Fld(PCreatedMs)} DESC
+ORDER BY {T.QtCol(PCreatedMs)} DESC
 {T.SqlMkr.ParamLimOfst(out var Lim, out var Ofst)}
 """;
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);

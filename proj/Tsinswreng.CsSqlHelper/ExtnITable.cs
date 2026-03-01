@@ -37,7 +37,7 @@ public static class ExtnITable {
 		#Params([Column name C# code (entity field)])
 		#Rtn[Column name in database table]
 		")]
-		public str ColNameToDb(
+		public str DbCol(
 			str CodeColName
 		) {
 			var Col = z.GetCol(CodeColName);
@@ -46,12 +46,12 @@ public static class ExtnITable {
 		}
 
 		[Doc(@$"#Sum[Map entity field name to quoted database column name.]
-		#See[{nameof(ColNameToDb)} then {nameof(ExtnITable.Qt)}]
+		#See[{nameof(DbCol)} then {nameof(ExtnITable.Qt)}]
 		")]
-		public str Fld(
+		public str QtCol(
 			str CodeColName
 		) {
-			var dbColName = z.ColNameToDb(CodeColName);
+			var dbColName = z.DbCol(CodeColName);
 			return z.SqlMkr.Quote(dbColName);
 		}
 
@@ -73,7 +73,7 @@ public static class ExtnITable {
 				#Params([Expression to extract member name from])
 				#Rtn[IField object with table context]
 				")]
-		public IField Fld<T>(Expression<Func<T, obj?>> ExprMemb) {
+		public IField QtCol<T>(Expression<Func<T, obj?>> ExprMemb) {
 			var memberName = ToolExpr.GetMemberName<T>(ExprMemb);
 			var R = new Field(z, memberName);
 			return R;
@@ -105,11 +105,11 @@ public static class ExtnITable {
 				#Params([IParam whose Name is the code column name])
 				#Rtn[Quoted database column name]
 				")]
-		public str Fld(
+		public str QtCol(
 			IParam CodeColNameParam
 		) {
 			var CodeColName = CodeColNameParam.Name;
-			var DbColName = z.ColNameToDb(CodeColName);
+			var DbColName = z.DbCol(CodeColName);
 			return z.SqlMkr.Quote(DbColName);
 		}
 
@@ -154,10 +154,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Assign database values to existing entity]
-				#Params([Dictionary with database column names], [Entity to assign values to])
-				#Rtn[The assigned entity]
-				")]
+		#Sum[Assign database values to existing entity]
+		#Params([Dictionary with database column names], [Entity to assign values to])
+		#Rtn[The assigned entity]
+		")]
 		public T AssignEntity<T>(
 			IStr_Any DbDict
 			, T ToBeAssigned
@@ -304,7 +304,7 @@ public static class ExtnITable {
 		) {
 			List<str> segs = [];
 			foreach (var rawField in UpperFields) {
-				var field = z.Fld(rawField);
+				var field = z.QtCol(rawField);
 				var param = z.Prm(rawField);
 				segs.Add(field + " = " + param);
 			}
@@ -322,7 +322,7 @@ public static class ExtnITable {
 			List<str> Fields = [];
 			List<IParam> Params = [];
 			foreach (var rawField in RawFields) {
-				var field = z.Fld(rawField);
+				var field = z.QtCol(rawField);
 				var param = z.Prm(rawField);
 				Fields.Add(field);
 				Params.Add(param);
@@ -341,7 +341,7 @@ public static class ExtnITable {
 		) {
 			IList<str> Fields = [];
 			foreach (var rawField in RawFields) {
-				var field = z.Fld(rawField);
+				var field = z.QtCol(rawField);
 				var param = z.Prm(rawField);
 				Fields.Add(field);
 			}
