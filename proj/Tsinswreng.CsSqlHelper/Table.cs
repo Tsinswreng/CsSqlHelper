@@ -83,8 +83,10 @@ public partial class Table:ITable{
 		t.Init();
 		return t;
 	}
+	
+	
 
-
+	[Obsolete("")]
 	public static Func<str, ITable<T>> FnMkTbl<T>(IDictMapperShallow DictMapper){
  		ITable<T2> Mk<T2>(str DbTblName){
 			var TypeDict = DictMapper.GetTypeDictShallowT<T2>();
@@ -95,6 +97,20 @@ public partial class Table:ITable{
 			);
 		}
 		return Mk<T>;
+	}
+	
+	public static Func<str, ITblSetter<T>> FnSetTbl<T>(IDictMapperShallow DictMapper){
+		ITblSetter<T2> Set<T2>(str DbTblName){
+			var TypeDict = DictMapper.GetTypeDictShallowT<T2>();
+			var Tbl = Table.Mk<T2>(
+				DictMapper
+				,DbTblName
+				,TypeDict
+			);
+			var R = new TblSetter<T2>(Tbl);
+			return R;
+		}
+		return Set<T>;
 	}
 
 	[Impl]

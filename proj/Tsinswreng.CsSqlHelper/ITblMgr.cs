@@ -8,11 +8,12 @@ public partial interface ITblMgr{
 	public str DbSrcType{get;set;}
 	public ISqlMkr SqlMkr{get;set;}
 
-	public void AddTbl(ITable Tbl){
+	public nil AddTbl(ITable Tbl){
 		Tbl.SqlMkr = SqlMkr;
 		Tbl.TblMgr = this;
 		//EntityType_Tbl.Add(Tbl.CodeEntityType, Tbl);
 		EntityType_Tbl[Tbl.CodeEntityType] = Tbl;
+		return NIL;
 	}
 
 	public ITable<TPo> GetTbl<TPo>(){
@@ -24,5 +25,13 @@ public partial interface ITblMgr{
 			throw new Exception($"Table is not generic ITable<{typeof(TPo)}> ");
 		}
 		return R;
+	}
+}
+
+public static class ExtnITblMgr{
+	extension(ITblMgr z){
+		public nil AddTbl<T>(ITblSetter<T> TblSetter){
+			return z.AddTbl(TblSetter.Tbl);
+		}
 	}
 }
