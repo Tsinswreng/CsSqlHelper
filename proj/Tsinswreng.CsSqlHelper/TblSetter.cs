@@ -3,10 +3,14 @@ using Tsinswreng.CsTools;
 
 namespace Tsinswreng.CsSqlHelper;
 
-[Doc(@$"returns strings to add in {nameof(ITable.OuterAdditionalSqls)} to create indexes")]
+[Doc(@$"
+should be pure function, should return strings instead of directly modifying {nameof(ITable.OuterAdditionalSqls)}
+#Rtn[strings to add in {nameof(ITable.OuterAdditionalSqls)} to create indexes]
+")]
 public delegate IList<str> FnSetIdx(
-	IOptMkIdx? Opt,
-	params IEnumerable<str>[] Cols
+	IOptMkIdx? Opt
+	,ITable Tbl
+	,params IEnumerable<str>[] Cols
 );
 
 public interface ITblSetter<T>{
@@ -48,8 +52,37 @@ public interface ITblSetter<T>{
 public class TblSetter<T>:ITblSetter<T>{
 	public TblSetter(ITable<T> Tbl){
 		this.Tbl = Tbl;
+		this.FnSetIdx = DefaultFnSetIdx;
 	}
 	public ITable<T> Tbl{get;set;}
+	public FnSetIdx FnSetIdx{get;set;}
+	
+	/// <summary>
+	/// Default implementation for FnSetIdx - pure function that only generates SQL
+	/// </summary>
+	private IList<str> DefaultFnSetIdx(
+		IOptMkIdx? Opt
+		, ITable Tbl
+		, params IEnumerable<str>[] Cols
+	) {
+		var results = new List<str>();
+		
+		foreach (var colSet in Cols) {
+			var colList = colSet.ToList();
+			var isUnique = Opt?.Unique ?? false;
+			var whereCondition = str.IsNullOrEmpty(Opt?.Where) ? null : new[] { Opt.Where };
+			
+			// Generate index name: Idx_{TableName}_{Col1}_{Col2}... or Ux_{TableName}_{Col1}_{Col2}...
+			var prefix = isUnique ? "Ux" : "Idx";
+			var colNamePart = string.Join("_", colList);
+			var indexName = $"{prefix}_{Tbl.DbTblName}_{colNamePart}";
+			
+			var sql = MkIndexSqlByCodeCols(indexName, colList, isUnique, whereCondition);
+			results.Add(sql);
+		}
+		
+		return results;
+	}
 	
 	/// <summary>
 	/// Define index using member expressions
@@ -73,22 +106,11 @@ public class TblSetter<T>:ITblSetter<T>{
 		IOptMkIdx? Opt,
 		params IEnumerable<str>[] Cols
 	) {
-		var tbl = Tbl;
-		
-		foreach (var colSet in Cols) {
-			var colList = colSet.ToList();
-			var isUnique = Opt?.Unique ?? false;
-			var whereCondition = str.IsNullOrEmpty(Opt?.Where) ? null : new[] { Opt.Where };
-			
-			// Generate index name: Idx_{TableName}_{Col1}_{Col2}... or Ux_{TableName}_{Col1}_{Col2}...
-			var prefix = isUnique ? "Ux" : "Idx";
-			var colNamePart = string.Join("_", colList);
-			var indexName = $"{prefix}_{tbl.DbTblName}_{colNamePart}";
-			
-			MkIndexSqlByCodeCols(indexName, colList, isUnique, whereCondition);
+		var sqls = FnSetIdx(Opt, Tbl, Cols);
+		foreach (var sql in sqls) {
+			Tbl.OuterAdditionalSqls.Add(sql);
 		}
-		
-		return tbl;
+		return Tbl;
 	}
 
 	/// <summary>
