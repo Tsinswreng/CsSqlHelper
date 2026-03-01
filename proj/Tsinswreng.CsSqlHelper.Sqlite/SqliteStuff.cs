@@ -8,4 +8,3 @@ public class SqliteStuff:IDbStuff{
 	public IDbValConvtr DbValConvtr{get;set;} = SqliteValConvtr.Inst;
 }
 
-

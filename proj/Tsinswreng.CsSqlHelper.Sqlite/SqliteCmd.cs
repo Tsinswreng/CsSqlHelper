@@ -13,6 +13,7 @@ public partial class SqliteCmd : BaseSqlCmd<SqliteCommand, SqliteTransaction> {
 	public SqliteCmd(SqliteCommand RawCmd):base(RawCmd){
 
 	}
+	public override IDbValConvtr DbValConvtr{get;protected set;} = SqliteValConvtr.Inst;
 	public override nil ParamAddWithValue(DbParameterCollection Params, string? parameterName, object? value) {
 		if(Params is not SqliteParameterCollection prm){
 			throw new ArgumentException("Params is not SqliteParameterCollection");
