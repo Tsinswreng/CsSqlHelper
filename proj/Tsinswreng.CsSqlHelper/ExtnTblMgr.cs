@@ -20,8 +20,7 @@ public static class ExtnTblMgr{
 		public TSelf Clone(){
 			var R = new TSelf();
 			R.EntityType_Tbl = z.EntityType_Tbl;
-			R.DbSrcType = z.DbSrcType;
-			R.SqlMkr = z.SqlMkr;
+			R.DbStuff = z.DbStuff;
 			return R;
 		}
 	}

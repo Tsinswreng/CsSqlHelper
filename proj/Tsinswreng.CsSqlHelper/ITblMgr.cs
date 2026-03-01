@@ -5,7 +5,7 @@ namespace Tsinswreng.CsSqlHelper;
 //TODO配置忽略之字段
 public partial interface ITblMgr{
 	public IDictionary<Type, ITable> EntityType_Tbl{get;set;}
-	public str DbSrcType{get;set;}
+	public str DbSrcType=>DbStuff.DbSrcType;
 	public IDbStuff DbStuff{get;set;}
 	public ISqlMkr SqlMkr=>DbStuff.SqlMkr;
 

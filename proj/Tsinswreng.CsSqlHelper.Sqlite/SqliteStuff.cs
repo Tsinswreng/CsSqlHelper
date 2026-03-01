@@ -3,6 +3,7 @@ using Tsinswreng.CsSqlHelper;
 
 public class SqliteStuff:IDbStuff{
 	public static SqliteStuff Inst => field??=new SqliteStuff();
+	public str DbSrcType{get;set;} = ConstDbSrcType.Sqlite;
 	public ISqlMkr SqlMkr{get;set;} = SqliteSqlMkr.Inst;
 	
 	public IDbValConvtr DbValConvtr{get;set;} = SqliteValConvtr.Inst;

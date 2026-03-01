@@ -5,17 +5,13 @@ namespace Tsinswreng.CsSqlHelper.Test.Domains;
 
 public static class TestTblMgrIniter {
 	public static ITblMgr MkSqliteMgr() {
-		var mgr = new SqliteTblMgr {
-			DbSrcType = ConstDbSrcType.Sqlite,
-		};
+		var mgr = new SqliteTblMgr {};
 		Init(mgr);
 		return mgr;
 	}
 
 	public static ITblMgr MkPostgresMgr() {
-		var mgr = new PostgresTblMgr {
-			DbSrcType = ConstDbSrcType.Postgres,
-		};
+		var mgr = new PostgresTblMgr {};
 		Init(mgr);
 		return mgr;
 	}
