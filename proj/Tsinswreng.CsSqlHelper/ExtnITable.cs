@@ -11,8 +11,8 @@ public static class ExtnITable {
 
 	extension(ITable z) {
 		[Doc($@"
-			Quote field name for SQL, e.g. in sqlite: ""field_name""; in mysql: `field_name`;
-			")]
+		Quote field name for SQL, e.g. in sqlite: ""field_name""; in mysql: `field_name`;
+		")]
 		public str Qt(
 			str s
 		) {
@@ -59,20 +59,20 @@ public static class ExtnITable {
 		#Example[fn<PoUser>(x=>x.UserName) returns string UserName]
 		")]
 		[Doc($@"
-				#Sum[Get member name from expression]
-				#Params([Expression to extract member name from])
-				#Rtn[Member name as string]
-				#Example[fn<PoUser>(x=>x.UserName) returns string ""UserName""]
-				")]
+		#Sum[Get member name from expression]
+		#Params([Expression to extract member name from])
+		#Rtn[Member name as string]
+		#Example[fn<PoUser>(x=>x.UserName) returns string ""UserName""]
+		")]
 		public str Memb<T>(Expression<Func<T, obj?>> ExprMemb) {
 			return ToolExpr.GetMemberName(ExprMemb);
 		}
 
 		[Doc($@"
-				#Sum[Create field reference from expression]
-				#Params([Expression to extract member name from])
-				#Rtn[IField object with table context]
-				")]
+		#Sum[Create field reference from expression]
+		#Params([Expression to extract member name from])
+		#Rtn[IField object with table context]
+		")]
 		public IField QtCol<T>(Expression<Func<T, obj?>> ExprMemb) {
 			var memberName = ToolExpr.GetMemberName<T>(ExprMemb);
 			var R = new Field(z, memberName);
@@ -80,9 +80,9 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Create typed SQL splicer]
-				#Rtn[Typed SQL splicer with table context set]
-				")]
+		#Sum[Create typed SQL splicer]
+		#Rtn[Typed SQL splicer with table context set]
+		")]
 		public ISqlSplicer<T> SqlSplicer<T>() {
 			var R = new SqlSplicer<T>();
 			R.Tbl = z;
@@ -90,9 +90,9 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Create untyped SQL splicer]
-				#Rtn[Untyped SQL splicer with table context set]
-				")]
+		#Sum[Create untyped SQL splicer]
+		#Rtn[Untyped SQL splicer with table context set]
+		")]
 		public ISqlSplicer SqlSplicer() {
 			var R = new SqlSplicer();
 			R.Tbl = z;
@@ -101,10 +101,10 @@ public static class ExtnITable {
 
 
 		[Doc($@"
-				#Sum[Map code column name to quoted database column name]
-				#Params([IParam whose Name is the code column name])
-				#Rtn[Quoted database column name]
-				")]
+		#Sum[Map code column name to quoted database column name]
+		#Params([IParam whose Name is the code column name])
+		#Rtn[Quoted database column name]
+		")]
 		public str QtCol(
 			IParam CodeColNameParam
 		) {
@@ -114,9 +114,9 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Create SQL parameter with specified name]
-				#Params([Parameter name])
-				")]
+		#Sum[Create SQL parameter with specified name]
+		#Params([Parameter name])
+		")]
 		public IParam Prm(
 			str Name
 		) {
@@ -124,9 +124,9 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Create SQL parameter with auto-generated unique name]
-				#Rtn[IParam with name like ""@_1ccGi7C87H-LETKfaB_JX""]
-				")]
+		#Sum[Create SQL parameter with auto-generated unique name]
+		#Rtn[IParam with name like ""@_1ccGi7C87H-LETKfaB_JX""]
+		")]
 		public IParam Prm() {
 			var bytes = Ulid.NewUlid().ToByteArray();
 			var id = ToolUInt128.ByteArrToUInt128(bytes);
@@ -135,10 +135,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Convert database dictionary to code dictionary]
-				#Params([Dictionary with database column names as keys])
-				#Rtn[Dictionary with code column names as keys and upper-cased values]
-				")]
+		#Sum[Convert database dictionary to code dictionary]
+		#Params([Dictionary with database column names as keys])
+		#Rtn[Dictionary with code column names as keys and upper-cased values]
+		")]
 		public IStr_Any ToCodeDict(
 			IStr_Any DbDict
 		) {
@@ -168,10 +168,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Convert database dictionary to entity with reference]
-				#Params([Dictionary with database column names], [Reference to entity instance, will be created if null])
-				#Rtn[The entity instance]
-				")]
+		#Sum[Convert database dictionary to entity with reference]
+		#Params([Dictionary with database column names], [Reference to entity instance, will be created if null])
+		#Rtn[The entity instance]
+		")]
 		public TPo DbDictToEntity<TPo>(
 			IStr_Any DbDict
 			, ref TPo R
@@ -183,10 +183,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Convert database dictionary to new entity]
-				#Params([Dictionary with database column names])
-				#Rtn[New entity instance with assigned values]
-				")]
+		#Sum[Convert database dictionary to new entity]
+		#Params([Dictionary with database column names])
+		#Rtn[New entity instance with assigned values]
+		")]
 		public TPo DbDictToEntity<TPo>(
 			IStr_Any DbDict
 		) where TPo : new() {
@@ -198,10 +198,10 @@ public static class ExtnITable {
 		//static i32 i = 0;
 
 		[Doc($@"
-				#Sum[Convert code dictionary to database dictionary]
-				#Params([Dictionary with code column names as keys])
-				#Rtn[Dictionary with database column names as keys and raw values]
-				")]
+		#Sum[Convert code dictionary to database dictionary]
+		#Params([Dictionary with code column names as keys])
+		#Rtn[Dictionary with database column names as keys and raw values]
+		")]
 		public IStr_Any ToDbDict(
 			IStr_Any CodeDict
 		) {
@@ -216,9 +216,9 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Convert upper value to raw value for specific column]
-				#Params([Upper value], [Code column name])
-				")]
+		#Sum[Convert upper value to raw value for specific column]
+		#Params([Upper value], [Code column name])
+		")]
 		public obj? UpperToRaw(
 			obj? UpperValue
 			, str CodeColName
@@ -228,10 +228,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Convert upper value to raw value with type fallback]
-				#Params([Upper value], [Upper type], [Optional code column name for column-specific conversion])
-				#Rtn[Raw value after conversion, or original value if no converter found]
-				")]
+		#Sum[Convert upper value to raw value with type fallback]
+		#Params([Upper value], [Upper type], [Optional code column name for column-specific conversion])
+		#Rtn[Raw value after conversion, or original value if no converter found]
+		")]
 		public obj? UpperToRaw(
 			obj? UpperValue
 			, Type UpperType
@@ -250,9 +250,9 @@ public static class ExtnITable {
 
 
 		[Doc($@"
-				#Sum[Generic version of UpperToRaw with type inference]
-				#Params([Upper value], [Optional code column name])
-				")]
+		#Sum[Generic version of UpperToRaw with type inference]
+		#Params([Upper value], [Optional code column name])
+		")]
 		public obj? UpperToRaw<T>(
 			T UpperValue
 			, str? CodeColName = null
@@ -261,9 +261,9 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Convert raw value to upper value for specific column]
-				#Params([Raw value from database], [Code column name])
-				")]
+		#Sum[Convert raw value to upper value for specific column]
+		#Params([Raw value from database], [Code column name])
+		")]
 		public obj? RawToUpper(
 			obj? RawValue
 			, str CodeColName
@@ -282,10 +282,10 @@ public static class ExtnITable {
 
 
 		[Doc($@"
-				#Sum[Convert raw value to upper value with generic return type]
-				#Params([Raw value from database], [Code column name])
-				#Rtn[Converted value cast to T]
-				")]
+		#Sum[Convert raw value to upper value with generic return type]
+		#Params([Raw value from database], [Code column name])
+		#Rtn[Converted value cast to T]
+		")]
 		public T RawToUpper<T>(
 			obj? RawValue
 			, str CodeColName
@@ -295,10 +295,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate UPDATE clause for specified fields]
-				#Params([Enumerable of code field names to update])
-				#Rtn[SQL SET clause like ""field1 = @field1, field2 = @field2""]
-				")]
+		#Sum[Generate UPDATE clause for specified fields]
+		#Params([Enumerable of code field names to update])
+		#Rtn[SQL SET clause like ""field1 = @field1, field2 = @field2""]
+		")]
 		public str UpdateClause(
 			IEnumerable<str> UpperFields
 		) {
@@ -312,10 +312,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate INSERT clause for specified fields]
-				#Params([Enumerable of code field names to insert])
-				#Rtn[SQL INSERT clause like ""(field1, field2) VALUES (@field1, @field2)""]
-				")]
+		#Sum[Generate INSERT clause for specified fields]
+		#Params([Enumerable of code field names to insert])
+		#Rtn[SQL INSERT clause like ""(field1, field2) VALUES (@field1, @field2)""]
+		")]
 		public str InsertClause(
 			IEnumerable<str> RawFields
 		) {
@@ -331,10 +331,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate INSERT clause for batch operations with numbered parameters]
-				#Params([Enumerable of code field names], [Number of parameter groups])
-				#Rtn[SQL INSERT clause with multiple value groups like ""(field1, field2) VALUES (@field1__0, @field2__0), (@field1__1, @field2__1)...""]
-				")]
+		#Sum[Generate INSERT clause for batch operations with numbered parameters]
+		#Params([Enumerable of code field names], [Number of parameter groups])
+		#Rtn[SQL INSERT clause with multiple value groups like ""(field1, field2) VALUES (@field1__0, @field2__0), (@field1__1, @field2__1)...""]
+		")]
 		public str InsertManyClause(
 			IEnumerable<str> RawFields
 			, u64 GroupCnt = 1000
@@ -380,10 +380,10 @@ public static class ExtnITable {
 
 		/// Num:0 -> @_0
 		[Doc($@"
-				#Sum[Create numbered parameter]
-				#Params([Number to use as suffix])
-				#Rtn[IParam with name like ""@_0"", ""@_1""]
-				")]
+		#Sum[Create numbered parameter]
+		#Params([Number to use as suffix])
+		#Rtn[IParam with name like ""@_0"", ""@_1""]
+		")]
 		public IParam NumParam(
 			u64 Num
 		) {
@@ -392,10 +392,10 @@ public static class ExtnITable {
 
 
 		[Doc($@"
-				#Sum[Generate numbered parameters from StartPos to EndPos inclusive]
-				#Params([End position], [Start position, default 0])
-				#Rtn[List of IParam from @_StartPos to @_EndPos]
-				")]
+		#Sum[Generate numbered parameters from StartPos to EndPos inclusive]
+		#Params([End position], [Start position, default 0])
+		#Rtn[List of IParam from @_StartPos to @_EndPos]
+		")]
 		public IList<IParam> NumParamsEndStart(
 			u64 EndPos, u64 StartPos = 0
 		) {
@@ -408,10 +408,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate numbered parameters from StartPos to EndPos inclusive]
-				#Params([Start position], [End position])
-				#Rtn[List of IParam from @_StartPos to @_EndPos]
-				")]
+		#Sum[Generate numbered parameters from StartPos to EndPos inclusive]
+		#Params([Start position], [End position])
+		#Rtn[List of IParam from @_StartPos to @_EndPos]
+		")]
 		public IList<IParam> NumParams(
 			u64 StartPos, u64 EndPos
 		) {
@@ -424,11 +424,11 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate numbered parameters from 0 to Cnt-1]
-				#Params([Count of parameters])
-				#Rtn[List of IParam from @_0 to @_{{Cnt - 1}}]
-				#Example[fn(2) -> [@_0, @_1]]
-				")]
+		#Sum[Generate numbered parameters from 0 to Cnt-1]
+		#Params([Count of parameters])
+		#Rtn[List of IParam from @_0 to @_{{Cnt - 1}}]
+		#Example[fn(2) -> [@_0, @_1]]
+		")]
 		public IList<IParam> NumParams(
 			u64 Cnt
 		) {
@@ -437,10 +437,10 @@ public static class ExtnITable {
 
 
 		[Doc($@"
-				#Sum[Generate numbered parameter clause for IN clause]
-				#Params([End position], [Start position, default 0])
-				#Rtn[SQL clause like ""(@0, @1, @2)""]
-				")]
+		#Sum[Generate numbered parameter clause for IN clause]
+		#Params([End position], [Start position, default 0])
+		#Rtn[SQL clause like ""(@0, @1, @2)""]
+		")]
 		public str NumParamClause(
 			u64 EndPos
 			, u64 StartPos = 0
@@ -459,10 +459,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate numbered parameters from Start to End inclusive]
-				#Params([Start number], [End number])
-				#Rtn[List of IParam from @Start to @End]
-				")]
+		#Sum[Generate numbered parameters from Start to End inclusive]
+		#Params([Start number], [End number])
+		#Rtn[List of IParam from @Start to @End]
+		")]
 		public IList<IParam> Prm(
 			u64 Start
 			, u64 End
@@ -476,10 +476,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate equality condition]
-				#Params([Database column name], [Parameter])
-				#Rtn[SQL equality like ""DbColName = @Param""]
-				")]
+		#Sum[Generate equality condition]
+		#Params([Database column name], [Parameter])
+		#Rtn[SQL equality like ""DbColName = @Param""]
+		")]
 		public str Eq(
 			str DbColName, IParam Param
 		) {
@@ -487,10 +487,10 @@ public static class ExtnITable {
 		}
 
 		[Doc($@"
-				#Sum[Generate self-equality condition]
-				#Params([Parameter whose Name is used as column name])
-				#Rtn[SQL equality like ""Param.Name = Param""]
-				")]
+		#Sum[Generate self-equality condition]
+		#Params([Parameter whose Name is used as column name])
+		#Rtn[SQL equality like ""Param.Name = Param""]
+		")]
 		public str Eq(IParam Param) {
 			return z.Eq(Param.Name, Param);
 		}
@@ -571,9 +571,9 @@ public static class ExtnITable {
 
 
 		[Doc($@"
-				#Sum[Create page query that selects all records]
-				#Desc[Sets PageSize to MaxValue, not a real SELECT ALL]
-				")]
+		#Sum[Create page query that selects all records]
+		#Desc[Sets PageSize to MaxValue, not a real SELECT ALL]
+		")]
 		public IPageQry PageSlctAll() {
 			var R = new PageQry();
 			if (z.TblMgr?.DbSrcType == ConstDbSrcType.Postgres) {
