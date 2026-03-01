@@ -116,13 +116,7 @@ $"SELECT COUNT(*) AS {T.Qt(NCnt)} FROM {T.Qt(T.DbTblName)}";
 
 	//public class _ClsInsrtMany<E,I>(SqlRepo<E,I> z)
 
-	/// <summary>
 	/// 適用sqlite
-	/// </summary>
-	/// <param name="Ctx"></param>
-	/// <param name="Prepare"></param>
-	/// <param name="Ct"></param>
-	/// <returns></returns>
 	protected async Task<Func<
 		IEnumerable<TEntity>
 		,CT
@@ -168,13 +162,9 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 
 	public class CfgInsertMany{
 		public bool Prepare = true;
-		/// <summary>
 		/// 餘ʹ數據量ˋ逾此則用大批插入
-		/// </summary>
 		public u64 FullBatchSize = 500;//Sqlite最多支持999個參數
-		/// <summary>
 		/// 餘ʹ數據量ˋ不足FullBatchSize則試小批插入
-		/// </summary>
 		public u64 SmallBatchSize = 20;
 		//public u64 BatchSize = 4;
 	}
@@ -212,7 +202,6 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		var Cmd = CmdFullSize;
 
 		return async(IEnumerable<TEntity> Entitys,CT Ct)=>{
-			//System.Console.WriteLine(typeof(TEntity));
 			//插入一批
 			var OneBatch = async(ISqlCmd Cmd, IList<IDictionary<string, object?>> ArgDicts)=>{
 				var FullArgDict = new Dictionary<str, obj?>();
@@ -229,37 +218,23 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			await using var BatchList = new BatchCollector<IDictionary<str, obj?>,nil>(
 				async(ArgDicts, Ct)=>{
 					if((u64)ArgDicts.Count >= Cfg.FullBatchSize){
-						//var sw = Stopwatch.StartNew();
 						await OneBatch(Cmd, ArgDicts);
-						//sw.Stop();
-						// System.Console.WriteLine(
-						// 	$"FullBatch:{sw.Elapsed.TotalMilliseconds}ms"
-						// );
 					}else{
 						var (SmallBatchCnt, Remainder) = DivideWithRemainder(
 							(u64)ArgDicts.Count, SmallSize
 						);
 						var Reversed = ArgDicts.Reverse().ToList();
 						for(u64 i = 0; i < SmallBatchCnt; i++){
-							//var sw = Stopwatch.StartNew();
 							await OneBatch(
 								CmdSmallSize
 								,PopMany(Reversed, SmallSize)
 							);
-							// sw.Stop();
-							// System.Console.WriteLine(
-							// 	$"SmallBatch:{sw.Elapsed.TotalMilliseconds}ms"
-							// );
 						}
 						for(u64 i = 0; i < Remainder; i++){
 							//var sw = Stopwatch.StartNew();
 							await OneBatch(
 								CmdOne, PopMany(Reversed, 1)
 							);
-							//sw.Stop();
-							// System.Console.WriteLine(
-							// 	$"OneBatch:{sw.Elapsed.TotalMilliseconds}ms"
-							// );
 						}
 					}
 
@@ -326,12 +301,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 	}
 
 
-/// <summary>
-/// 不預編譯。適用于況芝 在事務中 初建表後即添數據
-/// </summary>
-/// <param name="Ctx"></param>
-/// <param name="Ct"></param>
-/// <returns></returns>
+/// 不預編譯。適用于況芝 在事務中 初建表後即添數
 	public async Task<Func<
 		IEnumerable<TEntity>
 		,CT
@@ -445,25 +415,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 		// };
 	}
 
-// 	[Impl]
-// 	public async Task<Func<
-// 		obj//raw
-// 		,CT
-// 		,Task<IPage<IDictionary<str, obj?>>>
-// 	>> FnPageByOneCol(IDbFnCtx? Ctx, str DbColName, CTCt){
-// var T = TblMgr.GetTbl<TEntity>();
-// var Sql =
-// """
-// """
-// 	}
-
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="Ctx"></param>
 	/// <param name="UpperFieldsToUpdate">潙null旹更新全部字段</param>
-	/// <param name="Ct"></param>
-	/// <returns></returns>
 	public async Task<Func<
 		TId
 		,TEntity
@@ -493,13 +445,8 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.Fld(NId)} = {T.Prm(NId)}";
 		};
 	}
 
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="Ctx"></param>
+
 	/// <param name="UpperFieldsToUpdate">潙null旹更新全部字段</param>
-	/// <param name="Ct"></param>
-	/// <returns></returns>
 	public async Task<Func<
 		TEntity
 		,CT, Task<nil>
