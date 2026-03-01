@@ -7,7 +7,7 @@ public partial interface ITblMgr{
 	public IDictionary<Type, ITable> EntityType_Tbl{get;set;}
 	public str DbSrcType{get;set;}
 	public IDbStuff DbStuff{get;set;}
-	public ISqlMkr SqlMkr{get;set;}
+	public ISqlMkr SqlMkr=>DbStuff.SqlMkr;
 
 	public nil AddTbl(ITable Tbl){
 		Tbl.TblMgr = this;
