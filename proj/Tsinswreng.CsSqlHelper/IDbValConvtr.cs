@@ -15,7 +15,7 @@ public interface IDbValConvtr{
 	[Doc(@$"")]
 	public obj? ToCodeVal(obj? DbVal){
 		if(DbVal is DBNull){
-			return null!;
+			return null;
 		}
 		return DbVal;
 	}

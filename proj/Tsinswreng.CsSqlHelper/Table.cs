@@ -16,8 +16,9 @@ public partial class Table<T>: Table, ITable<T>{
 
 
 public partial class Table:ITable{
-
-	public ITblMgr? TblMgr{get;set;}
+	[Doc(@$"")]
+	public ITblMgr TblMgr{get;set;} = null!;
+	public IDbStuff DbStuff => TblMgr.DbStuff;
 
 	public IDictMapperShallow DictMapper{get;set;}
 
@@ -148,7 +149,7 @@ public partial class Table:ITable{
 	#endif
 
 	[Impl]
-	public ISqlMkr SqlMkr{get;set;}
+	public ISqlMkr SqlMkr => DbStuff.SqlMkr;
 
 	[Impl]
 	public IList<str> InnerAdditionalSqls{get;set;}
