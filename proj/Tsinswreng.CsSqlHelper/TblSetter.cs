@@ -3,6 +3,12 @@ using Tsinswreng.CsTools;
 
 namespace Tsinswreng.CsSqlHelper;
 
+[Doc(@$"returns strings to add in {nameof(ITable.OuterAdditionalSqls)} to create indexes")]
+public delegate IList<str> FnSetIdx(
+	IOptMkIdx? Opt,
+	params IEnumerable<str>[] Cols
+);
+
 public interface ITblSetter<T>{
 	public ITable<T> Tbl{get;set;}
 	[Doc($"""
@@ -16,6 +22,7 @@ public interface ITblSetter<T>{
 
 	])
 	""")]
+	public FnSetIdx FnSetIdx{get;set;}
 	public ITable<T> Idx(
 		IOptMkIdx? Opt,
 		params IEnumerable<str>[] Cols
