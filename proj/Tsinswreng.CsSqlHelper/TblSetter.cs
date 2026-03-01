@@ -5,11 +5,31 @@ namespace Tsinswreng.CsSqlHelper;
 
 public interface ITblSetter<T>{
 	public ITable<T> Tbl{get;set;}
+	[Doc($"""
+	define index for table using strings of field names in code.
+	#Params([Options])
+	#Examples([
+		using E = MyEntity;
+		fn(null, [nameof(E.Key)], [(nameof(E.Owner)), nameof(E.Head)]) ->
+		
+		means create two indexs, one is (E.Key), the other is (E.Owner, E.Head)
+	])
+	""")]
 	public ITable<T> Idx(
 		IOptMkIdx? Opt,
 		params IEnumerable<str>[] Cols
 	);
 	
+	[Doc($$"""
+	define index for table using member expressions.
+	#Examples([
+	fn(null
+		,x=>x.Key
+		,x=>new{x.Owner, x.Head}
+	)
+	means create two indexs, one is (E.Key), the other is (E.Owner, E.Head)
+	])
+	""")]
 	public ITable<T> IdxExpr(
 		IOptMkIdx? Opt,
 		params Expression<Func<T,obj?>>[] Exprs
