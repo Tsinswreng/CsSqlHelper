@@ -507,58 +507,6 @@ public static class ExtnITable {
 			}
 			return z;
 		}
-
-		[Doc($@"
-		#Sum[Build CREATE INDEX SQL using code column names]
-		#Params([Index name], [Code column names], [Whether UNIQUE], [WHERE conditions joined by AND])
-		")]
-		public str MkIndexSqlByCodeCols(
-			str IndexName
-			, IEnumerable<str> CodeColNames
-			, bool IsUnique = false
-			, IEnumerable<str>? WhereAnds = null
-		) {
-			var flds = new List<str>();
-			foreach (var codeCol in CodeColNames) {
-				flds.Add(z.Fld(codeCol));
-			}
-
-			var unique = IsUnique ? "UNIQUE " : "";
-			var sql =
-			$"""
-CREATE {unique}INDEX {z.Qt(IndexName)}
-ON {z.Qt(z.DbTblName)} ({str.Join(", ", flds)})
-""";
-
-			if (WhereAnds != null) {
-				var conds = new List<str>();
-				foreach (var cond in WhereAnds) {
-					if (!str.IsNullOrWhiteSpace(cond)) {
-						conds.Add(cond);
-					}
-				}
-				if (conds.Count > 0) {
-					sql += "\nWHERE " + str.Join("\nAND ", conds);
-				}
-			}
-
-			return sql;
-		}
-
-		[Doc($@"
-		#Sum[Build and append CREATE INDEX SQL to {nameof(ITable.OuterAdditionalSqls)}]
-		#Rtn[Same table instance for chaining]
-		")]
-		public ITable AddIndexByCodeCols(
-			str IndexName
-			, IEnumerable<str> CodeColNames
-			, bool IsUnique = false
-			, IEnumerable<str>? WhereAnds = null
-		) {
-			var sql = z.MkIndexSqlByCodeCols(IndexName, CodeColNames, IsUnique, WhereAnds);
-			z.OuterAdditionalSqls.Add(sql);
-			return z;
-		}
 		
 		[Doc(@$"generate sql for create table")]
 		public str SqlMkTbl() {

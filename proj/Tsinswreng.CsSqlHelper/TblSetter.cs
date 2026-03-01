@@ -78,10 +78,60 @@ public class TblSetter<T>:ITblSetter<T>{
 			var colNamePart = string.Join("_", colList);
 			var indexName = $"{prefix}_{tbl.DbTblName}_{colNamePart}";
 			
-			tbl.AddIndexByCodeCols(indexName, colList, isUnique, whereCondition);
+			MkIndexSqlByCodeCols(indexName, colList, isUnique, whereCondition);
 		}
 		
 		return tbl;
+	}
+
+	/// <summary>
+	/// Build CREATE INDEX SQL using code column names
+	/// </summary>
+	public str MkIndexSqlByCodeCols(
+		str IndexName
+		, IEnumerable<str> CodeColNames
+		, bool IsUnique = false
+		, IEnumerable<str>? WhereAnds = null
+	) {
+		var flds = new List<str>();
+		foreach (var codeCol in CodeColNames) {
+			flds.Add(Tbl.Fld(codeCol));
+		}
+
+		var unique = IsUnique ? "UNIQUE " : "";
+		var sql =
+		$"""
+CREATE {unique}INDEX {Tbl.Qt(IndexName)}
+ON {Tbl.Qt(Tbl.DbTblName)} ({str.Join(", ", flds)})
+""";
+
+		if (WhereAnds != null) {
+			var conds = new List<str>();
+			foreach (var cond in WhereAnds) {
+				if (!str.IsNullOrWhiteSpace(cond)) {
+					conds.Add(cond);
+				}
+			}
+			if (conds.Count > 0) {
+				sql += "\nWHERE " + str.Join("\nAND ", conds);
+			}
+		}
+
+		return sql;
+	}
+
+	/// <summary>
+	/// Build and append CREATE INDEX SQL to OuterAdditionalSqls
+	/// </summary>
+	public ITable<T> AddIndexByCodeCols(
+		str IndexName
+		, IEnumerable<str> CodeColNames
+		, bool IsUnique = false
+		, IEnumerable<str>? WhereAnds = null
+	) {
+		var sql = MkIndexSqlByCodeCols(IndexName, CodeColNames, IsUnique, WhereAnds);
+		Tbl.OuterAdditionalSqls.Add(sql);
+		return Tbl;
 	}
 }
 
