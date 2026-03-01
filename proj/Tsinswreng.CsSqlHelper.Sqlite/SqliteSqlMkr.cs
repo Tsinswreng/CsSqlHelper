@@ -3,8 +3,8 @@ namespace Tsinswreng.CsSqlHelper.Sqlite;
 public partial class SqliteSqlMkr
 	:ISqlMkr
 {
-	protected static SqliteSqlMkr? _Inst = null;
-	public static SqliteSqlMkr Inst => _Inst??= new SqliteSqlMkr();
+	//protected static SqliteSqlMkr? _Inst = null;
+	public static SqliteSqlMkr Inst => field??= new SqliteSqlMkr();
 	public ISqlTypeMapper SqlTypeMapper{get;set;} = SqliteTypeMapper.Inst;
 
 	public str Quote(str Name){

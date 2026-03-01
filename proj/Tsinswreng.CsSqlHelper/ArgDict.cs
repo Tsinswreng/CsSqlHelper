@@ -89,29 +89,6 @@ public partial class ArgDict: IArgDict{
 		return this;
 	}
 
-	// public IArgDict AddManyT<T>(
-	// 	IList<IParam> Params, IList<T> Uppers
-	// 	,str? CodeColName=null, obj? Alt=null
-	// ){
-	// 	var z = this;
-	// 	if(z.Tbl is null){
-	// 		throw new NullReferenceException("Tbl is null");
-	// 	}
-	// 	for(var i = 0; i < Params.Count; i++){
-	// 		var Param = Params[i];
-
-	// 		if(i >= Uppers.Count){
-	// 			var Raw = z.Tbl.UpperToRaw(Alt, typeof(T), CodeColName);
-	// 			ParamName_RawValue.TryAdd(Param.Name, Raw);
-	// 		}else{
-	// 			var Raw = z.Tbl.UpperToRaw(Uppers[i], CodeColName);
-	// 			ParamName_RawValue.TryAdd(Param.Name, Raw);
-	// 		}
-	// 	}
-	// 	return this;
-	// }
-
-
 	[Impl]
 	public IDictionary<str, obj?> ToDict(){
 		return ParamName_RawValue;

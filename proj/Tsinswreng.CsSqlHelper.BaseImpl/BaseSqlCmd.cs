@@ -19,6 +19,7 @@ public abstract partial class BaseSqlCmd<
 	public TRawCmd RawCmd{get;set;}
 	public IList<Func<Task<nil>>> FnsOnDispose{get;set;} = new List<Func<Task<nil>>>();
 	public str? Sql{get;set;}
+	public abstract IDbValConvtr DbValConvtr{get;protected set;}
 	public BaseSqlCmd(TRawCmd DbCmd){
 		RawCmd = DbCmd;
 	}
@@ -43,8 +44,9 @@ public abstract partial class BaseSqlCmd<
 	);
 
 	public abstract str ToResolvedArg(str RawArg);
+	
+	
 	//e.g return "@"+RawArg
-
 	[Impl]
 	public ISqlCmd ResolvedArgs(IDictionary<str, obj?> Args){
 		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
@@ -57,11 +59,7 @@ public abstract partial class BaseSqlCmd<
 		return this;
 	}
 
-
-
 	/// 傳入之字典不帶@名稱 佔位
-	/// <param name="Args"></param>
-	/// <returns></returns>
 	[Impl]
 	public ISqlCmd RawArgs(IDictionary<str, obj?> Args){
 		RawCmd.Parameters.Clear();//不清空舊參數 續ˣ珩DbCmd蜮報錯
@@ -75,8 +73,6 @@ public abstract partial class BaseSqlCmd<
 	}
 
 /// @0, @1, @2 ...
-/// <param name="Params"></param>
-/// <returns></returns>
 	public ISqlCmd Args(IEnumerable<obj?> Params){
 		RawCmd.Parameters.Clear();
 		var i = 0;
@@ -92,20 +88,12 @@ public abstract partial class BaseSqlCmd<
 
 
 	/// 若含null則做DBNull與null之轉、否則原樣返
-	/// <param name="DbVal"></param>
-	/// <returns></returns>
 	public virtual obj? DbValToCodeVal(obj? DbVal){
-		if(DbVal is DBNull){
-			return null!;
-		}
-		return DbVal;
+		return DbValConvtr.ToCodeVal(DbVal);
 	}
 
 	public virtual obj? CodeValToDbVal(obj? CodeVal){
-		if(CodeVal == null){
-			return DBNull.Value;
-		}
-		return CodeVal;
+		return DbValConvtr.ToDbVal(CodeVal);
 	}
 
 	public virtual async IAsyncEnumerable<
