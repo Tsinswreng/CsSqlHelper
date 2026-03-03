@@ -8,7 +8,7 @@ public partial class PostgresCmdMkr
 	:ISqlCmdMkr
 	,IMkrTxn
 {
-
+	public EDbSrcType DbSrcType => EDbSrcType.Postgres;
 	public IDbConnMgr DbConnGetter{get;set;}
 	public PostgresCmdMkr(IDbConnMgr DbConnGetter){
 		this.DbConnGetter = DbConnGetter;

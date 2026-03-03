@@ -2,10 +2,6 @@ using System.Linq.Expressions;
 using Tsinswreng.CsTools;
 namespace Tsinswreng.CsSqlHelper;
 
-
-
-
-
 public class ISqlSplicer<E>:I_DuplicateSql{
 	public ITable Tbl{get;set;}
 	public IList<obj> Segs{get;set;} = [];

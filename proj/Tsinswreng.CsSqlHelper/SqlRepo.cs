@@ -353,8 +353,8 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			Params = T.NumParams(Cnt);
 			return $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", Params)})" ;
 		});
-		var bat = T.AutoBatch<TId, IAsyncEnumerable<TEntity?>>(
-			Ctx, SqlCmdMkr, sqlD,
+		var bat = SqlCmdMkr.AutoBatch<TId, IAsyncEnumerable<TEntity?>>(
+			Ctx, sqlD,
 			async(z, Ids, Ct)=>{
 				var Args = ArgDict.Mk(T).AddManyT(Params, Ids, T.CodeIdName);
 				var RawDicts = z.SqlCmd.Args(Args).AsyE1d(Ct);

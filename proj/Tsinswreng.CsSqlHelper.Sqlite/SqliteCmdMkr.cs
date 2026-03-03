@@ -17,7 +17,7 @@ public partial class SqliteCmdMkr
 	// public SqliteCmdMkr(IDbConnection DbConnection){
 	// 	this.DbConnection = DbConnection;
 	// }
-
+	public EDbSrcType DbSrcType => EDbSrcType.Sqlite;
 	public IDbConnMgr DbConnGetter{get;set;}
 
 	public SqliteCmdMkr(IDbConnMgr DbConnGetter){

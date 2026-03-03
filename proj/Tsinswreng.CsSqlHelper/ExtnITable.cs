@@ -584,23 +584,6 @@ public static class ExtnITable {
 			return R;
 		}
 		
-		public AutoBatch<TItem, TRet> AutoBatch<TItem, TRet>(
-			IDbFnCtx Ctx,
-			ISqlCmdMkr SqlCmdMkr,
-			I_DuplicateSql SqlDuplicator,
-			Func<AutoBatch<TItem, TRet>, IList<TItem>, CT, Task<TRet>> FnAsy,
-			u64 BatchSize = 0
-		)
-		{
-			if(BatchSize == 0){
-				if(z.DbStuff.DbSrcType.Eq(EDbSrcType.Sqlite)){
-					BatchSize = 1;
-				}else{
-					BatchSize = 500;
-				}
-			}
-			return CsSqlHelper.AutoBatch<TItem, TRet>.Mk(Ctx, SqlCmdMkr, SqlDuplicator, FnAsy, BatchSize);
-		}
 	}
 
 }

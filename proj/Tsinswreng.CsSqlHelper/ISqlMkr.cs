@@ -1,7 +1,6 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public partial interface ISqlMkr{
-
+public partial interface ISqlMkr:I_DbSrcType{
 	public ISqlTypeMapper SqlTypeMapper{get;set;}
 
 	/// 字段加引號 如Name -> "Name"或`Name`或[Name]等
