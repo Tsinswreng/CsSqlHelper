@@ -1,28 +1,36 @@
+using System.Runtime.CompilerServices;
+
 namespace Tsinswreng.CsSqlHelper;
 public static class ExtnSqlCmd{
 	extension(ISqlCmd z){
 		
-		public async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(CT ct){
-			var R = await z.ExeReader(ct);
-			var itbl = R.AsyE1d(ct);
+		public async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(
+			[EnumeratorCancellation]
+			CT Ct
+		){
+			var R = await z.ExeReader(Ct);
+			var itbl = R.AsyE1d(Ct);
 			await foreach(var e in itbl){
 				yield return e;
 			}
 		}
-		public async Task<IList<IDictionary<str, obj?>>> All1d(CT ct){
-			var R = await z.ExeReader(ct);
-			return await R.All1d(ct);
+		public async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
+			var R = await z.ExeReader(Ct);
+			return await R.All1d(Ct);
 		}
-		public async IAsyncEnumerable<IAsyncEnumerable<IDictionary<str, obj?>>> AsyE2d(CT ct){
-			var R = await z.ExeReader(ct);
-			var itbl = R.AsyE2d(ct);
+		public async IAsyncEnumerable<IAsyncEnumerable<IDictionary<str, obj?>>> AsyE2d(
+			[EnumeratorCancellation]
+			CT Ct
+		){
+			var R = await z.ExeReader(Ct);
+			var itbl = R.AsyE2d(Ct);
 			await foreach(var e in itbl){
 				yield return e;
 			}
 		}
-		public async Task<IList<IList<IDictionary<str, obj?>>>> All2d(CT ct){
-			var R = await z.ExeReader(ct);
-			return await R.All2d(ct);
+		public async Task<IList<IList<IDictionary<str, obj?>>>> All2d(CT Ct){
+			var R = await z.ExeReader(Ct);
+			return await R.All2d(Ct);
 		}
 			
 		
