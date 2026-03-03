@@ -1,8 +1,7 @@
 namespace Tsinswreng.CsSqlHelper;
 
 [Doc(@$"Collection of things of a specialized Database Type(e,g Sqlite, Postgres)")]
-public interface IDbStuff{
-	public EDbSrcType DbSrcType{get;set;}
+public interface IDbStuff:I_DbSrcType{
 	[Doc(@$"Sql string Maker")]
 	public ISqlMkr SqlMkr{get;set;}
 	

@@ -12,6 +12,7 @@ public partial class PostgresCmd : BaseSqlCmd<NpgsqlCommand, NpgsqlTransaction> 
 	public PostgresCmd(NpgsqlCommand RawCmd):base(RawCmd){
 
 	}
+	public override EDbSrcType DbSrcType => EDbSrcType.Postgres;
 	public override IDbValConvtr DbValConvtr{get;protected set;} = PostgresValConvtr.Inst;
 	public override nil ParamAddWithValue(DbParameterCollection Params, string? parameterName, object? value) {
 		if(Params is not NpgsqlParameterCollection prm){

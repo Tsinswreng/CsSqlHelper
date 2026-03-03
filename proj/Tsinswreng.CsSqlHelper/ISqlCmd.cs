@@ -6,6 +6,7 @@ namespace Tsinswreng.CsSqlHelper;
 public partial interface ISqlCmd
 	:IDisposable
 	,IAsyncDisposable
+	,I_DbSrcType
 {
 	/// dispose旹 額外ᵈ珩之諸操作
 	[Doc(@$"

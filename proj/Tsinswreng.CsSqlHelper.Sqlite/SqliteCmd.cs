@@ -10,6 +10,7 @@ namespace Tsinswreng.CsSqlHelper.Sqlite;
 using IDbFnCtx = Tsinswreng.CsSqlHelper.IDbFnCtx;
 
 public partial class SqliteCmd : BaseSqlCmd<SqliteCommand, SqliteTransaction> {
+	public override EDbSrcType DbSrcType => EDbSrcType.Sqlite;
 	public SqliteCmd(SqliteCommand RawCmd):base(RawCmd){
 
 	}

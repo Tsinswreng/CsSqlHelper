@@ -16,6 +16,7 @@ public abstract partial class BaseSqlCmd<
 	where TRawCmd : DbCommand
 	where TRawTxn : DbTransaction
 {
+	public abstract EDbSrcType DbSrcType{get;}
 	public TRawCmd RawCmd{get;set;}
 	public IList<Func<Task<nil>>> FnsOnDispose{get;set;} = new List<Func<Task<nil>>>();
 	public str? Sql{get;set;}
