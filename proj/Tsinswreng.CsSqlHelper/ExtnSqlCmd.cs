@@ -62,14 +62,6 @@ public static class ExtnSqlCmd{
 			return z;
 		}
 
-		public async Task<IAsyncEnumerable<T>> IterAsyE<T>(
-			ITable Tbl, CT Ct
-		)where T:new()
-		{
-			var allRaw = z.AsyE1d(Ct);
-			return allRaw.Select(x=>Tbl.DbDictToEntity<T>(x));
-		}
-
 		public async Task<T?> FirstOrDefault<T>(
 			ITable Tbl, CT Ct
 		)where T:new(){

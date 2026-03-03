@@ -39,6 +39,7 @@ public static partial class ExtnIDbFnCtx{
 		where TSelf: IDbFnCtx
 	{
 		/// Prepare並AddToDispose
+		[Obsolete(@$"use {nameof(ISqlCmdMkr.Prepare)} directly")]
 		public async Task<ISqlCmd> PrepareToDispose(
 			ISqlCmdMkr CmdMkr
 			,str Sql
@@ -48,6 +49,8 @@ public static partial class ExtnIDbFnCtx{
 			//z?.AddToDispose(R); //2025_1225_105738 MkCmd中已有AddToDispose
 			return R;
 		}
+		
+		[Doc(@$"Cmd.AttachCtxTxn(DbFnCtx).Args(Arg);")]
 		public ISqlCmd RunCmd(
 			ISqlCmd Cmd
 			,IArgDict Arg
