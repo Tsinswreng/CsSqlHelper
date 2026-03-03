@@ -5,7 +5,8 @@ public class AutoBatch<TItem, TRet> : BatchCollector<TItem, TRet> {
 	public AutoBatch() {
 
 	}
-	public static new u64 DfltBatchSize { get; set; } = 50;
+	/// TODO pg旹 500>100>50; sqlite 單條循環>50>100>500 按數據庫選批大小
+	public static new u64 DfltBatchSize { get; set; } = 100;
 	public I_DuplicateSql SqlDuplicator { get; set; }
 	//public u64 BatchSize;
 	public ISqlCmd FullBatch { get; set; } = null!;

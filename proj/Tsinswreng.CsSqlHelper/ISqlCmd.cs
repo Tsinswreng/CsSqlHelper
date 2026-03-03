@@ -1,8 +1,12 @@
 namespace Tsinswreng.CsSqlHelper;
 
 
+
 [Doc($@"SQL command abstraction")]
-public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
+public partial interface ISqlCmd
+	:IDisposable
+	,IAsyncDisposable
+{
 	/// dispose旹 額外ᵈ珩之諸操作
 	[Doc(@$"
 #Sum[Additional operations executed when disposing]
@@ -11,37 +15,8 @@ public partial interface ISqlCmd: IDisposable, IAsyncDisposable{
 	public IList<Func<Task<nil>>> FnsOnDispose{get;set;}
 	[Doc($@"SQL text to execute")]
 	public str? Sql{get;set;}
-	[Doc(@$"
-#Sum[Execute and return 2D asynchronous enumerable result sets]
-#Params([Cancellation token])
-#Rtn[Asynchronous stream of result sets]
-")]
-	public IAsyncEnumerable<
-		IAsyncEnumerable<IDictionary<str, obj?>>
-	> AsyE2d(
-		CT Ct
-	);
-	[Doc(@$"
-#Sum[Execute and materialize all result sets as 2D collections]
-#Params([Cancellation token])
-#Rtn[All result sets in memory]
-")]
-	public Task<IList<
-		IList<IDictionary<str, obj?>>>
-	> All2d(CT Ct);
-	[Doc(@$"
-#Sum[Execute and return a flattened asynchronous row stream]
-#Params([Cancellation token])
-#Rtn[Asynchronous stream containing rows from all result sets]
-")]
-	public IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(CT Ct);
-	[Doc(@$"
-#Sum[Execute and materialize flattened rows as a list]
-#Params([Cancellation token])
-#Rtn[In-memory rows combined from all result sets]
-")]
-	public Task<IList<IDictionary<str, obj?>>> All1d(CT Ct);
 	
+	public IResultReader ExeReader(CT Ct);
 
 	/// raw arg name to value
 	/// {
