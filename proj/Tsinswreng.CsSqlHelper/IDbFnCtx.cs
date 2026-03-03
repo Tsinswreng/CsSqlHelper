@@ -72,15 +72,7 @@ public static partial class ExtnIDbFnCtx{
 	extension<TSelf>(TSelf z)
 		where TSelf: IDbFnCtx
 	{
-		/// <summary>
 		/// Prepare並AddToDispose
-		/// </summary>
-		/// <typeparam name="TSelf"></typeparam>
-		/// <param name="z"></param>
-		/// <param name="CmdMkr"></param>
-		/// <param name="Sql"></param>
-		/// <param name="Ct"></param>
-		/// <returns></returns>
 		public async Task<ISqlCmd> PrepareToDispose(
 			ISqlCmdMkr CmdMkr
 			,str Sql
