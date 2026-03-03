@@ -16,7 +16,7 @@ public partial interface ISqlCmd
 	[Doc($@"SQL text to execute")]
 	public str? Sql{get;set;}
 	
-	public IResultReader ExeReader(CT Ct);
+	public Task<IResultReader> ExeReader(CT Ct);
 
 	/// raw arg name to value
 	/// {

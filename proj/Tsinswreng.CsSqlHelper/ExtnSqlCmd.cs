@@ -1,28 +1,50 @@
 namespace Tsinswreng.CsSqlHelper;
 public static class ExtnSqlCmd{
-
-
-	public static async Task<IDictionary<str, obj?>> DictFirst(
-		this ISqlCmd z, CT Ct
-	){
-		var AsyE = z.AsyE1d(Ct);
-		var i = 0;
-		IDictionary<str, obj?> R = null!;
-		await foreach(var e in AsyE){
-			if(i >= 1){
-				break;
-			}
-			R = e;
-			i++;
-		}
-		if(i == 0){
-			throw new InvalidOperationException("no result");
-		}
-		return R;
-	}
-
-
 	extension(ISqlCmd z){
+		
+		public async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(CT ct){
+			var R = await z.ExeReader(ct);
+			var itbl = R.AsyE1d(ct);
+			await foreach(var e in itbl){
+				yield return e;
+			}
+		}
+		public async Task<IList<IDictionary<str, obj?>>> All1d(CT ct){
+			var R = await z.ExeReader(ct);
+			return await R.All1d(ct);
+		}
+		public async IAsyncEnumerable<IAsyncEnumerable<IDictionary<str, obj?>>> AsyE2d(CT ct){
+			var R = await z.ExeReader(ct);
+			var itbl = R.AsyE2d(ct);
+			await foreach(var e in itbl){
+				yield return e;
+			}
+		}
+		public async Task<IList<IList<IDictionary<str, obj?>>>> All2d(CT ct){
+			var R = await z.ExeReader(ct);
+			return await R.All2d(ct);
+		}
+			
+		
+		public async Task<IDictionary<str, obj?>> DictFirst(
+			CT Ct
+		){
+			var AsyE = z.AsyE1d(Ct);
+			var i = 0;
+			IDictionary<str, obj?> R = null!;
+			await foreach(var e in AsyE){
+				if(i >= 1){
+					break;
+				}
+				R = e;
+				i++;
+			}
+			if(i == 0){
+				throw new InvalidOperationException("no result");
+			}
+			return R;
+		}
+		
 		public ISqlCmd WithCtx(IDbFnCtx? Ctx){
 			if(Ctx is null){
 				return z;

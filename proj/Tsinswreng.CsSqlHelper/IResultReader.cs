@@ -2,6 +2,8 @@ namespace Tsinswreng.CsSqlHelper;
 
 
 public interface IResultReader{
+	[Doc(@$"the SqlCmd who generated this result set")]
+	public ISqlCmd Cmd{get;set;}
 	[Doc(@$"
 	#Sum[Execute and return 2D asynchronous enumerable result sets]
 	#Params([Cancellation token])

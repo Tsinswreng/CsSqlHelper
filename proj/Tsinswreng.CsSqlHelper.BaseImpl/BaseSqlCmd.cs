@@ -24,6 +24,18 @@ public abstract partial class BaseSqlCmd<
 		RawCmd = DbCmd;
 	}
 
+    // 实现 ExeReader，返回 IResultReader
+    public virtual async Task<IResultReader> ExeReader(CT Ct){
+		var RawReader = await RawCmd.ExecuteReaderAsync(Ct);
+		return new BaseResultReader(
+			this
+			,RawCmd
+			,RawReader
+			,DbValConvtr
+		);
+	}
+
+
 	public virtual ISqlCmd AttachCtxTxn(ITxn Txn){
 		if(Txn.RawTxn is not TRawTxn RawTxn){
 			throw new ArgumentException("Txn.RawTxn is not TRawTxn RawTxn");
@@ -95,91 +107,6 @@ public abstract partial class BaseSqlCmd<
 	public virtual obj? CodeValToDbVal(obj? CodeVal){
 		return DbValConvtr.ToDbVal(CodeVal);
 	}
-
-	public virtual async IAsyncEnumerable<
-		IAsyncEnumerable<IDictionary<str, obj?>>
-	> AsyE2d(
-		[EnumeratorCancellation]
-		CT Ct
-	){
-		using var Dl = new DisposableList();
-		DbDataReader Reader = null!;
-		try{
-			// 执行查询获取Reader，和原代码逻辑完全一致
-			Reader = await RawCmd.ExecuteReaderAsync(Ct);
-			Dl.Add(Reader);
-		}
-		catch (System.Exception e){
-			// 原代码的异常封装逻辑，一行不改
-			var Err = new DbErr(
-				e.Message
-				+ "\nSql:\n" + Sql
-				+ "\nParams" + RawCmd.Parameters.ToReadableString()
-				, e
-			);
-			Dl.Dispose();
-			throw Err;
-		}
-
-		// do-while 是多结果集的标准循环，先读第一个结果集，再切换
-		do{
-			// ★ 核心：为【当前结果集】创建一个「内层异步枚举器」，读取当前结果集的所有行
-			// 外层直接 yield return 这个内层枚举器，完美实现二维IAsyncEnumerable
-			yield return ReadCurrentResultSetRowsAsync(Reader, Ct);
-
-			// ★ 切换到下一个结果集，带取消令牌，无则退出循环
-		} while (await Reader.NextResultAsync(Ct));
-	}
-
-	// ★ 私有内层方法：负责读取【单个结果集】的所有行，返回单行数据的异步枚举
-	private async IAsyncEnumerable<IDictionary<str, obj?>> ReadCurrentResultSetRowsAsync(
-		DbDataReader reader,
-		[EnumeratorCancellation]
-		CT Ct
-	){
-		// 读取当前结果集的每一行，和你原IterAsyE的单行读取逻辑完全一致
-		while (await reader.ReadAsync(Ct)){
-			var RawDict = new Dictionary<str, obj?>();
-			for (var i = 0; i < reader.FieldCount; i++){
-//TODO 優化異常ʹ訊
-// reader.GetName(i)ʃ得ʹ列名ˋ不帶表名、如Select* 後作多表join 遇同名列則褈添ⁿ致錯、Select A.Id, B.Id旹亦然
-var k = reader.GetName(i);
-var v = DbValToCodeVal(reader.GetValue(i));
-				RawDict.Add(k, v);
-			}
-			yield return RawDict;
-		}
-	}
-
-
-	/// 多個結果集ʹ內容ˇ 皆扁平化
-	public virtual async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(
-		[EnumeratorCancellation]
-		CT Ct
-	){
-		var d2 = AsyE2d(Ct);
-		await foreach (var d1 in d2){
-			await foreach (var row in d1){
-				yield return row;
-			}
-		}
-	}
-	
-	public async Task<IList<
-		IList<IDictionary<str, obj?>>>
-	> All2d(CT Ct){
-		var ans = new List<IList<IDictionary<str, obj?>>>();
-		await foreach(var d1 in AsyE2d(Ct).WithCancellation(Ct)){
-			ans.Add(await d1.ToListAsync(Ct));
-		}
-		return ans;
-	}
-
-
-	public virtual async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
-		return await AsyE1d(Ct).ToListAsync(Ct);
-	}
-
 
 	public void Dispose(){
 		RawCmd.Dispose();
