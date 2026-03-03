@@ -177,7 +177,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 	){
 		Cfg??=new();
 
-		if(T.TblMgr?.DbSrcType == ConstDbSrcType.Sqlite){
+		if(T.TblMgr?.DbSrcType == EDbSrcType.Sqlite){
 			var old = await _FnInsertManyLoop(Ctx, Cfg.Prepare, Ct);
 			return old;
 		}
@@ -353,7 +353,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			Params = T.NumParams(Cnt);
 			return $"SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", Params)})" ;
 		});
-		var bat = AutoBatch<TId, IAsyncEnumerable<TEntity?>>.Mk(
+		var bat = T.AutoBatch<TId, IAsyncEnumerable<TEntity?>>(
 			Ctx, SqlCmdMkr, sqlD,
 			async(z, Ids, Ct)=>{
 				var Args = ArgDict.Mk(T).AddManyT(Params, Ids, T.CodeIdName);

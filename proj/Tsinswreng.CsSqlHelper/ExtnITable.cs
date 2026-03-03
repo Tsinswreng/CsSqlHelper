@@ -8,7 +8,6 @@ using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 public static class ExtnITable {
-
 	extension(ITable z) {
 		[Doc($@"
 		Quote field name for SQL, e.g. in sqlite: ""field_name""; in mysql: `field_name`;
@@ -576,7 +575,7 @@ public static class ExtnITable {
 		")]
 		public IPageQry PageSlctAll() {
 			var R = new PageQry();
-			if (z.TblMgr?.DbSrcType == ConstDbSrcType.Postgres) {
+			if (z.TblMgr?.DbSrcType == EDbSrcType.Postgres) {
 				R.PageSize = i64.MaxValue;
 			}
 			else {
@@ -584,8 +583,26 @@ public static class ExtnITable {
 			}
 			return R;
 		}
-
+		
+		public AutoBatch<TItem, TRet> AutoBatch<TItem, TRet>(
+			IDbFnCtx Ctx,
+			ISqlCmdMkr SqlCmdMkr,
+			I_DuplicateSql SqlDuplicator,
+			Func<AutoBatch<TItem, TRet>, IList<TItem>, CT, Task<TRet>> FnAsy,
+			u64 BatchSize = 0
+		)
+		{
+			if(BatchSize == 0){
+				if(z.DbStuff.DbSrcType.Eq(EDbSrcType.Sqlite)){
+					BatchSize = 1;
+				}else{
+					BatchSize = 500;
+				}
+			}
+			return CsSqlHelper.AutoBatch<TItem, TRet>.Mk(Ctx, SqlCmdMkr, SqlDuplicator, FnAsy, BatchSize);
+		}
 	}
+
 }
 
 #if DEBUG
