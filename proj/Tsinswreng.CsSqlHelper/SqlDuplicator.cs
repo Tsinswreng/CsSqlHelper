@@ -9,7 +9,7 @@ public interface IArgIndexer{
 }
 
 public interface IArgsSqlDuplicator:ISqlDuplicator, IArgIndexer{
-	public bool BindedArgs{get;set;}
+	
 }
 
 

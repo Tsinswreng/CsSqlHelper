@@ -52,8 +52,6 @@ public class AutoBatch<TItem, TRet> : BatchCollector<TItem, TRet> {
 		return R;
 	}
 	
-	public Task<IResultReader> ExeReader(CT Ct){
-		
-	}
+
 
 }

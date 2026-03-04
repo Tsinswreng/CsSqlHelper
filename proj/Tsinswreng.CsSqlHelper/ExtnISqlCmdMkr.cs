@@ -21,9 +21,11 @@ public static class ExtnISqlCmdMkr{
 			return CsSqlHelper.AutoBatch<TItem, TRet>.Mk(Ctx, z, SqlDuplicator, FnAsy, BatchSize);
 		}
 		
-		public Task<IResultReader> RunSql(
+		public async IAsyncEnumerable<
+			IDictionary<str, obj?>
+		> RunSql(//AsyE1d
 			IDbFnCtx Ctx
-			,ISqlDuplicator Sql
+			,IArgsSqlDuplicator Sql
 			,CT Ct
 		){
 			
