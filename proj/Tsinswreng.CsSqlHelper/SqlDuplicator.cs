@@ -4,6 +4,7 @@ public interface I_DuplicateSql{
 	public str DuplicateSql(u64 Cnt);
 }
 
+
 public class FnSqlDuplicator : I_DuplicateSql{
 	public str DuplicateSql(u64 Cnt){
 		return FnDuplicateSql(Cnt);

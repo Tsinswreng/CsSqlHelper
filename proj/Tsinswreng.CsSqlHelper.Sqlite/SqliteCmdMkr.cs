@@ -13,10 +13,7 @@ public partial class SqliteCmdMkr
 	// public IDbConnection? DbConnection{get;set;}
 
 	//#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	// [Obsolete]
-	// public SqliteCmdMkr(IDbConnection DbConnection){
-	// 	this.DbConnection = DbConnection;
-	// }
+	
 	public EDbSrcType DbSrcType => EDbSrcType.Sqlite;
 	public IDbConnMgr DbConnGetter{get;set;}
 
@@ -71,14 +68,7 @@ public partial class SqliteCmdMkr
 	}
 
 
-	/// <summary>
 	/// Prepare叵用于CREATE TABLE
-	/// </summary>
-	/// <param name="DbFnCtx"></param>
-	/// <param name="Sql"></param>
-	/// <param name="Ct"></param>
-	/// <returns></returns>
-	/// <exception cref="InvalidOperationException"></exception>
 	[Impl(typeof(ISqlCmdMkr))]
 	public async Task<ISqlCmd> Prepare(
 		IDbFnCtx? DbFnCtx
@@ -89,13 +79,6 @@ public partial class SqliteCmdMkr
 		return await Prepare(Cmd, Ct);
 	}
 
-	// [Impl(typeof(I_GetTxnAsy))]
-	// public async Task<ITxn> GetTxnAsy(CT Ct){
-	// 	var DbConnection = await DbConnGetter.GetConnAsy(Ct);
-	// 	var Tx = DbConnection.BeginTransaction();
-	// 	var Ans = new AdoTxn(Tx);
-	// 	return Ans;
-	// }
 
 	[Impl(typeof(IMkrTxn))]
 	public async Task<ITxn> MkTxn(

@@ -37,9 +37,7 @@ public partial class PostgresCmdMkr
 		return R;
 	}
 
-	/// <summary>
 	/// Npgsql叵 先Prepare後傳參數。若需效sqlite芝prepare後多次傳異ʹ參數 宜用Batch
-	/// </summary>
 	[Impl]
 	public async Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct){
 
@@ -52,14 +50,7 @@ public partial class PostgresCmdMkr
 	}
 
 
-	/// <summary>
 	/// Prepare叵用于CREATE TABLE
-	/// </summary>
-	/// <param name="DbFnCtx"></param>
-	/// <param name="Sql"></param>
-	/// <param name="Ct"></param>
-	/// <returns></returns>
-	/// <exception cref="InvalidOperationException"></exception>
 	public async Task<ISqlCmd> Prepare(
 		IDbFnCtx? DbFnCtx
 		,str Sql
@@ -68,14 +59,6 @@ public partial class PostgresCmdMkr
 		var Cmd = await MkCmd(DbFnCtx, Sql, Ct);
 		return await Prepare(Cmd, Ct);
 	}
-
-	// [Obsolete]
-	// public async Task<ITxn> GetTxnAsy(CT Ct){
-	// 	var DbConnection = await DbConnGetter.GetConnAsy(Ct);
-	// 	var Tx = DbConnection.BeginTransaction();
-	// 	var Ans = new AdoTxn(Tx);
-	// 	return Ans;
-	// }
 
 
 	public async Task<ITxn> MkTxn(

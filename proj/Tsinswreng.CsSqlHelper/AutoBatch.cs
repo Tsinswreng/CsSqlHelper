@@ -39,11 +39,11 @@ public class AutoBatch<TItem, TRet> : BatchCollector<TItem, TRet> {
 			R.SqlCmd = R.FullBatch;
 			var FnGetRepeatedSql = R.SqlDuplicator.DuplicateSql;
 			if ((u64)Items.Count < R.BatchSize) {//不滿一批 即末批
-				R.FinalBatch = await R.Ctx.PrepareToDispose(R.SqlCmdMkr, FnGetRepeatedSql(size), Ct);
+				R.FinalBatch = await R.SqlCmdMkr.Prepare(R.Ctx, FnGetRepeatedSql(size), Ct);
 				R.SqlCmd = R.FinalBatch;
 			}
 			else if (R.FullBatch == null) { //滿一批但FullBatch未初始化 即首批
-				R.FullBatch = await R.Ctx.PrepareToDispose(R.SqlCmdMkr, FnGetRepeatedSql(BatchSize), Ct);
+				R.FullBatch = await R.SqlCmdMkr.Prepare(R.Ctx, FnGetRepeatedSql(BatchSize), Ct);
 				R.SqlCmd = R.FullBatch;
 			}
 			return await ArgFn(R, Items, Ct);

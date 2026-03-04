@@ -228,6 +228,7 @@ public class ISqlSplicer<E>:I_DuplicateSql{
 		return AddSeg(")");
 	}
 
+	[Impl]
 	[Doc($@"
 #Sum[Generate repeated SQL statements]
 #Params([Repeat count])
@@ -243,6 +244,7 @@ public class ISqlSplicer<E>:I_DuplicateSql{
 		return string.Join("", R);
 	}
 
+	[Impl]
 	[Doc($@"
 #Sum[Convert SQL segments to SQL string with offset]
 #Params([Parameter offset])
