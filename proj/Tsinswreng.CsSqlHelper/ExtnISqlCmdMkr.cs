@@ -1,6 +1,9 @@
 namespace Tsinswreng.CsSqlHelper;
 
 using Tsinswreng.CsSqlHelper;
+using System.Collections;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 public static class ExtnISqlCmdMkr{
 	extension(ISqlCmdMkr z){
@@ -23,12 +26,83 @@ public static class ExtnISqlCmdMkr{
 		
 		public async IAsyncEnumerable<
 			IDictionary<str, obj?>
-		> RunSql(//AsyE1d
+		> RunSql<E>(//AsyE1d
 			IDbFnCtx Ctx
-			,IArgsSqlDuplicator Sql
-			,CT Ct
+			,ISqlSplicer<E> Sql
+			,[EnumeratorCancellation] CT Ct
 		){
-			
+			var BatchSize = z.DbSrcType.Eq(EDbSrcType.Sqlite) ? 1ul : 500ul;
+			var binders = Sql.ParamAutoBinders;
+			var manyBinders = binders
+				.Where(x=>x is IParamAutoBinderManyValuesBatch)
+				.Cast<IParamAutoBinderManyValuesBatch>()
+				.ToList();
+			var oneBinders = binders.Where(x=>x is not IParamAutoBinderManyValuesBatch).ToList();
+
+			ISqlCmd? fullBatchCmd = null;
+			ISqlCmd? finalBatchCmd = null;
+			try{
+				if(manyBinders.Count == 0){
+					var cmd = await z.Prepare(Ctx, Sql.ToSqlStr(1), Ct);
+					finalBatchCmd = cmd;
+					var args = ArgDict.Mk(Sql.Tbl);
+					foreach(var binder in oneBinders){
+						binder.Bind(Sql.Tbl, args, new List<obj?>());
+					}
+					var rows = cmd.Args(args).AsyE1d(Ct);
+					await foreach(var row in rows){
+						yield return row;
+					}
+					yield break;
+				}
+
+				while(true){
+					if(!manyBinders[0].TryTakeBatch(BatchSize, out var firstBatch)){
+						break;
+					}
+					var cnt = (u64)firstBatch.Count;
+					var batches = new List<IList>{firstBatch};
+					for(var i=1; i<manyBinders.Count; i++){
+						if(!manyBinders[i].TryTakeBatch(cnt, out var batchI)){
+							throw new InvalidOperationException("ParamAutoBinder.Many(...) length mismatch.");
+						}
+						if((u64)batchI.Count != cnt){
+							throw new InvalidOperationException("ParamAutoBinder.Many(...) length mismatch.");
+						}
+						batches.Add(batchI);
+					}
+
+					ISqlCmd cmd;
+					if(cnt == BatchSize){
+						fullBatchCmd ??= await z.Prepare(Ctx, Sql.ToSqlStr(BatchSize), Ct);
+						cmd = fullBatchCmd;
+					}else{
+						finalBatchCmd?.Dispose();
+						finalBatchCmd = await z.Prepare(Ctx, Sql.ToSqlStr(cnt), Ct);
+						cmd = finalBatchCmd;
+					}
+
+					var args = ArgDict.Mk(Sql.Tbl);
+					foreach(var binder in oneBinders){
+						binder.Bind(Sql.Tbl, args, firstBatch);
+					}
+					for(var i=0; i<manyBinders.Count; i++){
+						manyBinders[i].BindBatch(Sql.Tbl, args, batches[i]);
+					}
+
+					var rows = cmd.Args(args).AsyE1d(Ct);
+					await foreach(var row in rows){
+						yield return row;
+					}
+				}
+			}finally{
+				if(finalBatchCmd != null && !ReferenceEquals(finalBatchCmd, fullBatchCmd)){
+					await finalBatchCmd.DisposeAsync();
+				}
+				if(fullBatchCmd != null){
+					await fullBatchCmd.DisposeAsync();
+				}
+			}
 		}
 		
 	}

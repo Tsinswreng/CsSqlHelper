@@ -294,6 +294,11 @@ public interface IParamAutoBinder{
 	public void Bind(ITable Tbl, IArgDict Args, IList Items);
 }
 
+public interface IParamAutoBinderManyValuesBatch: IParamAutoBinder{
+	public bool TryTakeBatch(u64 BatchSize, out IList Batch);
+	public void BindBatch(ITable Tbl, IArgDict Args, IList Batch);
+}
+
 public class SqlArgBinderFactory{
 	public IParam Param { get; set; }
 	public SqlArgBinderFactory(IParam Param){
@@ -345,9 +350,10 @@ public class ParamAutoBinderMany<TItem, TVal>: IParamAutoBinder{
 	}
 }
 
-public class ParamAutoBinderManyValues<TVal>: IParamAutoBinder{
+public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 	public IParam Param { get; set; }
 	public IEnumerable<TVal> Values { get; set; }
+	protected IEnumerator<TVal>? ValueEnum { get; set; }
 
 	public ParamAutoBinderManyValues(IParam Param, IEnumerable<TVal> Values){
 		this.Param = Param;
@@ -356,5 +362,34 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinder{
 
 	public void Bind(ITable Tbl, IArgDict Args, IList Items){
 		Args.AddManyT(Param, Values);
+	}
+
+	protected IEnumerator<TVal> GetOrMkEnum(){
+		ValueEnum ??= Values.GetEnumerator();
+		return ValueEnum;
+	}
+
+	public bool TryTakeBatch(u64 BatchSize, out IList Batch){
+		var list = new List<TVal>();
+		var e = GetOrMkEnum();
+		for(u64 i = 0; i < BatchSize; i++){
+			if(!e.MoveNext()){
+				break;
+			}
+			list.Add(e.Current);
+		}
+		Batch = list;
+		return list.Count > 0;
+	}
+
+	public void BindBatch(ITable Tbl, IArgDict Args, IList Batch){
+		var list = new List<TVal>(Batch.Count);
+		foreach(var item in Batch){
+			if(item is not TVal typed){
+				throw new InvalidCastException($"Expected batch item type {typeof(TVal).Name}, got {item?.GetType().Name ?? "null"}.");
+			}
+			list.Add(typed);
+		}
+		Args.AddManyT(Param, list);
 	}
 }
