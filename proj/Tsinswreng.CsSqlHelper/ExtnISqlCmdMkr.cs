@@ -6,12 +6,101 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 
 public static class ExtnISqlCmdMkr{
+	private static (
+		IList<IParamAutoBinderManyValuesBatch> ManyBinders,
+		IList<IParamAutoBinder> OneBinders
+	) SplitBinders(IList<IParamAutoBinder> binders){
+		var many = binders
+			.Where(x=>x is IParamAutoBinderManyValuesBatch)
+			.Cast<IParamAutoBinderManyValuesBatch>()
+			.ToList();
+		var one = binders.Where(x=>x is not IParamAutoBinderManyValuesBatch).ToList();
+		return (many, one);
+	}
+
+	private static async IAsyncEnumerable<IDictionary<str, obj?>> YieldRowsOrNull(
+		ISqlCmd cmd,
+		IArgDict args,
+		[EnumeratorCancellation] CT ct
+	){
+		// Iterate per result-set to preserve one-slot output for empty result-sets.
+		var d2 = cmd.Args(args).AsyE2d(ct);
+		await foreach(var d1 in d2.WithCancellation(ct)){
+			var hasAny = false;
+			await foreach(var row in d1.WithCancellation(ct)){
+				hasAny = true;
+				yield return row;
+			}
+			if(!hasAny){
+				yield return null!;
+			}
+		}
+	}
+
+	private static async Task<ISqlCmd> GetCmdForBatch(
+		ISqlCmdMkr mkr,
+		IDbFnCtx ctx,
+		IAutoBindSqlDuplicator sql,
+		u64 batchSize,
+		u64 cnt,
+		ISqlCmd? fullBatchCmd,
+		CT ct
+	){
+		if(cnt == batchSize){
+			fullBatchCmd ??= await mkr.Prepare(ctx, sql.DuplicateSql(batchSize), ct);
+			return fullBatchCmd;
+		}
+		return await mkr.Prepare(ctx, sql.DuplicateSql(cnt), ct);
+	}
+
+	private static IArgDict BuildArgsForBatch(
+		ITable tbl,
+		IList<IParamAutoBinder> oneBinders,
+		IList<IParamAutoBinderManyValuesBatch> manyBinders,
+		IList firstBatch,
+		IList<IList> batches
+	){
+		var args = ArgDict.Mk(tbl);
+		foreach(var binder in oneBinders){
+			binder.Bind(tbl, args, firstBatch);
+		}
+		for(var i=0; i<manyBinders.Count; i++){
+			manyBinders[i].BindBatch(tbl, args, batches[i]);
+		}
+		return args;
+	}
+
+	private static bool TryTakeAlignedBatches(
+		IList<IParamAutoBinderManyValuesBatch> manyBinders,
+		u64 batchSize,
+		out IList firstBatch,
+		out IList<IList> batches
+	){
+		firstBatch = new List<obj?>();
+		batches = new List<IList>();
+		if(!manyBinders[0].TryTakeBatch(batchSize, out firstBatch)){
+			return false;
+		}
+		var cnt = (u64)firstBatch.Count;
+		batches = new List<IList>{firstBatch};
+		for(var i=1; i<manyBinders.Count; i++){
+			if(!manyBinders[i].TryTakeBatch(cnt, out var batchI)){
+				throw new InvalidOperationException("ParamAutoBinder.Many(...) length mismatch.");
+			}
+			if((u64)batchI.Count != cnt){
+				throw new InvalidOperationException("ParamAutoBinder.Many(...) length mismatch.");
+			}
+			batches.Add(batchI);
+		}
+		return true;
+	}
+
 	extension(ISqlCmdMkr z){
 		[Doc(@$"
 #Sum[Create auto batch helper with provider-based default size]
 #Params([Db function context],[SQL duplicator],[Batch execution delegate],[Batch size, 0 means auto])
 #TParams([Batch item type],[Batch return type])
-#Rtn[{nameof(AutoBatch<TItem, TRet>)} instance]
+#Rtn[{nameof(AutoBatch)} instance]
 ")]
 		public AutoBatch<TItem, TRet> AutoBatch<TItem, TRet>(
 			IDbFnCtx Ctx,
@@ -34,101 +123,61 @@ public static class ExtnISqlCmdMkr{
 #Sum[Execute auto-bound duplicated SQL lazily and flatten as row stream]
 #Params([Db function context],[SQL splicer carrying auto binders],[Cancellation token])
 #Rtn[Flattened async row stream; emits null placeholder for empty result-set]
-#See([{nameof(ISqlSplicer.ParamAutoBinders)}],[{nameof(IParamAutoBinderManyValuesBatch)}])
+#See([{nameof(IAutoBindSqlDuplicator.ParamAutoBinders)}],[{nameof(IParamAutoBinderManyValuesBatch)}])
 ")]
 		public async IAsyncEnumerable<
 			IDictionary<str, obj?>
 		> RunSql(//AsyE1d
 			IDbFnCtx Ctx
-			,ISqlSplicer Sql
+			,IAutoBindSqlDuplicator Sql
 			,[EnumeratorCancellation] CT Ct
 		){
 			// Keep same default policy as AutoBatch helper.
 			var BatchSize = z.DbSrcType.Eq(EDbSrcType.Sqlite) ? 1ul : 500ul;
-			var binders = Sql.ParamAutoBinders;
-			var manyBinders = binders
-				.Where(x=>x is IParamAutoBinderManyValuesBatch)
-				.Cast<IParamAutoBinderManyValuesBatch>()
-				.ToList();
-			var oneBinders = binders.Where(x=>x is not IParamAutoBinderManyValuesBatch).ToList();
+			var (manyBinders, oneBinders) = SplitBinders(Sql.ParamAutoBinders);
 
 			ISqlCmd? fullBatchCmd = null;
 			ISqlCmd? finalBatchCmd = null;
 			try{
 				// No Many binder: run once with fixed binders only.
 				if(manyBinders.Count == 0){
-					var cmd = await z.Prepare(Ctx, Sql.ToSqlStr(1), Ct);
+					var cmd = await z.Prepare(Ctx, Sql.DuplicateSql(1), Ct);
 					finalBatchCmd = cmd;
 					var args = ArgDict.Mk(Sql.Tbl);
 					foreach(var binder in oneBinders){
 						binder.Bind(Sql.Tbl, args, new List<obj?>());
 					}
-					var d2 = cmd.Args(args).AsyE2d(Ct);
-					await foreach(var d1 in d2.WithCancellation(Ct)){
-						var hasAny = false;
-						await foreach(var row in d1.WithCancellation(Ct)){
-							hasAny = true;
-							yield return row;
-						}
-						// Preserve 1:1 "input sql segment -> output element" shape for caller mapping.
-						if(!hasAny){
-							yield return null!;
-						}
+					await foreach(var row in YieldRowsOrNull(cmd, args, Ct)){
+						yield return row;
 					}
 					yield break;
 				}
 
 				while(true){
 					// Take one logical batch from first sequence binder.
-					if(!manyBinders[0].TryTakeBatch(BatchSize, out var firstBatch)){
+					if(!TryTakeAlignedBatches(manyBinders, BatchSize, out var firstBatch, out var batches)){
 						break;
 					}
 					var cnt = (u64)firstBatch.Count;
-					var batches = new List<IList>{firstBatch};
-					// All Many binders must have the same batch length.
-					for(var i=1; i<manyBinders.Count; i++){
-						if(!manyBinders[i].TryTakeBatch(cnt, out var batchI)){
-							throw new InvalidOperationException("ParamAutoBinder.Many(...) length mismatch.");
-						}
-						if((u64)batchI.Count != cnt){
-							throw new InvalidOperationException("ParamAutoBinder.Many(...) length mismatch.");
-						}
-						batches.Add(batchI);
-					}
 
 					ISqlCmd cmd;
 					if(cnt == BatchSize){
 						// Reuse prepared full-batch command.
-						fullBatchCmd ??= await z.Prepare(Ctx, Sql.ToSqlStr(BatchSize), Ct);
+						fullBatchCmd ??= await GetCmdForBatch(z, Ctx, Sql, BatchSize, cnt, fullBatchCmd, Ct);
 						cmd = fullBatchCmd;
 					}else{
 						// Tail batch needs different duplicated SQL; prepare a separate command.
 						if(finalBatchCmd != null && !ReferenceEquals(finalBatchCmd, fullBatchCmd)){
 							await finalBatchCmd.DisposeAsync();
 						}
-						finalBatchCmd = await z.Prepare(Ctx, Sql.ToSqlStr(cnt), Ct);
+						finalBatchCmd = await GetCmdForBatch(z, Ctx, Sql, BatchSize, cnt, fullBatchCmd, Ct);
 						cmd = finalBatchCmd;
 					}
 
-					var args = ArgDict.Mk(Sql.Tbl);
-					foreach(var binder in oneBinders){
-						binder.Bind(Sql.Tbl, args, firstBatch);
-					}
-					for(var i=0; i<manyBinders.Count; i++){
-						manyBinders[i].BindBatch(Sql.Tbl, args, batches[i]);
-					}
+					var args = BuildArgsForBatch(Sql.Tbl, oneBinders, manyBinders, firstBatch, batches);
 
-					// Iterate per result-set to detect empty set and emit null placeholder.
-					var d2 = cmd.Args(args).AsyE2d(Ct);
-					await foreach(var d1 in d2.WithCancellation(Ct)){
-						var hasAny = false;
-						await foreach(var row in d1.WithCancellation(Ct)){
-							hasAny = true;
-							yield return row;
-						}
-						if(!hasAny){
-							yield return null!;
-						}
+					await foreach(var row in YieldRowsOrNull(cmd, args, Ct)){
+						yield return row;
 					}
 				}
 			}finally{

@@ -3,7 +3,7 @@ using System.Collections;
 using Tsinswreng.CsTools;
 namespace Tsinswreng.CsSqlHelper;
 
-public class ISqlSplicer<E>:ISqlDuplicator{
+public class ISqlSplicer<E>: IAutoBindSqlDuplicator{
 	public ITable Tbl{get;set;}
 	public IList<obj> Segs{get;set;} = [];
 	public IList<IParamAutoBinder> ParamAutoBinders { get; set; } = [];
@@ -289,6 +289,16 @@ public class SqlSplicer:ISqlSplicer{
 
 
 
+
+/// <summary>
+/// SQL duplicator with table context and auto-binder metadata.
+/// </summary>
+public interface IAutoBindSqlDuplicator: ISqlDuplicator{
+	[Doc($@"Table metadata used for argument conversion and column mapping")]
+	public ITable Tbl{get;set;}
+	[Doc($@"Auto binders captured during SQL construction")]
+	public IList<IParamAutoBinder> ParamAutoBinders { get; set; }
+}
 
 /// <summary>
 /// Bind values into <see cref="IArgDict"/> for one execution.
