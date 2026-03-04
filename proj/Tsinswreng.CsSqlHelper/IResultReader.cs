@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Tsinswreng.CsSqlHelper;
 
 
@@ -36,6 +38,26 @@ public interface IResultReader{
 	public Task<IList<IDictionary<str, obj?>>> All1d(CT Ct);
 }
 
-public interface IResultReader<T>{
-	
+
+public static class ExtnTaskIResultReader{
+	extension(Task<IResultReader> z){
+		public async IAsyncEnumerable<
+			IAsyncEnumerable<IDictionary<str, obj?>>
+		> AsyE2d(
+			[EnumeratorCancellation]
+			CT Ct
+		){
+			var r = await z;
+			var itbl = r.AsyE2d(Ct);
+			await foreach(var e in itbl){
+				yield return e;
+			}
+		}
+	}
 }
+
+
+
+// public interface IResultReader<T>{
+	
+// }

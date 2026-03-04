@@ -1,10 +1,12 @@
 using System.Linq.Expressions;
+using System.Collections;
 using Tsinswreng.CsTools;
 namespace Tsinswreng.CsSqlHelper;
 
-public class ISqlSplicer<E>:I_DuplicateSql{
+public class ISqlSplicer<E>:ISqlDuplicator{
 	public ITable Tbl{get;set;}
 	public IList<obj> Segs{get;set;} = [];
+	public IList<IParamAutoBinder> ParamAutoBinders { get; set; } = [];
 
 
 	//變 實體
@@ -157,10 +159,15 @@ public class ISqlSplicer<E>:I_DuplicateSql{
 		return And(GetMember, "=", out Param);
 	}
 
-
-	// public ISqlSplicer<E> AndEq<T>(Expression<Func<E, obj?>> GetMember, IEnumerable<T> Args){
-	// 	return And(GetMember, "=", out Param);
-	// }
+	public ISqlSplicer<E> AndEq(
+		Expression<Func<E, obj?>> GetMember,
+		Func<SqlArgBinderFactory, IParamAutoBinder> Bind
+	){
+		AndEq(GetMember, out var param);
+		var binder = Bind(new SqlArgBinderFactory(param));
+		ParamAutoBinders.Add(binder);
+		return this;
+	}
 
 
 
@@ -278,4 +285,76 @@ public class SqlSplicer<T>:ISqlSplicer<T>{}
 
 public class SqlSplicer:ISqlSplicer{
 
+}
+
+
+
+
+public interface IParamAutoBinder{
+	public void Bind(ITable Tbl, IArgDict Args, IList Items);
+}
+
+public class SqlArgBinderFactory{
+	public IParam Param { get; set; }
+	public SqlArgBinderFactory(IParam Param){
+		this.Param = Param;
+	}
+	public IParamAutoBinder One<TVal>(TVal Value){
+		return new ParamAutoBinderOne<TVal>(Param, Value);
+	}
+	public IParamAutoBinder Many<TVal>(IEnumerable<TVal> Values){
+		return new ParamAutoBinderManyValues<TVal>(Param, Values);
+	}
+	public IParamAutoBinder Many<TItem, TVal>(Func<TItem, TVal> Selector){
+		return new ParamAutoBinderMany<TItem, TVal>(Param, Selector);
+	}
+}
+
+public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
+	public IParam Param { get; set; }
+	public TVal Value { get; set; }
+
+	public ParamAutoBinderOne(IParam Param, TVal Value){
+		this.Param = Param;
+		this.Value = Value;
+	}
+
+	public void Bind(ITable Tbl, IArgDict Args, IList Items){
+		Args.AddT(Param, Value);
+	}
+}
+
+public class ParamAutoBinderMany<TItem, TVal>: IParamAutoBinder{
+	public IParam Param { get; set; }
+	public Func<TItem, TVal> Selector { get; set; }
+
+	public ParamAutoBinderMany(IParam Param, Func<TItem, TVal> Selector){
+		this.Param = Param;
+		this.Selector = Selector;
+	}
+
+	public void Bind(ITable Tbl, IArgDict Args, IList Items){
+		var vals = new List<TVal>();
+		foreach(var item in Items){
+			if(item is not TItem typed){
+				throw new InvalidCastException($"Expected batch item type {typeof(TItem).Name}, got {item?.GetType().Name ?? "null"}.");
+			}
+			vals.Add(Selector(typed));
+		}
+		Args.AddManyT(Param, vals);
+	}
+}
+
+public class ParamAutoBinderManyValues<TVal>: IParamAutoBinder{
+	public IParam Param { get; set; }
+	public IEnumerable<TVal> Values { get; set; }
+
+	public ParamAutoBinderManyValues(IParam Param, IEnumerable<TVal> Values){
+		this.Param = Param;
+		this.Values = Values;
+	}
+
+	public void Bind(ITable Tbl, IArgDict Args, IList Items){
+		Args.AddManyT(Param, Values);
+	}
 }

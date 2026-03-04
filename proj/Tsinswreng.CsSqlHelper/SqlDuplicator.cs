@@ -1,11 +1,19 @@
 namespace Tsinswreng.CsSqlHelper;
 
-public interface I_DuplicateSql{
+public interface ISqlDuplicator{
 	public str DuplicateSql(u64 Cnt);
 }
 
+public interface IArgIndexer{
+	public obj? GetArgAt(u64 Ofst);
+}
 
-public class FnSqlDuplicator : I_DuplicateSql{
+public interface IArgsSqlDuplicator:ISqlDuplicator, IArgIndexer{
+	public bool BindedArgs{get;set;}
+}
+
+
+public class FnSqlDuplicator : ISqlDuplicator{
 	public str DuplicateSql(u64 Cnt){
 		return FnDuplicateSql(Cnt);
 	}
@@ -13,7 +21,7 @@ public class FnSqlDuplicator : I_DuplicateSql{
 	public FnSqlDuplicator(Func<u64, str> FnDuplicateSql){
 		this.FnDuplicateSql = FnDuplicateSql;
 	}
-	public static I_DuplicateSql Mk(Func<u64, str> FnDuplicateSql){
+	public static ISqlDuplicator Mk(Func<u64, str> FnDuplicateSql){
 		return new FnSqlDuplicator(FnDuplicateSql);
 	}
 }
