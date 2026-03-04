@@ -53,6 +53,26 @@ public static class ExtnTaskIResultReader{
 				yield return e;
 			}
 		}
+
+		public async Task<IList<IList<IDictionary<str, obj?>>>> All2d(CT Ct){
+			var r = await z;
+			return await r.All2d(Ct);
+		}
+
+		public async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(
+			[EnumeratorCancellation] CT Ct
+		){
+			var r = await z;
+			var itbl = r.AsyE1d(Ct);
+			await foreach(var row in itbl){
+				yield return row;
+			}
+		}
+
+		public async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
+			var r = await z;
+			return await r.All1d(Ct);
+		}
 	}
 }
 
