@@ -49,9 +49,16 @@ public static class ExtnISqlCmdMkr{
 					foreach(var binder in oneBinders){
 						binder.Bind(Sql.Tbl, args, new List<obj?>());
 					}
-					var rows = cmd.Args(args).AsyE1d(Ct);
-					await foreach(var row in rows){
-						yield return row;
+					var d2 = cmd.Args(args).AsyE2d(Ct);
+					await foreach(var d1 in d2.WithCancellation(Ct)){
+						var hasAny = false;
+						await foreach(var row in d1.WithCancellation(Ct)){
+							hasAny = true;
+							yield return row;
+						}
+						if(!hasAny){
+							yield return null!;
+						}
 					}
 					yield break;
 				}
@@ -77,7 +84,9 @@ public static class ExtnISqlCmdMkr{
 						fullBatchCmd ??= await z.Prepare(Ctx, Sql.ToSqlStr(BatchSize), Ct);
 						cmd = fullBatchCmd;
 					}else{
-						finalBatchCmd?.Dispose();
+						if(finalBatchCmd != null && !ReferenceEquals(finalBatchCmd, fullBatchCmd)){
+							await finalBatchCmd.DisposeAsync();
+						}
 						finalBatchCmd = await z.Prepare(Ctx, Sql.ToSqlStr(cnt), Ct);
 						cmd = finalBatchCmd;
 					}
@@ -90,9 +99,16 @@ public static class ExtnISqlCmdMkr{
 						manyBinders[i].BindBatch(Sql.Tbl, args, batches[i]);
 					}
 
-					var rows = cmd.Args(args).AsyE1d(Ct);
-					await foreach(var row in rows){
-						yield return row;
+					var d2 = cmd.Args(args).AsyE2d(Ct);
+					await foreach(var d1 in d2.WithCancellation(Ct)){
+						var hasAny = false;
+						await foreach(var row in d1.WithCancellation(Ct)){
+							hasAny = true;
+							yield return row;
+						}
+						if(!hasAny){
+							yield return null!;
+						}
 					}
 				}
 			}finally{
