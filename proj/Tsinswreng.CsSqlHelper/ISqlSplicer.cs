@@ -377,14 +377,22 @@ public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 
 /// Binder for prebuilt value sequence; supports incremental batch consumption.
 public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
+	[Doc(@$"Declared Parameter")]
 	public IParam Param { get; set; }
-	public IEnumerable<TVal> Values { get; set; }
-	protected IEnumerator<TVal>? ValueEnum { get; set; }
+	[Doc(@$"Received Arguments")]
+	public IEnumerable<TVal> Args { get; set; }
+	protected IEnumerator<TVal> ArgsItor{
+		get{
+			field ??= Args.GetEnumerator();
+			return field;
+		}
+	}
 	public ITable? Tbl { get; set; }
-
-	public ParamAutoBinderManyValues(IParam Param, IEnumerable<TVal> Values){
+	
+	
+	public ParamAutoBinderManyValues(IParam Param, IEnumerable<TVal> Args){
 		this.Param = Param;
-		this.Values = Values;
+		this.Args = Args;
 	}
 
 	[Doc(@$"
@@ -393,7 +401,7 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 #Rtn[Void]
 ")]
 	public void Bind(IArgDict Args, IList Items){
-		foreach(var (i, value) in Values.Index()){
+		foreach(var (i, value) in this.Args.Index()){
 			var p = Param.ToOfst((u64)i);
 			if(Tbl != null){
 				Args.AddRaw(p, Tbl.UpperToRaw(value));
@@ -403,11 +411,7 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 		}
 	}
 
-	[Doc($@"Get or create the shared enumerator for sequence batching")]
-	protected IEnumerator<TVal> GetOrMkEnum(){
-		ValueEnum ??= Values.GetEnumerator();
-		return ValueEnum;
-	}
+
 
 	[Doc(@$"
 #Sum[Take next N values from sequence]
@@ -416,13 +420,13 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 ")]
 	public bool TryTakeBatch(u64 BatchSize, out IList Batch){
 		var list = new List<TVal>();
-		var e = GetOrMkEnum();
+		var argsItor = ArgsItor;
 		// Pull values lazily; do not materialize full source sequence.
 		for(u64 i = 0; i < BatchSize; i++){
-			if(!e.MoveNext()){
+			if(!argsItor.MoveNext()){
 				break;
 			}
-			list.Add(e.Current);
+			list.Add(argsItor.Current);
 		}
 		Batch = list;
 		return list.Count > 0;

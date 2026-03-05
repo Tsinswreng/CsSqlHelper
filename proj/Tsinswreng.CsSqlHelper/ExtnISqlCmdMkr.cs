@@ -151,7 +151,7 @@ public static class ExtnISqlCmdMkr{
 					}
 					yield break;
 				}
-
+				//有ManyBinder
 				while(true){
 					// Take one logical batch from first sequence binder.
 					if(!TryTakeAlignedBatches(manyBinders, BatchSize, out var firstBatch, out var batches)){
