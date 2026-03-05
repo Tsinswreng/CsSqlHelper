@@ -304,13 +304,13 @@ public interface IParamAutoBinder{
 }
 
 /// Binder for "Many(values)" that can stream values by batch size.
-public interface IParamAutoBinderManyValuesBatch: IParamAutoBinder{
+public interface IParamAutoBinderMulti: IParamAutoBinder{
 	[Doc(@$"
-#Sum[Take next value batch from internal sequence]
+#Sum[Take next arguments batch from internal sequence]
 #Params([Expected batch size],[Output batch list])
 #Rtn[True if at least one value is available]
 ")]
-	public bool TryTakeBatch(u64 BatchSize, out IList Batch);
+	public bool TryTakeBatchArgs(u64 BatchSize, out IList Args);
 	[Doc(@$"
 #Sum[Bind a taken batch into arguments]
 #Params([Argument dictionary],[Batch values])
@@ -376,7 +376,7 @@ public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 }
 
 /// Binder for prebuilt value sequence; supports incremental batch consumption.
-public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
+public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderMulti{
 	[Doc(@$"Declared Parameter")]
 	public IParam Param { get; set; }
 	[Doc(@$"Received Arguments")]
@@ -418,18 +418,18 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 #Params([Maximum items to take],[Taken values])
 #Rtn[True when at least one value is taken]
 ")]
-	public bool TryTakeBatch(u64 BatchSize, out IList Batch){
-		var list = new List<TVal>();
+	public bool TryTakeBatchArgs(u64 BatchSize, out IList Batch){
+		var args = new List<TVal>();
 		var argsItor = ArgsItor;
 		// Pull values lazily; do not materialize full source sequence.
 		for(u64 i = 0; i < BatchSize; i++){
 			if(!argsItor.MoveNext()){
 				break;
 			}
-			list.Add(argsItor.Current);
+			args.Add(argsItor.Current);
 		}
-		Batch = list;
-		return list.Count > 0;
+		Batch = args;
+		return args.Count > 0;
 	}
 
 	[Doc(@$"
