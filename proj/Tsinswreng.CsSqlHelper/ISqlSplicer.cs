@@ -164,7 +164,7 @@ public class ISqlSplicer<E>: IAutoBindSqlDuplicator{
 		Func<SqlArgBinderFactory, IParamAutoBinder> Bind
 	){
 		AndEq(GetMember, out var param);
-		var binder = Bind(new SqlArgBinderFactory(param));
+		var binder = Bind(new SqlArgBinderFactory(param, Tbl));
 		ParamAutoBinders.Add(binder);
 		return this;
 	}
@@ -289,8 +289,6 @@ public class SqlSplicer:ISqlSplicer{
 
 /// SQL duplicator with table context and auto-binder metadata.
 public interface IAutoBindSqlDuplicator: ISqlDuplicator{
-	[Doc($@"Table metadata used for argument conversion and column mapping")]
-	public ITable Tbl{get;set;}
 	[Doc($@"Auto binders captured during SQL construction")]
 	public IList<IParamAutoBinder> ParamAutoBinders { get; set; }
 }
@@ -299,10 +297,10 @@ public interface IAutoBindSqlDuplicator: ISqlDuplicator{
 public interface IParamAutoBinder{
 	[Doc(@$"
 #Sum[Bind values into argument dictionary for current execution]
-#Params([Table metadata used for upper/raw conversion],[Argument dictionary],[Current batch items])
+#Params([Argument dictionary],[Current batch items])
 #Rtn[Void]
 ")]
-	public void Bind(ITable Tbl, IArgDict Args, IList Items);
+	public void Bind(IArgDict Args, IList Items);
 }
 
 /// Binder for "Many(values)" that can stream values by batch size.
@@ -315,18 +313,20 @@ public interface IParamAutoBinderManyValuesBatch: IParamAutoBinder{
 	public bool TryTakeBatch(u64 BatchSize, out IList Batch);
 	[Doc(@$"
 #Sum[Bind a taken batch into arguments]
-#Params([Table metadata],[Argument dictionary],[Batch values])
+#Params([Argument dictionary],[Batch values])
 #Rtn[Void]
 ")]
-	public void BindBatch(ITable Tbl, IArgDict Args, IList Batch);
+	public void BindBatch(IArgDict Args, IList Batch);
 }
 
 
 /// Factory that creates auto-binders bound to one SQL parameter.
 public class SqlArgBinderFactory{
 	public IParam Param { get; set; }
-	public SqlArgBinderFactory(IParam Param){
+	public ITable? Tbl{get;set;}
+	public SqlArgBinderFactory(IParam Param, ITable? Tbl=null){
 		this.Param = Param;
+		this.Tbl = Tbl;
 	}
 	[Doc(@$"
 #Sum[Create binder for one fixed value]
@@ -335,7 +335,7 @@ public class SqlArgBinderFactory{
 #Rtn[Auto binder instance]
 ")]
 	public IParamAutoBinder One<TVal>(TVal Value){
-		return new ParamAutoBinderOne<TVal>(Param, Value);
+		return new ParamAutoBinderOne<TVal>(Param, Value){Tbl=Tbl};
 	}
 	[Doc(@$"
 #Sum[Create binder for a value sequence]
@@ -344,7 +344,7 @@ public class SqlArgBinderFactory{
 #Rtn[Auto binder instance]
 ")]
 	public IParamAutoBinder Many<TVal>(IEnumerable<TVal> Values){
-		return new ParamAutoBinderManyValues<TVal>(Param, Values);
+		return new ParamAutoBinderManyValues<TVal>(Param, Values){Tbl=Tbl};
 	}
 
 }
@@ -354,6 +354,7 @@ public class SqlArgBinderFactory{
 public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 	public IParam Param { get; set; }
 	public TVal Value { get; set; }
+	public ITable? Tbl { get; set; }
 
 	public ParamAutoBinderOne(IParam Param, TVal Value){
 		this.Param = Param;
@@ -362,11 +363,15 @@ public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 
 	[Doc(@$"
 #Sum[Bind one fixed value]
-#Params([Table metadata],[Argument dictionary],[Ignored batch items])
+#Params([Argument dictionary],[Ignored batch items])
 #Rtn[Void]
 ")]
-	public void Bind(ITable Tbl, IArgDict Args, IList Items){
-		Args.AddT(Param, Value);
+	public void Bind(IArgDict Args, IList Items){
+		if(Tbl != null){
+			Args.AddRaw(Param, Tbl.UpperToRaw(Value));
+			return;
+		}
+		Args.AddRaw(Param, Value);
 	}
 }
 
@@ -375,6 +380,7 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 	public IParam Param { get; set; }
 	public IEnumerable<TVal> Values { get; set; }
 	protected IEnumerator<TVal>? ValueEnum { get; set; }
+	public ITable? Tbl { get; set; }
 
 	public ParamAutoBinderManyValues(IParam Param, IEnumerable<TVal> Values){
 		this.Param = Param;
@@ -383,11 +389,18 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 
 	[Doc(@$"
 #Sum[Bind all values in sequence]
-#Params([Table metadata],[Argument dictionary],[Ignored batch items])
+#Params([Argument dictionary],[Ignored batch items])
 #Rtn[Void]
 ")]
-	public void Bind(ITable Tbl, IArgDict Args, IList Items){
-		Args.AddManyT(Param, Values);
+	public void Bind(IArgDict Args, IList Items){
+		foreach(var (i, value) in Values.Index()){
+			var p = Param.ToOfst((u64)i);
+			if(Tbl != null){
+				Args.AddRaw(p, Tbl.UpperToRaw(value));
+			}else{
+				Args.AddRaw(p, value);
+			}
+		}
 	}
 
 	[Doc($@"Get or create the shared enumerator for sequence batching")]
@@ -417,11 +430,11 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 
 	[Doc(@$"
 #Sum[Bind a pre-taken value batch]
-#Params([Table metadata],[Argument dictionary],[Batch values])
+#Params([Argument dictionary],[Batch values])
 #Rtn[Void]
 #Throw[{nameof(InvalidCastException)}][When batch element type does not match {nameof(TVal)}]
 ")]
-	public void BindBatch(ITable Tbl, IArgDict Args, IList Batch){
+	public void BindBatch(IArgDict Args, IList Batch){
 		var list = new List<TVal>(Batch.Count);
 		foreach(var item in Batch){
 			if(item is not TVal typed){
@@ -429,6 +442,13 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 			}
 			list.Add(typed);
 		}
-		Args.AddManyT(Param, list);
+		foreach(var (i, value) in list.Index()){
+			var p = Param.ToOfst((u64)i);
+			if(Tbl != null){
+				Args.AddRaw(p, Tbl.UpperToRaw(value));
+			}else{
+				Args.AddRaw(p, value);
+			}
+		}
 	}
 }

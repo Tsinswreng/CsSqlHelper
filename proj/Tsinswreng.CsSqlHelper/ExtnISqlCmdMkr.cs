@@ -54,18 +54,17 @@ public static class ExtnISqlCmdMkr{
 	}
 
 	private static IArgDict BuildArgsForBatch(
-		ITable tbl,
 		IList<IParamAutoBinder> oneBinders,
 		IList<IParamAutoBinderManyValuesBatch> manyBinders,
 		IList firstBatch,
 		IList<IList> batches
 	){
-		var args = ArgDict.Mk(tbl);
+		var args = ArgDict.Mk();
 		foreach(var binder in oneBinders){
-			binder.Bind(tbl, args, firstBatch);
+			binder.Bind(args, firstBatch);
 		}
 		for(var i=0; i<manyBinders.Count; i++){
-			manyBinders[i].BindBatch(tbl, args, batches[i]);
+			manyBinders[i].BindBatch(args, batches[i]);
 		}
 		return args;
 	}
@@ -143,9 +142,9 @@ public static class ExtnISqlCmdMkr{
 				if(manyBinders.Count == 0){
 					var cmd = await z.Prepare(Ctx, Sql.DuplicateSql(1), Ct);
 					finalBatchCmd = cmd;
-					var args = ArgDict.Mk(Sql.Tbl);
+					var args = ArgDict.Mk();
 					foreach(var binder in oneBinders){
-						binder.Bind(Sql.Tbl, args, new List<obj?>());
+						binder.Bind(args, new List<obj?>());
 					}
 					await foreach(var row in YieldRowsOrNull(cmd, args, Ct)){
 						yield return row;
@@ -174,7 +173,7 @@ public static class ExtnISqlCmdMkr{
 						cmd = finalBatchCmd;
 					}
 
-					var args = BuildArgsForBatch(Sql.Tbl, oneBinders, manyBinders, firstBatch, batches);
+					var args = BuildArgsForBatch(oneBinders, manyBinders, firstBatch, batches);
 
 					await foreach(var row in YieldRowsOrNull(cmd, args, Ct)){
 						yield return row;
