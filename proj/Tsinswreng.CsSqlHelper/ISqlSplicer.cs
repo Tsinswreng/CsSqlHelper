@@ -287,12 +287,7 @@ public class SqlSplicer:ISqlSplicer{
 
 }
 
-
-
-
-/// <summary>
 /// SQL duplicator with table context and auto-binder metadata.
-/// </summary>
 public interface IAutoBindSqlDuplicator: ISqlDuplicator{
 	[Doc($@"Table metadata used for argument conversion and column mapping")]
 	public ITable Tbl{get;set;}
@@ -300,9 +295,7 @@ public interface IAutoBindSqlDuplicator: ISqlDuplicator{
 	public IList<IParamAutoBinder> ParamAutoBinders { get; set; }
 }
 
-/// <summary>
 /// Bind values into <see cref="IArgDict"/> for one execution.
-/// </summary>
 public interface IParamAutoBinder{
 	[Doc(@$"
 #Sum[Bind values into argument dictionary for current execution]
@@ -312,9 +305,7 @@ public interface IParamAutoBinder{
 	public void Bind(ITable Tbl, IArgDict Args, IList Items);
 }
 
-/// <summary>
 /// Binder for "Many(values)" that can stream values by batch size.
-/// </summary>
 public interface IParamAutoBinderManyValuesBatch: IParamAutoBinder{
 	[Doc(@$"
 #Sum[Take next value batch from internal sequence]
@@ -330,9 +321,8 @@ public interface IParamAutoBinderManyValuesBatch: IParamAutoBinder{
 	public void BindBatch(ITable Tbl, IArgDict Args, IList Batch);
 }
 
-/// <summary>
+
 /// Factory that creates auto-binders bound to one SQL parameter.
-/// </summary>
 public class SqlArgBinderFactory{
 	public IParam Param { get; set; }
 	public SqlArgBinderFactory(IParam Param){
@@ -356,20 +346,11 @@ public class SqlArgBinderFactory{
 	public IParamAutoBinder Many<TVal>(IEnumerable<TVal> Values){
 		return new ParamAutoBinderManyValues<TVal>(Param, Values);
 	}
-	[Doc(@$"
-#Sum[Create binder using selector over batch items]
-#Params([Selector from item to parameter value])
-#TParams([Batch item type],[Value type])
-#Rtn[Auto binder instance]
-")]
-	public IParamAutoBinder Many<TItem, TVal>(Func<TItem, TVal> Selector){
-		return new ParamAutoBinderMany<TItem, TVal>(Param, Selector);
-	}
+
 }
 
-/// <summary>
-/// Binder for one constant value.
-/// </summary>
+
+/// Binder for one fixed value.
 public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 	public IParam Param { get; set; }
 	public TVal Value { get; set; }
@@ -389,39 +370,7 @@ public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 	}
 }
 
-/// <summary>
-/// Binder that derives parameter values from each batch item.
-/// </summary>
-public class ParamAutoBinderMany<TItem, TVal>: IParamAutoBinder{
-	public IParam Param { get; set; }
-	public Func<TItem, TVal> Selector { get; set; }
-
-	public ParamAutoBinderMany(IParam Param, Func<TItem, TVal> Selector){
-		this.Param = Param;
-		this.Selector = Selector;
-	}
-
-	[Doc(@$"
-#Sum[Bind values projected from current batch items]
-#Params([Table metadata],[Argument dictionary],[Current batch items])
-#Rtn[Void]
-#Throw[{nameof(InvalidCastException)}][When item type does not match generic {nameof(TItem)}]
-")]
-	public void Bind(ITable Tbl, IArgDict Args, IList Items){
-		var vals = new List<TVal>();
-		foreach(var item in Items){
-			if(item is not TItem typed){
-				throw new InvalidCastException($"Expected batch item type {typeof(TItem).Name}, got {item?.GetType().Name ?? "null"}.");
-			}
-			vals.Add(Selector(typed));
-		}
-		Args.AddManyT(Param, vals);
-	}
-}
-
-/// <summary>
 /// Binder for prebuilt value sequence; supports incremental batch consumption.
-/// </summary>
 public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderManyValuesBatch{
 	public IParam Param { get; set; }
 	public IEnumerable<TVal> Values { get; set; }

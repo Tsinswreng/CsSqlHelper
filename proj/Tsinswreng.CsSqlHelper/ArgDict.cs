@@ -12,7 +12,9 @@ public partial class ArgDict: IArgDict{
 		return new ArgDict{Tbl = Tbl};
 	}
 
+	[Doc(@$"Param name(without prefix like `@`) map to raw value")]
 	public IDictionary<str, obj?> ParamName_RawValue{get;set;} = new Dictionary<str, obj?>();
+	[Doc(@$"Used to convert between upper and raw value.")]
 	public ITable? Tbl{get;set;}
 
 	[Impl]
