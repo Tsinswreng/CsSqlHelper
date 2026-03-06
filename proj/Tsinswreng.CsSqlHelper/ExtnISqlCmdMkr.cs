@@ -126,7 +126,7 @@ public static class ExtnISqlCmdMkr{
 ")]
 		public async IAsyncEnumerable<
 			IDictionary<str, obj?>
-		> RunSql(//AsyE1d
+		> RunBatSql(//AsyE1d
 			IDbFnCtx Ctx
 			,IAutoBindSqlDuplicator Sql
 			,[EnumeratorCancellation] CT Ct

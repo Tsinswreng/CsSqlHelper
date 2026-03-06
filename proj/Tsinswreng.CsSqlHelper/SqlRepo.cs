@@ -344,7 +344,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 	}
 
 
-	public async Task<IAsyncEnumerable<TEntity?>> SlctManyInIds(
+	public async Task<IAsyncEnumerable<TEntity?>> SlctManyInIdsWithDel(
 		IDbFnCtx Ctx, IEnumerable<TId> Ids
 		,CT Ct
 	){
@@ -358,12 +358,38 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			async(z, Ids, Ct)=>{
 				var Args = ArgDict.Mk(T).AddManyT(Params, Ids, T.CodeIdName);
 				var RawDicts = z.SqlCmd.Args(Args).AsyE1d(Ct);
-				return RawDicts.Select(x=>T.DbDictToEntity<TEntity>(x));
+				return RawDicts.Select(x=>T.DbDictToEntity(x));
 			}
 		);
 		var R = bat.AddToEnd(Ids, Ct);
 		return R.Flat();
 	}
+
+	public async Task<IAsyncEnumerable<TEntity?>> SlctManyInIds(
+		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		,CT Ct
+	){
+		IList<IParam> Params = [];
+		var sqlD = FnSqlDuplicator.Mk((Cnt)=>{
+			Params = T.NumParams(Cnt);
+			return 
+$"""
+SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", Params)})
+{T.AndSqlIsNonDel()}
+""" ;
+		});
+		var bat = SqlCmdMkr.AutoBatch<TId, IAsyncEnumerable<TEntity?>>(
+			Ctx, sqlD,
+			async(z, Ids, Ct)=>{
+				var Args = ArgDict.Mk(T).AddManyT(Params, Ids, T.CodeIdName);
+				var RawDicts = z.SqlCmd.Args(Args).AsyE1d(Ct);
+				return RawDicts.Select(x=>T.DbDictToEntity(x));
+			}
+		);
+		var R = bat.AddToEnd(Ids, Ct);
+		return R.Flat();
+	}
+
 
 	public async Task<IAsyncEnumerable<TEntity?>> BatSlctById(
 		IDbFnCtx Ctx, IEnumerable<TId> Ids
@@ -496,7 +522,6 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.QtCol(NId)} = {T.Prm(NId)}";
 			return NIL;
 		};
 	}
-
 
 	public async Task<Func<
 		IAsyncEnumerable<TEntity>

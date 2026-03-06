@@ -8,7 +8,9 @@ using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
 public static partial class ExtnITableT{
-	extension<T>(ITable<T> z){
+	extension<T>(ITable<T> z)
+		where T:new()
+	{
 		//"db_col_name"  不帶表名前綴
 		public str DbCol(Expression<Func<T, obj?>> ExprMemb){
 			var t = (ITable)z;
@@ -31,11 +33,11 @@ public static partial class ExtnITableT{
 			return t.SqlSplicer<T>();
 		}
 
-		public TPo DbDictToEntity<TPo>(
+		public T DbDictToEntity(
 			IStr_Any DbDict
-		)where TPo:new(){
+		){
 			var t = (ITable)z;
-			return t.DbDictToEntity<TPo>(DbDict);
+			return t.DbDictToEntity<T>(DbDict);
 		}
 
 	}

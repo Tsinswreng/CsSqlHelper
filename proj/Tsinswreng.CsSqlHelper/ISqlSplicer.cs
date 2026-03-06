@@ -37,13 +37,18 @@ public class ISqlSplicer<E>: IAutoBindSqlDuplicator{
 	}
 
 	// CodeCol -> "DbCol"
-	str Fld(str s){
+	str QtCol(str s){
 		return Tbl.QtCol(s);
 		//return Tbl.Qt(Tbl.DbTblName+"."+Tbl.ColNameToDb(s));
+	}
+	// CodeCol -> "Tbl"."DbCol"
+	str QtTblCol(str s){
+		return Tbl.Qt(Tbl.DbTblName)+"."+QtCol(s);
 	}
 
 	/// p -> @p
 	IParam Prm(str s){
+		//TODO 若褈則改名併返改後者
 		return Tbl.Prm(s);
 	}
 
@@ -133,12 +138,15 @@ public class ISqlSplicer<E>: IAutoBindSqlDuplicator{
 
 	public ISqlSplicer<E> Bool(Expression<Func<E, obj?>> GetMember, str Op, IParam Param){
 		var memb = Memb(GetMember);
-		return AddSeg(Fld(memb)).AddSeg(Op).AddSeg(Param);
+		return AddSeg(QtCol(memb)).AddSeg(Op).AddSeg(Param);
 	}
-
+	public ISqlSplicer<E> Bool(str Memb, str Op, out IParam Param){
+		Param = Prm(Memb);
+		return AddSeg(QtTblCol(Memb)).AddSeg(Op).AddSeg(Param);
+	}
 	public ISqlSplicer<E> Bool(Expression<Func<E, obj?>> GetMember, str Op, out IParam Param){
 		var memb = Memb(GetMember);
-		Param = Prm(memb);//TODO 維護dict參數表㕥判褈名
+		Param = Prm(memb);
 		return Bool(GetMember, Op, Param);
 	}
 
@@ -163,10 +171,21 @@ public class ISqlSplicer<E>: IAutoBindSqlDuplicator{
 		Expression<Func<E, obj?>> GetMember,
 		Func<SqlArgBinderFactory, IParamAutoBinder> Bind
 	){
+		var memb = Memb(GetMember);
 		AndEq(GetMember, out var param);
-		var binder = Bind(new SqlArgBinderFactory(param, Tbl));
+		var binder = Bind(new SqlArgBinderFactory(param, Tbl, memb));
 		ParamAutoBinders.Add(binder);
 		return this;
+	}
+	
+	public ISqlSplicer<E> AndEq(
+		string CodeCol,
+		Func<SqlArgBinderFactory, IParamAutoBinder> Bind
+	){
+		var r = And().Bool(CodeCol, "=", out var param);
+		var binder = Bind(new SqlArgBinderFactory(param, Tbl, CodeCol));
+		ParamAutoBinders.Add(binder);
+		return r;
 	}
 
 
@@ -181,7 +200,7 @@ public class ISqlSplicer<E>: IAutoBindSqlDuplicator{
 		return this;
 	}
 	public ISqlSplicer<E> OrderByDesc(Expression<Func<E, obj?>> GetMember){
-		OrderByDesc(Fld(Memb(GetMember)));
+		OrderByDesc(QtCol(Memb(GetMember)));
 		return this;
 	}
 	public ISqlSplicer<E> LimOfst(out IParam Lim, out IParam Ofst){
@@ -321,12 +340,20 @@ public interface IParamAutoBinderMulti: IParamAutoBinder{
 
 
 /// Factory that creates auto-binders bound to one SQL parameter.
+
 public class SqlArgBinderFactory{
 	public IParam Param { get; set; }
 	public ITable? Tbl{get;set;}
-	public SqlArgBinderFactory(IParam Param, ITable? Tbl=null){
+	//TODO 處理CodeColo
+	public str? CodeCol{get;set;}
+	public SqlArgBinderFactory(
+		IParam Param
+		,ITable? Tbl=null
+		,str? CodeCol = null
+	){
 		this.Param = Param;
 		this.Tbl = Tbl;
+		this.CodeCol = CodeCol;
 	}
 	[Doc(@$"
 #Sum[Create binder for one fixed value]

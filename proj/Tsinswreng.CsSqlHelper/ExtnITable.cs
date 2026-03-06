@@ -584,6 +584,19 @@ public static class ExtnITable {
 			return R;
 		}
 		
+		
+		[Doc(@$"Expr that filter non deleted rows
+		you do not need to add 'AND' before it
+		if {nameof(z.SoftDelCol)} is not set, it will return empty str
+		#See[{nameof(z.SoftDelCol.FnSqlIsNonDel)}]
+		")]
+		public str AndSqlIsNonDel(){
+			if(z.SoftDelCol is null){
+				return "";
+			}
+			return "AND " + z.SoftDelCol.FnSqlIsNonDel()??"";
+		}
+		
 	}
 
 }
