@@ -864,10 +864,6 @@ Func<
 		};
 	}
 
-//public delegate Task<IDictionary<TKey, IList<TPo>>> TFnIncludeEntitysByKeys<TKey, TPo>(
-//		ITable Tbl, Func<TPo, TKey> FnMemb, IEnumerable<TKey> Keys, CT Ct
-//	);
-
 	public async Task<IDictionary<TKey, IList<TPo>>> IncludeEntitysByKeys<TPo, TKey>(
 		IDbFnCtx Ctx
 		,str CodeCol

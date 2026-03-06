@@ -199,7 +199,22 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
-
+	
+	[Doc(@$"
+	assume you have MainEntity and AssetEntity, Each MainEntity Has Many AssetEntity,
+	when you want to selete multi MainEntity with their respective AssetEntity,
+	use this to avoid N+1 Query
+	#Params(
+		[],
+		[logical Forein Key],
+		[Options],
+		[All Keys. we use `IN` inside to avoid N+1 Query],
+		[main entity member selector],
+		[Table],
+		[],
+	)
+	#Rtn[Dict of Key map to multi OneToMany entitys]
+	")]
 	public Task<IDictionary<TKey, IList<TPo>>> IncludeEntitysByKeys<TPo, TKey>(
 		IDbFnCtx Ctx
 		,str CodeCol
@@ -217,7 +232,7 @@ public partial interface IRepo<TEntity, TId>{
 		,OptQry? OptQry
 		,IEnumerable<TKey> Keys
 		,Func<TPo, TKey> FnMemb
-		,ITable<TPo> Tbl
+		,ITable<TPo> Tbl //帶泛型
 		,CT Ct
 	)where TPo: new();
 
