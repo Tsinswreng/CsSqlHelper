@@ -411,6 +411,81 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 		return R.Flat();
 	}
 
+	public async Task<IAsyncEnumerable<TAgg?>> BatSlctAggByIds<TAgg>(
+		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		,CT Ct
+	)
+		where TAgg: class
+	{
+		var ids = Ids.ToList();
+		var aggReg = TblMgr.GetAgg<TAgg>();
+		if(aggReg.RootEntityType != typeof(TEntity)){
+			throw new Exception($"Agg root type mismatch. Agg={typeof(TAgg)}, ExpectedRoot={typeof(TEntity)}, RegisteredRoot={aggReg.RootEntityType}");
+		}
+		if(aggReg.RootIdType != typeof(TId)){
+			throw new Exception($"Agg root id type mismatch. Agg={typeof(TAgg)}, ExpectedId={typeof(TId)}, RegisteredId={aggReg.RootIdType}");
+		}
+
+		var rootsAsy = await BatSlctById(Ctx, ids, Ct);
+		var roots = await rootsAsy.ToListAsync(Ct);
+		var rootById = new Dictionary<object, TEntity>();
+		var rootIds = new List<TId>();
+		foreach(var root in roots){
+			if(root is null){
+				continue;
+			}
+			var keyObj = aggReg.FnRootIdObj(root);
+			if(keyObj is null){
+				continue;
+			}
+			if(keyObj is not TId key){
+				throw new Exception($"Agg root key type mismatch. Agg={typeof(TAgg)}, Root={typeof(TEntity)}, Key={keyObj.GetType()}, ExpectedKey={typeof(TId)}");
+			}
+			rootById[key] = root;
+			rootIds.Add(key);
+		}
+
+		var buildCtx = new AggBuildCtx();
+		if(rootIds.Count > 0){
+			var optQry = new OptQry{ InParamCnt = (u64)rootIds.Count };
+			foreach(var include in aggReg.Includes){
+				var slctByIn = await FnScltAllByColInVals<TId>(Ctx, include.Tbl, include.CodeCol, optQry, Ct);
+				var dbAsy = await slctByIn(rootIds, Ct);
+				await foreach(var dbDict in dbAsy.WithCancellation(Ct)){
+					var codeDict = include.Tbl.ToCodeDict(dbDict);
+					var entity = Activator.CreateInstance(include.EntityType);
+					if(entity is null){
+						throw new Exception($"Create include entity failed. Type={include.EntityType}");
+					}
+					include.Tbl.DictMapper.AssignShallow(include.EntityType, entity, codeDict);
+					var keyObj = include.FnMembObj(entity);
+					if(keyObj is null){
+						continue;
+					}
+					if(include.RelKind == EAggRelKind.OneToOne
+						&& buildCtx.GetOne(include.EntityType, keyObj) is not null
+					){
+						throw new Exception($"OneToOne include got duplicate rows. Agg={typeof(TAgg)}, Include={include.EntityType}, Key={keyObj}");
+					}
+					buildCtx.Add(include.EntityType, keyObj, entity);
+				}
+			}
+		}
+
+		async IAsyncEnumerable<TAgg?> fn(IEnumerable<TId> orderedIds){
+			foreach(var id in orderedIds){
+				if(!rootById.TryGetValue(id!, out var root)){
+					yield return null;
+					continue;
+				}
+				var agg = (TAgg)aggReg.FnAssembleObj(root, buildCtx);
+				yield return agg;
+			}
+		}
+
+		return fn(ids);
+	}
+
 
 
 
