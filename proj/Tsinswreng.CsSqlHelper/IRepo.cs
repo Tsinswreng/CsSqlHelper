@@ -74,7 +74,7 @@ public partial interface IRepo<TEntity, TId>{
 	);
 
 	[Doc(@$"Batch select aggregate roots by ids; aggregate metadata should be registered in ITblMgr.AddAgg().")]
-	public Task<IAsyncEnumerable<TAgg?>> BatSlctAggByIds<TAgg>(
+	public Task<IAsyncEnumerable<TAgg?>> BatSlctAggById<TAgg>(
 		IDbFnCtx Ctx, IEnumerable<TId> Ids
 		,CT Ct
 	)

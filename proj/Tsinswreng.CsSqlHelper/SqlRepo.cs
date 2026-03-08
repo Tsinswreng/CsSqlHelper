@@ -411,7 +411,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 		return R.Flat();
 	}
 
-	public async Task<IAsyncEnumerable<TAgg?>> BatSlctAggByIds<TAgg>(
+	public async Task<IAsyncEnumerable<TAgg?>> BatSlctAggById<TAgg>(
 		IDbFnCtx Ctx, IEnumerable<TId> Ids
 		,CT Ct
 	)
@@ -426,7 +426,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 			throw new Exception($"Agg root id type mismatch. Agg={typeof(TAgg)}, ExpectedId={typeof(TId)}, RegisteredId={aggReg.RootIdType}");
 		}
 
-		var rootsAsy = await BatSlctById(Ctx, ids, Ct);
+		var rootsAsy = await SlctManyInIdsWithDel(Ctx, ids, Ct);
 		var roots = await rootsAsy.ToListAsync(Ct);
 		var rootById = new Dictionary<object, TEntity>();
 		var rootIds = new List<TId>();
