@@ -824,7 +824,7 @@ SELECT * FROM {Tbl.Qt(Tbl.DbTblName)}
 WHERE 1=1
 AND {T.QtCol(CodeCol)} IN ({str.Join(",", numParams)})
 """;
-		var SqlCmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
+		var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		return async(Args ,Ct)=>{
 			if(Args.Count < numParams.Count){
 				throw new Exception("Args.Count < numParams.Count");
@@ -837,7 +837,7 @@ AND {T.QtCol(CodeCol)} IN ({str.Join(",", numParams)})
 	}
 
 	public delegate Task<IDictionary<TKey, IList<TPo>>> TFnIncludeEntitysByKeys<TKey, TPo>(
-		ITable Tbl, Func<TPo, TKey> FnMemb, IEnumerable<TKey> Keys, CT Ct
+		ITable Tbl, Func<TPo, TKey> FnMemb, IEnumerable<TKey?> Keys, CT Ct
 	);
 
 /*
@@ -855,7 +855,7 @@ Func<
 	)where TPo: new(){
 		var fn = await FnScltAllByColInVals<TKey>(Ctx, Tbl, CodeCol, OptQry, Ct);
 		return async(Tbl, Memb, Keys, Ct)=>{
-			var KeyList = Keys.AsOrToList();
+			IList<TKey> KeyList = Keys.Where(x=>x is not null).ToList()!;
 			var poPage = await fn(KeyList, Ct);
 			var dicts = await poPage.ToListAsync(Ct);
 			var pos = dicts.Select(x=>Tbl.DbDictToEntity<TPo>(x));
@@ -868,7 +868,7 @@ Func<
 		IDbFnCtx Ctx
 		,str CodeCol
 		,OptQry? OptQry
-		,IEnumerable<TKey> Keys
+		,IEnumerable<TKey?> Keys
 		,Func<TPo, TKey> FnMemb
 		,ITable Tbl
 		,CT Ct
@@ -883,7 +883,7 @@ Func<
 		IDbFnCtx Ctx
 		,str CodeCol
 		,OptQry? OptQry
-		,IEnumerable<TKey> Keys
+		,IEnumerable<TKey?> Keys
 		,Func<TPo, TKey> FnMemb
 		,ITable<TPo> Tbl
 		,CT Ct
@@ -916,7 +916,7 @@ SELECT * FROM {Tbl.Qt(Tbl.DbTblName)}
 WHERE 1=1
 AND {Tbl.QtCol(CodeCol)} IN ({str.Join(",", numParams)})
 """;
-		var SqlCmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
+		var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		return async(Args ,Ct)=>{
 			if(Args.Count < numParams.Count){
 				throw new Exception("Args.Count < numParams.Count");
@@ -927,76 +927,4 @@ AND {Tbl.QtCol(CodeCol)} IN ({str.Join(",", numParams)})
 			return DbDict.Select(x=>Tbl.DbDictToEntity<TEntity2>(x));
 		};
 	}
-
-
-
-	// public async Task<Func<
-	// 	IEnumerable<T_Entity>
-	// 	,i64
-	// 	,CT
-	// 	,Task<nil>
-	// >> Fn_BatchSetUpdateAtAsy(
-	// 	CT ct
-	// ){
-	// 	var Fn = async(
-	// 		IEnumerable<T_Entity> Pos
-	// 		,i64 Time
-	// 		,CT ct
-	// 	)=>{
-	// 		foreach(var po in Pos){
-	// 			if(po is not I_HasId<T_Id> IdPo){
-	// 				continue;
-	// 			}
-
-	// 		}
-	// 		return Nil;
-	// 	};
-	// 	return Fn;
-	// }
-
-
-// 	public async Task<Func<
-// 		IEnumerable<T_Id2>
-// 		,CT
-// 		,Task<nil>
-// 	>> Fn_DeleteManyByIdAsy<T_Id2>(){
-// 		var Tbl = TblMgr.GetTable<T_Entity>();
-// 		var Cmd = Connection.CreateCommand();
-// 		Cmd.CommandText =
-// $"DELETE FROM {Tbl.Name} WHERE ${nameof(I_Id<nil>.Id)} IN ?";
-// 		var Fn = async(
-// 			IEnumerable<T_Id2> Ids
-// 			,CT ct
-// 		)=>{
-// 			// if(Id is not T_Id id){
-// 			// 	throw new Exception("Id is not T_Id id");
-// 			// }
-
-// 			var IdCol = Tbl.Columns[nameof(I_Id<nil>.Id)];
-// 			var ConvertedId = IdCol.ToDbType(Id);
-// 			Cmd.Parameters.AddWithValue("", ConvertedId);
-// 			using var Reader = await Cmd.ExecuteReaderAsync(ct);
-// 			return Nil;
-// 		};
-// 		return Fn;
-// 	}
-
-
-	// public async Task<T_Ret> TxnAsy<T_Ret>(
-	// 	Func<CT, Task<T_Ret>> FnAsy
-	// 	,CT ct
-	// ){
-	// 	using var Tx = await DbCtx.Database.BeginTransactionAsync(ct);
-	// 	try{
-	// 		var ans = await FnAsy(ct);
-	// 		await Tx.CommitAsync(ct);
-	// 		return ans;
-	// 	}
-	// 	catch (System.Exception){
-	// 		await Tx.RollbackAsync(ct);
-	// 		throw;
-	// 	}
-	// }
-
-
 }

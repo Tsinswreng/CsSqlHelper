@@ -5,6 +5,7 @@ namespace Tsinswreng.CsSqlHelper;
 //TODO配置忽略之字段
 public partial interface ITblMgr{
 	public IDictionary<Type, ITable> EntityType_Tbl{get;set;}
+	public IDictionary<Type, IAggReg> AggType_Reg{get;set;}
 	public EDbSrcType DbSrcType=>DbStuff.DbSrcType;
 	public IDbStuff DbStuff{get;set;}
 	public ISqlMkr SqlMkr=>DbStuff.SqlMkr;
@@ -25,12 +26,34 @@ public partial interface ITblMgr{
 		}
 		return R;
 	}
+
+	public nil AddAgg(IAggReg Reg){
+		AggType_Reg[Reg.AggType] = Reg;
+		return NIL;
+	}
+
+	public IAggReg GetAgg(Type AggType){
+		if(!AggType_Reg.TryGetValue(AggType, out var R)){
+			throw new Exception($"GetAgg() Failed. {AggType} is not registered.");
+		}
+		return R;
+	}
+
+	public IAggReg GetAgg<TAgg>(){
+		return GetAgg(typeof(TAgg));
+	}
 }
 
 public static class ExtnITblMgr{
 	extension(ITblMgr z){
 		public nil AddTbl<T>(ITblSetter<T> TblSetter){
 			return z.AddTbl(TblSetter.Tbl);
+		}
+
+		public nil AddAgg<TAgg, TRoot, TRootId>(AggReg<TAgg, TRoot, TRootId> Reg)
+			where TRoot: class, new()
+		{
+			return z.AddAgg(Reg);
 		}
 	}
 }

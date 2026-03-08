@@ -8,6 +8,8 @@ using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 #TParams([Entity type],[Entity ID type])
 ")]
 public partial interface IRepo<TEntity, TId>{
+	
+	
 
 	public Task<Func<
 		IEnumerable<TEntity>
@@ -208,7 +210,8 @@ public partial interface IRepo<TEntity, TId>{
 		[],
 		[logical Forein Key],
 		[Options],
-		[All Keys. we use `IN` inside to avoid N+1 Query],
+		[All Keys. we use `IN` inside to avoid N+1 Query
+		null will be filtered off by code before being sent to db],
 		[main entity member selector],
 		[Table],
 		[],
@@ -219,7 +222,7 @@ public partial interface IRepo<TEntity, TId>{
 		IDbFnCtx Ctx
 		,str CodeCol
 		,OptQry? OptQry
-		,IEnumerable<TKey> Keys
+		,IEnumerable<TKey?> Keys
 		,Func<TPo, TKey> FnMemb
 		,ITable Tbl
 		,CT Ct
