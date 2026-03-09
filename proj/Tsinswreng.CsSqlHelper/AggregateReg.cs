@@ -33,36 +33,43 @@ public enum EAggRelKind {
 Context for building/assembling aggregates during data retrieval.
 ]
 #Descr[
-Acts as a temporary cache that holds related entities grouped by type and key, enabling the assembly phase to fetch pre-loaded related data.
-Example: When loading a Word aggregate with its Props and Learn records, the context stores lists of Props and Learn records keyed by WordId, so the FnAssemble function can retrieve them without additional queries.
+Acts as a temporary cache that holds related entities grouped by type and key,
+enabling the assembly phase to fetch pre-loaded related data.
+Example: When loading a Word aggregate with its Props and Learn records,
+the context stores lists of Props and Learn records keyed by WordId,
+so the FnAssemble function can retrieve them without additional queries.
 ]
 """)]
-public partial interface IAggBuildCtx {
+public partial interface IAggQryCtx {
 	[Doc(@"""
 #Sum[Add a related entity to the context under its type and key]
-#Params([The CLR type of the entity (e.g., typeof(PoWordProp))],[The grouping key (e.g., WordId value)],[The entity instance to add])
+#Params(
+	[The CLR type of the entity (not root entity) , e.g., typeof(PoWordProp) ],
+	[The grouping key e.g., WordId value],
+	[The entity instance to add],
+)
 """)]
-	public nil Add(Type EntityType, object Key, object Entity);
+	public nil Add(Type SubEntityType, obj Key, obj SubEntity);
 
 	[Doc(@"""
 #Sum[Retrieve all related entities of a given type and key]
 #Rtn[A list of entities matching the type and key; empty list if not found]
 """)]
-	public IList<object> GetMany(Type EntityType, object Key);
+	public IList<obj> GetMany(Type EntityType, obj Key);
 
 	[Doc(@"""
 #Sum[Retrieve the first related entity of a given type and key]
 #Rtn[The first entity, or null if not found]
 """)]
-	public object? GetOne(Type EntityType, object Key);
+	public obj? GetOne(Type EntityType, obj Key);
 }
 
 [Doc(@"""
 #Sum[Default implementation of IAggBuildCtx that stores entities in nested dictionaries.]
 #Descr[The structure is: Dictionary[EntityType] -> Dictionary[Key] -> List[Entities]]
 """)]
-public partial class AggBuildCtx
-	: IAggBuildCtx {
+public partial class AggQryCtx
+	: IAggQryCtx {
 	[Doc(@"""
 #Sum[Three-level storage structure for aggregated entities.]
 #Descr[
@@ -71,12 +78,12 @@ Level 2: Key value (e.g., WordId: 123)
 Level 3: List of all entities matching that type and key
 ]
 """)]
-	public IDictionary<Type, IDictionary<object, IList<object>>> EntityType_Key_Items { get; set; }
-		= new Dictionary<Type, IDictionary<object, IList<object>>>();
+	public IDictionary<Type, IDictionary<obj, IList<obj>>> EntityType_Key_Items { get; set; }
+		= new Dictionary<Type, IDictionary<obj, IList<obj>>>();
 
-	public nil Add(Type EntityType, object Key, object Entity) {
+	public nil Add(Type EntityType, obj Key, obj Entity) {
 		if (!EntityType_Key_Items.TryGetValue(EntityType, out var key_Items)) {
-			key_Items = new Dictionary<object, IList<object>>();
+			key_Items = new Dictionary<obj, IList<obj>>();
 			EntityType_Key_Items[EntityType] = key_Items;
 		}
 		if (!key_Items.TryGetValue(Key, out var items)) {
@@ -87,7 +94,7 @@ Level 3: List of all entities matching that type and key
 		return NIL;
 	}
 
-	public IList<object> GetMany(Type EntityType, object Key) {
+	public IList<obj> GetMany(Type EntityType, obj Key) {
 		if (!EntityType_Key_Items.TryGetValue(EntityType, out var key_Items)) {
 			return [];
 		}
@@ -97,7 +104,7 @@ Level 3: List of all entities matching that type and key
 		return items;
 	}
 
-	public object? GetOne(Type EntityType, object Key) {
+	public obj? GetOne(Type EntityType, obj Key) {
 		return GetMany(EntityType, Key).FirstOrDefault();
 	}
 }
@@ -107,10 +114,10 @@ Level 3: List of all entities matching that type and key
 #Descr[These provide generic versions of GetMany and GetOne. Example: Instead of ctx.GetOne(typeof(User), userId) and casting, use ctx.GetOne<User, IdUser>(userId) for type safety.]
 """)]
 public static partial class ExtnAggBuildCtx {
-	extension(IAggBuildCtx z) {
+	extension(IAggQryCtx z) {
 		[Doc(@"""
 	#Sum[Retrieve all related entities of type TPo with key TKey.]
-	#TParams([The persistent object type to retrieve],[The key type used for grouping])
+	#TParams([The persistent obj type to retrieve],[The key type used for grouping])
 	#Params([The key value to lookup (e.g., WordId: 123)])
 	#Rtn[List of TPo instances; empty if not found. Never null.]
 	""")]
@@ -121,7 +128,7 @@ public static partial class ExtnAggBuildCtx {
 
 		[Doc(@"""
 	#Sum[Retrieve the first related entity of type TPo with key TKey. Useful for one-to-one relationships.]
-	#TParams([The persistent object type to retrieve],[The key type used for grouping])
+	#TParams([The persistent obj type to retrieve],[The key type used for grouping])
 	#Params([The key value to lookup])
 	#Rtn[The first TPo instance or null if not found]
 	""")]
@@ -147,7 +154,7 @@ public partial interface IAggIncludeReg {
 #Sum[The column name in the related table used as the join key.]
 #Descr[Example: "WordId" in the WordProp table]
 """)]
-	public str CodeCol { get; }
+	public str FKeyCodeCol { get; }
 
 	[Doc(@"#Sum[The table definition for the related entity type]")]
 	public ITable Tbl { get; }
@@ -159,13 +166,21 @@ public partial interface IAggIncludeReg {
 #Sum[Function that extracts the join key from a root entity.]
 #Descr[Used to determine which related entities belong to a given root. Example: For WordProp items, this extracts the WordId from a Word root entity.]
 """)]
-	public Func<object, object?> FnMembObj { get; }
+	public Func<obj, obj?> FnFKeyToRootIdObj { get; }
 }
 
 [Doc("""
-#Sum[Strongly-typed registration of a single related entity set in an aggregate.]
-#Descr[Stores configuration for loading related entities of type TPo, grouped by key TKey from a root entity. Example: In a Word aggregate: new AggIncludeReg<PoWordProp, IdWord>(Tbl_Prop, "WordId", EAggRelKind.OneToMany, x => x.WordId)]
-#TParams([The type of related entities (e.g., PoWordProp)],[The key type used to group related entities (e.g., IdWord)])
+#Sum[Strongly-typed registration of a single *related entity*(not root entity) set in an aggregate.]
+#Descr[Stores configuration for loading related entities of type TPo,
+grouped by key TKey from a root entity.
+Example: In a Word aggregate:
+
+new AggIncludeReg<PoWordProp, IdWord>(Tbl_Prop, "WordId", EAggRelKind.OneToMany, x => x.WordId)]
+
+#TParams(
+	[The type of related entities (e.g., PoWordProp)],
+	[The key type used to group related entities (e.g., IdWord)]
+)
 """)]
 public partial class AggIncludeReg<TPo, TKey>
 	: IAggIncludeReg
@@ -173,7 +188,7 @@ public partial class AggIncludeReg<TPo, TKey>
 	public Type EntityType => typeof(TPo);
 
 	[Doc(@"#Sum[The column name in this entity's table used for joining to the root]")]
-	public str CodeCol { get; set; }
+	public str FKeyCodeCol { get; set; }
 
 	[Doc(@"#Sum[The table definition containing entities of type TPo]")]
 	public ITable Tbl { get; set; }
@@ -185,10 +200,10 @@ public partial class AggIncludeReg<TPo, TKey>
 #Sum[Strongly-typed function to extract the join key from a TPo instance.]
 #Descr[Example: x => x.WordId]
 """)]
-	public Func<TPo, TKey> FnMemb { get; set; }
+	public Func<TPo, TKey> FnFKeyToRootId { get; set; }
 
 	[Doc(@"#Sum[Object-typed wrapper of FnMemb for runtime use]")]
-	public Func<object, object?> FnMembObj => x => FnMemb((TPo)x);
+	public Func<obj, obj?> FnFKeyToRootIdObj => x => FnFKeyToRootId((TPo)x);
 
 	[Doc("""
 #Sum[Create a new strongly-typed include registration.]
@@ -196,14 +211,14 @@ public partial class AggIncludeReg<TPo, TKey>
 """)]
 	public AggIncludeReg(
 		ITable<TPo> Tbl
-		, str CodeCol
+		, str FKeyCodeCol
 		, EAggRelKind RelKind
-		, Func<TPo, TKey> FnMemb
+		, Func<TPo, TKey> FnFKeyToRootId
 	) {
 		this.Tbl = Tbl;
-		this.CodeCol = CodeCol;
+		this.FKeyCodeCol = FKeyCodeCol;
 		this.RelKind = RelKind;
-		this.FnMemb = FnMemb;
+		this.FnFKeyToRootId = FnFKeyToRootId;
 	}
 }
 
@@ -212,40 +227,56 @@ public partial class AggIncludeReg<TPo, TKey>
 #Descr[An aggregate is a graph of related entities centered around a root entity. Example: A JnWord aggregate consists of: - Root: PoWord (the main entity) - Includes: PoWordProp and PoWordLearn (loaded separately and attached to the root) - Assembly: Creates a JnWord(root, props, learns) from the root and loaded related entities. The registration system works in 2 phases: 1. LOAD: Load root entities by their IDs, then load all related entities 2. ASSEMBLE: For each root, invoke FnAssemble with the root and a context containing pre-loaded related entities]
 """)]
 public partial interface IAggReg {
-	[Doc(@"#Sum[The aggregate type being registered (e.g., typeof(JnWord))]")]
+	[Doc(@"#Sum[The aggregate type being registered e.g., typeof(JnWord)]")]
 	public Type AggType { get; }
 
-	[Doc(@"#Sum[The type of the root entity (e.g., typeof(PoWord))]")]
+	[Doc(@"#Sum[The type of the root entity e.g., typeof(PoWord)]")]
 	public Type RootEntityType { get; }
 
-	[Doc(@"#Sum[The type of the root entity's ID (e.g., typeof(IdWord))]")]
+	[Doc(@"#Sum[The type of the root entity's ID e.g., typeof(IdWord)]")]
 	public Type RootIdType { get; }
 
-	[Doc(@"#Sum[The table definition for root entities]")]
+	[Doc(@"#Sum[The table definition for root entities, e.g ITable<PoWord>]")]
 	public ITable RootTbl { get; }
 
 	[Doc(@"""
-#Sum[Function that extracts the ID from a root entity object.]
-#Descr[Example: x => x.Id where x is a PoWord]
+#Sum[Function that extracts the ID from a root entity obj.]
+#Examples([
+fn(PoUser) returns PoUser.Id
+])
 """)]
-	public Func<object, object?> FnRootIdObj { get; }
+	public Func<obj, obj?> FnGetIdFromRootObj { get; }
 
 	[Doc(@"""
 #Sum[Function that assembles a complete aggregate from a root and pre-loaded related entities.]
-#Descr[The context parameter contains all related entities grouped by type and key. Example: (root, ctx) => new JnWord(root, ctx.GetMany<PoWordProp, IdWord>(root.Id), ...)]
+#Descr[
+	The context parameter contains all related entities grouped by type and key.
+	Example:
+```cs
+(root, ctx) => new JnWord(
+	root, ctx.GetMany<PoWordProp, IdWord>(root.Id), ...
+)
+```
+]
 """)]
-	public Func<object, IAggBuildCtx, object> FnAssembleObj { get; }
+	public Func<obj, IAggQryCtx, obj> FnAssembleAggObj { get; }
 
 	[Doc(@"""
 #Sum[List of all included related entity sets.]
 #Descr[Each entry describes a one-to-many or one-to-one relationship.]
 """)]
-	public IReadOnlyList<IAggIncludeReg> Includes { get; }
+	public IList<IAggIncludeReg> Includes { get; }
 }
 
 [Doc("""
 #Sum[Strongly-typed registration of a complete aggregate.]
-#Descr[Defines how to load and assemble a TAgg aggregate from its TRoot root entity and related entities identified by TRootId. Example: var agg = AggReg<JnWord, PoWord, IdWord>.Mk(Tbl_Word.Tbl, x => x.Id, (root, ctx) => new JnWord(root, ctx.GetMany<PoWordProp, IdWord>(root.Id), ctx.GetMany<PoWordLearn, IdWord>(root.Id))).AddOneToMany(Tbl_Prop.Tbl, "WordId", x => x.WordId).AddOneToMany(Tbl_Learn.Tbl, "WordId", x => x.WordId); When BatSlctAggById is called with Word IDs: 1. Loads PoWord rows for each ID 2. Loads all PoWordProp rows where WordId matches 3. Loads all PoWordLearn rows where WordId matches 4. For each root PoWord, calls FnAssemble with the root and a context containing the matched related entities 5. Returns the assembled JnWord aggregates]
+#Descr[Defines how to load and assemble a TAgg aggregate from its TRoot root entity
+and related entities identified by TRootId.
+Example:
+var agg = AggReg<JnWord, PoWord, IdWord>.Mk(
+	Tbl_Word.Tbl
+	,x => x.Id
+	,(root, ctx) => new JnWord(root, ctx.GetMany<PoWordProp, IdWord>(root.Id), ctx.GetMany<PoWordLearn, IdWord>(root.Id))).AddOneToMany(Tbl_Prop.Tbl, "WordId", x => x.WordId).AddOneToMany(Tbl_Learn.Tbl, "WordId", x => x.WordId); When BatSlctAggById is called with Word IDs: 1. Loads PoWord rows for each ID 2. Loads all PoWordProp rows where WordId matches 3. Loads all PoWordLearn rows where WordId matches 4. For each root PoWord, calls FnAssemble with the root and a context containing the matched related entities 5. Returns the assembled JnWord aggregates]
 #TParams([The aggregate root type (e.g., JnWord)],[The persistent root entity type (e.g., PoWord)],[The ID type of the root entity (e.g., IdWord)])
 """)]
 public partial class AggReg<TAgg, TRoot, TRootId>
@@ -259,39 +290,53 @@ public partial class AggReg<TAgg, TRoot, TRootId>
 	public ITable RootTbl { get; set; }
 
 	[Doc(@"#Sum[Strongly-typed function to extract the ID from a root entity]")]
-	public Func<TRoot, TRootId> FnRootId { get; set; }
+	public Func<TRoot, TRootId> FnGetIdFromRoot { get; set; }
 
 	[Doc(@"#Sum[Object-typed wrapper of FnRootId]")]
-	public Func<object, object?> FnRootIdObj => x => FnRootId((TRoot)x);
+	public Func<obj, obj?> FnGetIdFromRootObj => x => FnGetIdFromRoot((TRoot)x);
 
 	[Doc(@"""
 #Sum[Strongly-typed function that assembles the complete aggregate.]
 #Descr[Parameters: - TRoot: The root entity instance - IAggBuildCtx: Context containing pre-loaded related entities Returns: The assembled TAgg instance Example: (root, ctx) => new JnWord(root, ctx.GetMany<PoWordProp, IdWord>(root.Id), ...)]
 """)]
-	public Func<TRoot, IAggBuildCtx, TAgg> FnAssemble { get; set; }
+	public Func<TRoot, IAggQryCtx, TAgg> FnAssembleAgg { get; set; }
 
 	[Doc(@"#Sum[Object-typed wrapper of FnAssemble]")]
-	public Func<object, IAggBuildCtx, object> FnAssembleObj => (root, ctx) => FnAssemble((TRoot)root, ctx)!;
+	public Func<obj, IAggQryCtx, obj> FnAssembleAggObj => (root, ctx) => FnAssembleAgg((TRoot)root, ctx)!;
 
 	[Doc(@"#Sum[List of included related entity sets (stored as mutable list internally)]")]
 	public IList<IAggIncludeReg> _Includes { get; set; } = [];
 
 	[Doc(@"#Sum[Read-only list of included related entity sets]")]
-	public IReadOnlyList<IAggIncludeReg> Includes => _Includes.AsReadOnly();
+	public IList<IAggIncludeReg> Includes => _Includes;//原潙 _Includes.AsReadOnly();
 
 	[Doc(@"""
 #Sum[Create a new aggregate registration.]
-#Descr[Example: new AggReg<JnWord, PoWord, IdWord>(Tbl_Word.Tbl, x => x.Id, (root, ctx) => new JnWord(root, ctx.GetMany<PoWordProp, IdWord>(root.Id), ...))]
-#Params([The table containing root entities],[Function to extract the ID from a root entity],[Function to assemble the aggregate from root and context])
+#Examples([
+```cs
+new AggReg<JnWord, PoWord, IdWord>(
+	Tbl_Word.Tbl, x => x.Id
+	,(root, ctx) => new JnWord(
+		root, ctx.GetMany<PoWordProp, IdWord>(root.Id)
+		,...
+	)
+)
+```
+])
+#Params(
+	[The table containing root entities],
+	[Function to extract the ID from a root entity],
+	[Function to assemble the aggregate from root and context],
+)
 """)]
 	public AggReg(
 		ITable<TRoot> RootTbl
-		, Func<TRoot, TRootId> FnRootId
-		, Func<TRoot, IAggBuildCtx, TAgg> FnAssemble
+		, Func<TRoot, TRootId> FnGetIdFromRoot
+		, Func<TRoot, IAggQryCtx, TAgg> FnAssembleAgg
 	) {
 		this.RootTbl = RootTbl;
-		this.FnRootId = FnRootId;
-		this.FnAssemble = FnAssemble;
+		this.FnGetIdFromRoot = FnGetIdFromRoot;
+		this.FnAssembleAgg = FnAssembleAgg;
 	}
 
 	[Doc(@"""
@@ -301,7 +346,7 @@ public partial class AggReg<TAgg, TRoot, TRootId>
 	public static AggReg<TAgg, TRoot, TRootId> Mk(
 		ITable<TRoot> RootTbl
 		, Func<TRoot, TRootId> FnRootId
-		, Func<TRoot, IAggBuildCtx, TAgg> FnAssemble
+		, Func<TRoot, IAggQryCtx, TAgg> FnAssemble
 	) {
 		return new AggReg<TAgg, TRoot, TRootId>(RootTbl, FnRootId, FnAssemble);
 	}
@@ -312,44 +357,40 @@ public partial class AggReg<TAgg, TRoot, TRootId>
 #Params([The table containing related entities],[The column name to join on (e.g., "WordId")],[The relationship kind (OneToOne or OneToMany)],[Function to extract the join key from a related entity])
 #Rtn[This registration for method chaining]
 """)]
-	public AggReg<TAgg, TRoot, TRootId> AddInclude<TPo, TKey>(
-		ITable<TPo> Tbl
-		, str CodeCol
+	public AggReg<TAgg, TRoot, TRootId> AddInclude<TSubPo, TSubKey>(
+		ITable<TSubPo> SubTbl
+		, str SubCodeCol
 		, EAggRelKind RelKind
-		, Func<TPo, TKey> FnMemb
+		, Func<TSubPo, TSubKey> FnGetSubFKeyToRoot
 	)
-		where TPo : new() {
-		_Includes.Add(new AggIncludeReg<TPo, TKey>(Tbl, CodeCol, RelKind, FnMemb));
+		where TSubPo : new() {
+		_Includes.Add(new AggIncludeReg<TSubPo, TSubKey>(SubTbl, SubCodeCol, RelKind, FnGetSubFKeyToRoot));
 		return this;
 	}
 
 	[Doc("""
-#Sum[Add a one-to-one related entity set to this aggregate. Each root entity will have at most one related entity of this type.]
-#Descr[Example: Adding a single User for each Account .AddOneToOne(Tbl_User.Tbl, "AccountId", x => x.AccountId)]
-#Params([The table containing related entities],[The join column name],[Function to extract the join key from a related entity])
-#Rtn[This registration for method chaining]
+return AddInclude(Tbl, CodeCol, EAggRelKind.OneToOne, FnMemb);
 """)]
 	public AggReg<TAgg, TRoot, TRootId> AddOneToOne<TPo, TKey>(
 		ITable<TPo> Tbl
 		, str CodeCol
 		, Func<TPo, TKey> FnMemb
 	)
-		where TPo : new() {
+		where TPo : new()
+	{
 		return AddInclude(Tbl, CodeCol, EAggRelKind.OneToOne, FnMemb);
 	}
 
 	[Doc("""
-#Sum[Add a one-to-many related entity set to this aggregate. Each root entity can have zero or more related entities of this type.]
-#Descr[Example: Adding multiple properties and learning records to a Word .AddOneToMany(Tbl_Prop.Tbl, "WordId", x => x.WordId) .AddOneToMany(Tbl_Learn.Tbl, "WordId", x => x.WordId)]
-#Params([The table containing related entities],[The join column name],[Function to extract the join key from a related entity])
-#Rtn[This registration for method chaining]
+return AddInclude(Tbl, CodeCol, EAggRelKind.OneToMany, FnMemb);
 """)]
 	public AggReg<TAgg, TRoot, TRootId> AddOneToMany<TPo, TKey>(
 		ITable<TPo> Tbl
 		, str CodeCol
 		, Func<TPo, TKey> FnMemb
 	)
-		where TPo : new() {
+		where TPo : new()
+	{
 		return AddInclude(Tbl, CodeCol, EAggRelKind.OneToMany, FnMemb);
 	}
 }

@@ -434,7 +434,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 			if(root is null){
 				continue;
 			}
-			var keyObj = aggReg.FnRootIdObj(root);
+			var keyObj = aggReg.FnGetIdFromRootObj(root);
 			if(keyObj is null){
 				continue;
 			}
@@ -445,11 +445,11 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 			rootIds.Add(key);
 		}
 
-		var buildCtx = new AggBuildCtx();
+		var buildCtx = new AggQryCtx();
 		if(rootIds.Count > 0){
 			var optQry = new OptQry{ InParamCnt = (u64)rootIds.Count };
 			foreach(var include in aggReg.Includes){
-				var slctByIn = await FnScltAllByColInVals<TId>(Ctx, include.Tbl, include.CodeCol, optQry, Ct);
+				var slctByIn = await FnScltAllByColInVals<TId>(Ctx, include.Tbl, include.FKeyCodeCol, optQry, Ct);
 				var dbAsy = await slctByIn(rootIds, Ct);
 				await foreach(var dbDict in dbAsy.WithCancellation(Ct)){
 					var codeDict = include.Tbl.ToCodeDict(dbDict);
@@ -458,7 +458,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 						throw new Exception($"Create include entity failed. Type={include.EntityType}");
 					}
 					include.Tbl.DictMapper.AssignShallow(include.EntityType, entity, codeDict);
-					var keyObj = include.FnMembObj(entity);
+					var keyObj = include.FnFKeyToRootIdObj(entity);
 					if(keyObj is null){
 						continue;
 					}
@@ -478,7 +478,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 					yield return null;
 					continue;
 				}
-				var agg = (TAgg)aggReg.FnAssembleObj(root, buildCtx);
+				var agg = (TAgg)aggReg.FnAssembleAggObj(root, buildCtx);
 				yield return agg;
 			}
 		}
