@@ -4,6 +4,8 @@ namespace Tsinswreng.CsSqlHelper;
 
 //TODO配置忽略之字段
 public partial interface ITblMgr{
+	/// (ITable is ITable<Type>) should be true at runtime,
+	/// which means you should register with ITable<> instead of ITable
 	public IDictionary<Type, ITable> EntityType_Tbl{get;set;}
 	public IDictionary<Type, IAggReg> AggType_Reg{get;set;}
 	public EDbSrcType DbSrcType=>DbStuff.DbSrcType;
@@ -46,14 +48,6 @@ public partial interface ITblMgr{
 
 public static class ExtnITblMgr{
 	extension(ITblMgr z){
-		public nil AddTbl<T>(ITblSetter<T> TblSetter){
-			return z.AddTbl(TblSetter.Tbl);
-		}
-
-		public nil AddAgg<TAgg, TRoot, TRootId>(AggReg<TAgg, TRoot, TRootId> Reg)
-			where TRoot: class, new()
-		{
-			return z.AddAgg(Reg);
-		}
+	
 	}
 }
