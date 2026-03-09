@@ -45,9 +45,3 @@ public partial interface ITblMgr{
 		return GetAgg(typeof(TAgg));
 	}
 }
-
-public static class ExtnITblMgr{
-	extension(ITblMgr z){
-	
-	}
-}
