@@ -417,7 +417,6 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 	)
 		where TAgg: class
 	{
-		var ids = Ids.ToList();
 		var aggReg = TblMgr.GetAgg<TAgg>();
 		if(aggReg.RootEntityType != typeof(TEntity)){
 			throw new Exception($"Agg root type mismatch. Agg={typeof(TAgg)}, ExpectedRoot={typeof(TEntity)}, RegisteredRoot={aggReg.RootEntityType}");
@@ -426,64 +425,93 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 			throw new Exception($"Agg root id type mismatch. Agg={typeof(TAgg)}, ExpectedId={typeof(TId)}, RegisteredId={aggReg.RootIdType}");
 		}
 
-		var rootsAsy = await SlctManyInIdsWithDel(Ctx, ids, Ct);
-		var roots = await rootsAsy.ToListAsync(Ct);
-		var rootById = new Dictionary<object, TEntity>();
-		var rootIds = new List<TId>();
-		foreach(var root in roots){
-			if(root is null){
-				continue;
-			}
-			var keyObj = aggReg.FnGetIdFromRootObj(root);
-			if(keyObj is null){
-				continue;
-			}
-			if(keyObj is not TId key){
-				throw new Exception($"Agg root key type mismatch. Agg={typeof(TAgg)}, Root={typeof(TEntity)}, Key={keyObj.GetType()}, ExpectedKey={typeof(TId)}");
-			}
-			rootById[key] = root;
-			rootIds.Add(key);
-		}
+		u64 InBatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
 
-		var buildCtx = new AggQryCtx();
-		if(rootIds.Count > 0){
-			var optQry = new OptQry{ InParamCnt = (u64)rootIds.Count };
-			foreach(var include in aggReg.Includes){
-				var slctByIn = await FnScltAllByColInVals<TId>(Ctx, include.Tbl, include.FKeyCodeCol, optQry, Ct);
-				var dbAsy = await slctByIn(rootIds, Ct);
-				await foreach(var dbDict in dbAsy.WithCancellation(Ct)){
-					var codeDict = include.Tbl.ToCodeDict(dbDict);
-					var entity = Activator.CreateInstance(include.EntityType);
-					if(entity is null){
-						throw new Exception($"Create include entity failed. Type={include.EntityType}");
+		async Task<IList<TAgg?>> HandleOneBatch(IList<TId> OrderedBatchIds, CT Ct){
+			var rootsAsy = await SlctManyInIdsWithDel(Ctx, OrderedBatchIds, Ct);
+			var rootById = new Dictionary<object, TEntity>();
+			var rootIdSet = new HashSet<TId>();
+			await foreach(var root in rootsAsy.WithCancellation(Ct)){
+				if(root is null){
+					continue;
+				}
+				var keyObj = aggReg.FnGetIdFromRootObj(root);
+				if(keyObj is null){
+					continue;
+				}
+				if(keyObj is not TId key){
+					throw new Exception($"Agg root key type mismatch. Agg={typeof(TAgg)}, Root={typeof(TEntity)}, Key={keyObj.GetType()}, ExpectedKey={typeof(TId)}");
+				}
+				rootById[key] = root;
+				rootIdSet.Add(key);
+			}
+
+			var buildCtx = new AggQryCtx();
+			if(rootIdSet.Count > 0){
+				var rootIds = rootIdSet.ToList();
+				var optQry = new OptQry{ InParamCnt = (u64)rootIds.Count };
+				foreach(var include in aggReg.Includes){
+					var slctByIn = await FnScltAllByColInVals<TId>(Ctx, include.Tbl, include.FKeyCodeCol, optQry, Ct);
+					var dbAsy = await slctByIn(rootIds, Ct);
+					await foreach(var dbDict in dbAsy.WithCancellation(Ct)){
+						var codeDict = include.Tbl.ToCodeDict(dbDict);
+						var entity = include.FnNewEntityObj();
+						include.Tbl.DictMapper.AssignShallow(include.EntityType, entity, codeDict);
+						var keyObj = include.FnFKeyToRootIdObj(entity);
+						if(keyObj is null){
+							continue;
+						}
+						if(include.RelKind == EAggRelKind.OneToOne
+							&& buildCtx.GetOne(include.EntityType, keyObj) is not null
+						){
+							throw new Exception($"OneToOne include got duplicate rows. Agg={typeof(TAgg)}, Include={include.EntityType}, Key={keyObj}");
+						}
+						buildCtx.Add(include.EntityType, keyObj, entity);
 					}
-					include.Tbl.DictMapper.AssignShallow(include.EntityType, entity, codeDict);
-					var keyObj = include.FnFKeyToRootIdObj(entity);
-					if(keyObj is null){
-						continue;
-					}
-					if(include.RelKind == EAggRelKind.OneToOne
-						&& buildCtx.GetOne(include.EntityType, keyObj) is not null
-					){
-						throw new Exception($"OneToOne include got duplicate rows. Agg={typeof(TAgg)}, Include={include.EntityType}, Key={keyObj}");
-					}
-					buildCtx.Add(include.EntityType, keyObj, entity);
 				}
 			}
-		}
 
-		async IAsyncEnumerable<TAgg?> fn(IEnumerable<TId> orderedIds){
-			foreach(var id in orderedIds){
+			var ans = new List<TAgg?>(OrderedBatchIds.Count);
+			foreach(var id in OrderedBatchIds){
 				if(!rootById.TryGetValue(id!, out var root)){
-					yield return null;
+					ans.Add(null);
 					continue;
 				}
 				var agg = (TAgg)aggReg.FnAssembleAggObj(root, buildCtx);
-				yield return agg;
+				ans.Add(agg);
+			}
+			return ans;
+		}
+
+		async IAsyncEnumerable<TAgg?> Fn(IAsyncEnumerable<TAgg?> Src){
+			await foreach(var item in Src.WithCancellation(Ct)){
+				yield return item;
 			}
 		}
 
-		return fn(ids);
+		async IAsyncEnumerable<TAgg?> Run(){
+			var batchIds = new List<TId>((i32)InBatchSize);
+			foreach(var id in Ids){
+				batchIds.Add(id);
+				if((u64)batchIds.Count < InBatchSize){
+					continue;
+				}
+				var batchAns = await HandleOneBatch(batchIds, Ct);
+				foreach(var item in batchAns){
+					yield return item;
+				}
+				batchIds = new List<TId>((i32)InBatchSize);
+			}
+
+			if(batchIds.Count > 0){
+				var batchAns = await HandleOneBatch(batchIds, Ct);
+				foreach(var item in batchAns){
+					yield return item;
+				}
+			}
+		}
+
+		return Fn(Run());
 	}
 
 

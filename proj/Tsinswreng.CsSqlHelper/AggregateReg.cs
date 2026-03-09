@@ -150,6 +150,9 @@ public partial interface IAggIncludeReg {
 	[Doc(@"#Sum[The CLR type of the related entity (e.g., typeof(PoWordProp))]")]
 	public Type EntityType { get; }
 
+	[Doc(@"#Sum[AOT-safe factory function to create related entity instances]")]
+	public Func<obj> FnNewEntityObj { get; }
+
 	[Doc("""
 #Sum[The column name in the related table used as the join key.]
 #Descr[Example: "WordId" in the WordProp table]
@@ -186,6 +189,8 @@ public partial class AggIncludeReg<TPo, TKey>
 	: IAggIncludeReg
 	where TPo : new() {
 	public Type EntityType => typeof(TPo);
+
+	public Func<obj> FnNewEntityObj => () => new TPo()!;
 
 	[Doc(@"#Sum[The column name in this entity's table used for joining to the root]")]
 	public str FKeyCodeCol { get; set; }
