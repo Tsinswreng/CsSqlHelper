@@ -425,7 +425,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 			throw new Exception($"Agg root id type mismatch. Agg={typeof(TAgg)}, ExpectedId={typeof(TId)}, RegisteredId={aggReg.RootIdType}");
 		}
 
-		u64 InBatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
+		u64 InBatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 50ul : 500ul;
 
 		async Task<IList<TAgg?>> HandleOneBatch(IList<TId> OrderedBatchIds, CT Ct){
 			var rootsAsy = await SlctManyInIdsWithDel(Ctx, OrderedBatchIds, Ct);
@@ -446,7 +446,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 				rootIdSet.Add(key);
 			}
 
-			var buildCtx = new AggQryCtx();
+			var qryCtx = new AggQryCtx();
 			if(rootIdSet.Count > 0){
 				var rootIds = rootIdSet.ToList();
 				var optQry = new OptQry{ InParamCnt = (u64)rootIds.Count };
@@ -462,11 +462,11 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 							continue;
 						}
 						if(include.RelKind == EAggRelKind.OneToOne
-							&& buildCtx.GetOne(include.EntityType, keyObj) is not null
+							&& qryCtx.GetOne(include.EntityType, keyObj) is not null
 						){
 							throw new Exception($"OneToOne include got duplicate rows. Agg={typeof(TAgg)}, Include={include.EntityType}, Key={keyObj}");
 						}
-						buildCtx.Add(include.EntityType, keyObj, entity);
+						qryCtx.Add(include.EntityType, keyObj, entity);
 					}
 				}
 			}
@@ -477,7 +477,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 					ans.Add(null);
 					continue;
 				}
-				var agg = (TAgg)aggReg.FnAssembleAggObj(root, buildCtx);
+				var agg = (TAgg)aggReg.FnAssembleAggObj(root, qryCtx);
 				ans.Add(agg);
 			}
 			return ans;
