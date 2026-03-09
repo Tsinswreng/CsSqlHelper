@@ -113,7 +113,7 @@ Level 3: List of all entities matching that type and key
 #Sum[Strongly-typed extension methods for IAggBuildCtx that avoid boxing/unboxing.]
 #Descr[These provide generic versions of GetMany and GetOne. Example: Instead of ctx.GetOne(typeof(User), userId) and casting, use ctx.GetOne<User, IdUser>(userId) for type safety.]
 """)]
-public static partial class ExtnAggBuildCtx {
+public static partial class ExtnAggQryCtx {
 	extension(IAggQryCtx z) {
 		[Doc(@"""
 	#Sum[Retrieve all related entities of type TPo with key TKey.]
@@ -143,7 +143,7 @@ public static partial class ExtnAggBuildCtx {
 }
 
 [Doc(@"""
-#Sum[Metadata about a single related entity set in an aggregate.]
+#Sum[Metadata about a single *related entity* (not Root Entity) set in an aggregate.]
 #Descr[Stores information about how to load and retrieve related entities of a specific type. Example: An aggregate may have multiple includes: - PoWordProp items joined on WordId (OneToMany) - PoWordLearn items joined on WordId (OneToMany) - PoWordMeaning item joined on WordId (OneToOne)]
 """)]
 public partial interface IAggIncludeReg {
