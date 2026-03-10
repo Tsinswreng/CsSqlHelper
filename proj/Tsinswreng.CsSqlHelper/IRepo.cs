@@ -73,13 +73,41 @@ public partial interface IRepo<TEntity, TId>{
 	)where TPo: new();
 	
 	
-	public Task<IRespBatInsert> BatInsert(IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct);
+	public Task<IRespBatInsert> BatInsert(
+		IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct
+	);
 	
-	public Task<IRespBatUpd> BatUpdById(IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct);
+	public Task<IRespBatUpd> BatUpdById(
+		IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct
+	);
 	
-	public Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct);
+	[Doc(@$"
+	#Params(
+		[],
+		[Dicts, Db Col Map to Raw Value],
+		[Ids, its count must equal to Dicts count],
+		[],
+	)
+	#Examples([
+	```cs
 	
-	public Task<IBatHardDel> BatHardDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct);
+	```
+	])
+	")]
+	public Task<IRespBatUpd> BatUpdByDbDictEtId(
+		IDbFnCtx Ctx
+		,IAsyncEnumerable<IStr_Any> Dicts
+		,IAsyncEnumerable<TId> Ids
+		,CT Ct
+	);
+	
+	public Task<IBatSoftDel> BatSoftDelById(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct
+	);
+	
+	public Task<IBatHardDel> BatHardDelById(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct
+	);
 
 }
 
