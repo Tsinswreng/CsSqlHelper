@@ -95,10 +95,10 @@ public partial interface IRepo<TEntity, TId>{
 	```
 	])
 	")]
-	public Task<IRespBatUpd> BatUpdByDbDictEtId(
+	public Task<IRespBatUpd> BatUpdByDbDict(
 		IDbFnCtx Ctx
-		,IAsyncEnumerable<IStr_Any> Dicts
 		,IAsyncEnumerable<TId> Ids
+		,IAsyncEnumerable<IStr_Any> Dicts
 		,CT Ct
 	);
 	
@@ -116,10 +116,10 @@ public partial interface IRepo<TEntity, TId>{
 	```
 	])
 	")]
-	public Task<IRespBatUpd> BatUpdByCodeDictEtId(
+	public Task<IRespBatUpd> BatUpdByCodeDict(
 		IDbFnCtx Ctx
-		,IAsyncEnumerable<IStr_Any> Dicts
 		,IAsyncEnumerable<TId> Ids
+		,IAsyncEnumerable<IStr_Any> Dicts
 		,CT Ct
 	);
 	

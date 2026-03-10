@@ -363,10 +363,10 @@ Func<
 		return new RespUpd();
 	}
 
-	public async Task<IRespBatUpd> BatUpdByDbDictEtId(
+	public async Task<IRespBatUpd> BatUpdByDbDict(
 		IDbFnCtx Ctx
-		,IAsyncEnumerable<IStr_Any> Dicts
 		,IAsyncEnumerable<TId> Ids
+		,IAsyncEnumerable<IStr_Any> Dicts
 		,CT Ct
 	){
 		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
@@ -439,14 +439,14 @@ Func<
 		return new RespUpd();
 	}
 	
-	public Task<IRespBatUpd> BatUpdByCodeDictEtId(
+	public Task<IRespBatUpd> BatUpdByCodeDict(
 		IDbFnCtx Ctx
-		,IAsyncEnumerable<IStr_Any> Dicts
 		,IAsyncEnumerable<TId> Ids
+		,IAsyncEnumerable<IStr_Any> Dicts
 		,CT Ct
 	){
 		var DbDicts = Dicts.Select(x=>T.ToDbDict(x));
-		return BatUpdByDbDictEtId(Ctx, DbDicts, Ids, Ct);
+		return BatUpdByDbDict(Ctx, DbDicts, Ids, Ct);
 	}
 
 	public async Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct){
