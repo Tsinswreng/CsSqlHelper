@@ -6,9 +6,6 @@ using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 
 
 public partial interface IRepo<TEntity, TId>{
-	
-	
-
 
 	[Doc(@$"using `Id IN (...)` Clause,
 	which would ignore unexisted Id and returned list may be unordered.

@@ -22,11 +22,8 @@ public partial class SqlRepo<
 	where TEntity: class, new()
 {
 
-
-
-
-	public async Task<IAsyncEnumerable<TEntity?>> SlctManyInIdsWithDel(
-		IDbFnCtx Ctx, IEnumerable<TId> Ids
+	public Task<IAsyncEnumerable<TEntity?>> SlctManyInIdsWithDel(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids
 		,CT Ct
 	){
 		IList<IParam> Params = [];
@@ -42,8 +39,27 @@ public partial class SqlRepo<
 				return RawDicts.Select(x=>T.DbDictToEntity(x));
 			}
 		);
-		var R = bat.AddToEnd(Ids, Ct);
-		return R.Flat();
+
+		async IAsyncEnumerable<TEntity?> Run(){
+			await using var Bat = bat;
+			await foreach(var id in Ids.WithCancellation(Ct)){
+				var oneBatch = await Bat.Add(id, Ct);
+				if(oneBatch is null){
+					continue;
+				}
+				await foreach(var item in oneBatch.WithCancellation(Ct)){
+					yield return item;
+				}
+			}
+			var tailBatch = await Bat.End(Ct);
+			if(tailBatch is not null){
+				await foreach(var item in tailBatch.WithCancellation(Ct)){
+					yield return item;
+				}
+			}
+		}
+
+		return Task.FromResult<IAsyncEnumerable<TEntity?>>(Run());
 	}
 
 	public async Task<IAsyncEnumerable<TEntity?>> SlctManyInIds(
@@ -72,8 +88,8 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 	}
 
 
-	public async Task<IAsyncEnumerable<TEntity?>> BatSlctById(
-		IDbFnCtx Ctx, IEnumerable<TId> Ids
+	public Task<IAsyncEnumerable<TEntity?>> BatSlctById(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids
 		,CT Ct
 	){
 		var PId = T.Prm(T.CodeIdName);
@@ -88,16 +104,41 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 				return RawDicts.Select(x=>T.DbDictToEntity<TEntity>(x));
 			}
 		);
-		var R = bat.AddToEnd(Ids, Ct);
-		return R.Flat();
+
+		async IAsyncEnumerable<TEntity?> Run(){
+			await using var Bat = bat;
+			await foreach(var id in Ids.WithCancellation(Ct)){
+				var oneBatch = await Bat.Add(id, Ct);
+				if(oneBatch is null){
+					continue;
+				}
+				await foreach(var item in oneBatch.WithCancellation(Ct)){
+					yield return item;
+				}
+			}
+			var tailBatch = await Bat.End(Ct);
+			if(tailBatch is not null){
+				await foreach(var item in tailBatch.WithCancellation(Ct)){
+					yield return item;
+				}
+			}
+		}
+
+		return Task.FromResult<IAsyncEnumerable<TEntity?>>(Run());
 	}
 
 	public async Task<IAsyncEnumerable<TAgg?>> BatSlctAggById<TAgg>(
-		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids
 		,CT Ct
 	)
 		where TAgg: class
 	{
+		async IAsyncEnumerable<TId> ToAsyncIds(IEnumerable<TId> Src){
+			foreach(var id in Src){
+				yield return id;
+			}
+		}
+
 		var aggReg = TblMgr.GetAgg<TAgg>();
 		if(aggReg.RootEntityType != typeof(TEntity)){
 			throw new Exception($"Agg root type mismatch. Agg={typeof(TAgg)}, ExpectedRoot={typeof(TEntity)}, RegisteredRoot={aggReg.RootEntityType}");
@@ -109,7 +150,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 		u64 InBatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 50ul : 500ul;
 
 		async Task<IList<TAgg?>> HandleOneBatch(IList<TId> OrderedBatchIds, CT Ct){
-			var rootsAsy = await SlctManyInIdsWithDel(Ctx, OrderedBatchIds, Ct);
+			var rootsAsy = await SlctManyInIdsWithDel(Ctx, ToAsyncIds(OrderedBatchIds), Ct);
 			var rootById = new Dictionary<object, TEntity>();
 			var rootIdSet = new HashSet<TId>();
 			await foreach(var root in rootsAsy.WithCancellation(Ct)){
@@ -172,7 +213,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 
 		async IAsyncEnumerable<TAgg?> Run(){
 			var batchIds = new List<TId>((i32)InBatchSize);
-			foreach(var id in Ids){
+			await foreach(var id in Ids.WithCancellation(Ct)){
 				batchIds.Add(id);
 				if((u64)batchIds.Count < InBatchSize){
 					continue;
