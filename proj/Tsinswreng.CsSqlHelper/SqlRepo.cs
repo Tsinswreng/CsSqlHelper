@@ -438,6 +438,16 @@ Func<
 
 		return new RespUpd();
 	}
+	
+	public Task<IRespBatUpd> BatUpdByCodeDictEtId(
+		IDbFnCtx Ctx
+		,IAsyncEnumerable<IStr_Any> Dicts
+		,IAsyncEnumerable<TId> Ids
+		,CT Ct
+	){
+		var DbDicts = Dicts.Select(x=>T.ToDbDict(x));
+		return BatUpdByDbDictEtId(Ctx, DbDicts, Ids, Ct);
+	}
 
 	public async Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct){
 		if(T.SoftDelCol is null){

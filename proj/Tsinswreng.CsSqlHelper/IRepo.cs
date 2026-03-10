@@ -84,7 +84,8 @@ public partial interface IRepo<TEntity, TId>{
 	[Doc(@$"
 	#Params(
 		[],
-		[Dicts, Db Col Map to Raw Value],
+		[Dicts, Db Col Map to Raw Value, support;
+		dicts with different key structure are allowed],
 		[Ids, its count must equal to Dicts count],
 		[],
 	)
@@ -95,6 +96,27 @@ public partial interface IRepo<TEntity, TId>{
 	])
 	")]
 	public Task<IRespBatUpd> BatUpdByDbDictEtId(
+		IDbFnCtx Ctx
+		,IAsyncEnumerable<IStr_Any> Dicts
+		,IAsyncEnumerable<TId> Ids
+		,CT Ct
+	);
+	
+	[Doc(@$"
+	#Params(
+		[],
+		[Dicts, Code Col(Entity Field) Map to Upper Value(Entity member), support;
+		dicts with different key structure are allowed],
+		[Ids, its count must equal to Dicts count],
+		[],
+	)
+	#Examples([
+	```cs
+	
+	```
+	])
+	")]
+	public Task<IRespBatUpd> BatUpdByCodeDictEtId(
 		IDbFnCtx Ctx
 		,IAsyncEnumerable<IStr_Any> Dicts
 		,IAsyncEnumerable<TId> Ids
