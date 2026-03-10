@@ -1,3 +1,4 @@
+//此文件中的API已廢棄
 namespace Tsinswreng.CsSqlHelper;
 
 using System.Data;

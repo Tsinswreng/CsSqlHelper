@@ -1,7 +1,9 @@
+//此文件中的API已廢棄
 namespace Tsinswreng.CsSqlHelper;
 
 using Tsinswreng.CsPage;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
+
 
 public partial interface IRepo<TEntity, TId>{
 	
@@ -69,8 +71,38 @@ public partial interface IRepo<TEntity, TId>{
 		,ITable<TPo> Tbl //帶泛型
 		,CT Ct
 	)where TPo: new();
-
-
 	
+	
+	public Task<IRespBatInsert> BatInsert(IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct);
+	
+	public Task<IRespBatUpd> BatUpdById(IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct);
+	
+	public Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct);
+	
+	public Task<IBatHardDel> BatHardDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct);
 
 }
+
+
+
+public class IRespBatInsert{
+	
+}
+
+public class RespBatInsert:IRespBatInsert{}
+
+
+public class IRespBatUpd{
+	
+}
+public class RespUpd:IRespBatUpd{
+	
+}
+
+public class IBatSoftDel{}
+
+public class BatSoftDel:IBatSoftDel{}
+
+public class IBatHardDel{}
+
+public class BatHardDel:IBatHardDel{}
