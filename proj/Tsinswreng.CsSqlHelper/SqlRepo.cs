@@ -363,6 +363,82 @@ Func<
 		return new RespUpd();
 	}
 
+	public async Task<IRespBatUpd> BatUpdByDbDictEtId(
+		IDbFnCtx Ctx
+		,IAsyncEnumerable<IStr_Any> Dicts
+		,IAsyncEnumerable<TId> Ids
+		,CT Ct
+	){
+		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
+		var CmdBySql = new Dictionary<str, ISqlCmd>();
+		var dbIdColName = T.DbCol(T.CodeIdName);
+
+		async Task<ISqlCmd> GetCmd(str Sql, CT Ct){
+			if(CmdBySql.TryGetValue(Sql, out var Got)){
+				return Got;
+			}
+			var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
+			Ctx.AddToDispose(Cmd);
+			CmdBySql[Sql] = Cmd;
+			return Cmd;
+		}
+
+		await using var Batch = new BatchCollector<(IStr_Any Dict, TId Id), nil>(async(BatchItems, Ct)=>{
+			var Stmts = new List<str>(BatchItems.Count);
+			var Arg = new Dictionary<str, obj?>();
+
+			for(i32 i = 0; i < BatchItems.Count; i++){
+				var (DbDict, Id) = BatchItems[i];
+				var SetSegs = new List<str>();
+				i32 j = 0;
+				foreach(var (DbColName, RawVal) in DbDict){
+					if(DbColName == dbIdColName || DbColName == T.CodeIdName){
+						continue;
+					}
+					var P = T.Prm($"u_{i}_{j}");
+					SetSegs.Add($"{T.Qt(DbColName)} = {P}");
+					Arg[P.Name] = RawVal;
+					j++;
+				}
+
+				if(SetSegs.Count == 0){
+					continue;
+				}
+
+				var PId = T.Prm($"id_{i}");
+				Arg[PId.Name] = T.UpperToRaw(Id, T.CodeIdName);
+				var Clause = str.Join(", ", SetSegs);
+				Stmts.Add($"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.QtCol(T.CodeIdName)} = {PId}");
+			}
+
+			if(Stmts.Count == 0){
+				return NIL;
+			}
+
+			var Sql = str.Join(";\n", Stmts);
+			var Cmd = await GetCmd(Sql, Ct);
+			await Cmd.RawArgs(Arg).AsyE1d(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		}, BatchSize);
+
+		await using var DictEtor = Dicts.GetAsyncEnumerator(Ct);
+		await using var IdEtor = Ids.GetAsyncEnumerator(Ct);
+		while(true){
+			var HasDict = await DictEtor.MoveNextAsync();
+			var HasId = await IdEtor.MoveNextAsync();
+			if(HasDict != HasId){
+				throw new ArgumentException("Dicts count must equal to Ids count");
+			}
+			if(!HasDict){
+				break;
+			}
+			await Batch.Add((DictEtor.Current, IdEtor.Current), Ct);
+		}
+		await Batch.End(Ct);
+
+		return new RespUpd();
+	}
+
 	public async Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct){
 		if(T.SoftDelCol is null){
 			throw new Exception("SoftDeleteCol is null");
