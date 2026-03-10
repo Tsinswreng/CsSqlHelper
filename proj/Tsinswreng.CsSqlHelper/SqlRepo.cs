@@ -258,5 +258,195 @@ Func<
 		return await fn(Tbl, FnMemb, Keys, Ct);
 	}
 
+	public async Task<IRespBatInsert> BatInsert(IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct){
+		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
+		var Cols = T.Columns.Keys.ToList();
+		var CmdByCnt = new Dictionary<u64, ISqlCmd>();
+
+		str MkSql(u64 Cnt){
+			var Stmts = new List<str>((i32)Cnt);
+			foreach(var i in Enumerable.Range(0, (i32)Cnt)){
+				var Idx = (u64)i;
+				var Fields = str.Join(", ", Cols.Select(x=>T.QtCol(x)));
+				var Values = str.Join(", ", Cols.Select(x=>T.NumFieldParam(x, Idx).ToString()));
+				Stmts.Add($"INSERT INTO {T.Qt(T.DbTblName)} ({Fields}) VALUES ({Values})");
+			}
+			return str.Join(";\n", Stmts);
+		}
+
+		async Task<ISqlCmd> GetCmd(u64 Cnt, CT Ct){
+			if(CmdByCnt.TryGetValue(Cnt, out var Got)){
+				return Got;
+			}
+			var Cmd = await SqlCmdMkr.Prepare(Ctx, MkSql(Cnt), Ct);
+			Ctx.AddToDispose(Cmd);
+			CmdByCnt[Cnt] = Cmd;
+			return Cmd;
+		}
+
+		await using var Batch = new BatchCollector<TEntity, nil>(async(BatchEnts, Ct)=>{
+			var Cnt = (u64)BatchEnts.Count;
+			var Arg = new Dictionary<str, obj?>();
+			for(i32 i = 0; i < BatchEnts.Count; i++){
+				var Ent = BatchEnts[i];
+				var DbDict = T.ToDbDict(DictMapper.ToDictShallowT(Ent));
+				foreach(var (k, v) in DbDict){
+					Arg[T.NumFieldParam(k, (u64)i).Name] = v;
+				}
+			}
+			var Cmd = await GetCmd(Cnt, Ct);
+			await Cmd.RawArgs(Arg).AsyE1d(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		}, BatchSize);
+
+		await foreach(var Ent in Ents.WithCancellation(Ct)){
+			await Batch.Add(Ent, Ct);
+		}
+		await Batch.End(Ct);
+
+		return new RespBatInsert();
+	}
+
+	public async Task<IRespBatUpd> BatUpdById(IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct){
+		var fieldsToUpdate = T.Columns.Keys.Where(x=>x != T.CodeIdName).ToList();
+		if(fieldsToUpdate.Count == 0){
+			return new RespUpd();
+		}
+
+		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
+		var CmdByCnt = new Dictionary<u64, ISqlCmd>();
+
+		str MkSql(u64 Cnt){
+			var Stmts = new List<str>((i32)Cnt);
+			foreach(var i in Enumerable.Range(0, (i32)Cnt)){
+				var Idx = (u64)i;
+				var Clause = str.Join(", ", fieldsToUpdate.Select(x=>$"{T.QtCol(x)} = {T.NumFieldParam(x, Idx)}"));
+				var PId = T.NumFieldParam(T.CodeIdName, Idx);
+				Stmts.Add($"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.QtCol(T.CodeIdName)} = {PId}");
+			}
+			return str.Join(";\n", Stmts);
+		}
+
+		async Task<ISqlCmd> GetCmd(u64 Cnt, CT Ct){
+			if(CmdByCnt.TryGetValue(Cnt, out var Got)){
+				return Got;
+			}
+			var Cmd = await SqlCmdMkr.Prepare(Ctx, MkSql(Cnt), Ct);
+			Ctx.AddToDispose(Cmd);
+			CmdByCnt[Cnt] = Cmd;
+			return Cmd;
+		}
+
+		await using var Batch = new BatchCollector<TEntity, nil>(async(BatchEnts, Ct)=>{
+			var Cnt = (u64)BatchEnts.Count;
+			var Arg = new Dictionary<str, obj?>();
+			for(i32 i = 0; i < BatchEnts.Count; i++){
+				var Ent = BatchEnts[i];
+				var DbDict = T.ToDbDict(DictMapper.ToDictShallowT(Ent));
+				foreach(var Col in fieldsToUpdate){
+					if(DbDict.TryGetValue(Col, out var Val)){
+						Arg[T.NumFieldParam(Col, (u64)i).Name] = Val;
+					}
+				}
+				Arg[T.NumFieldParam(T.CodeIdName, (u64)i).Name] = DbDict[T.CodeIdName];
+			}
+			var Cmd = await GetCmd(Cnt, Ct);
+			await Cmd.RawArgs(Arg).AsyE1d(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		}, BatchSize);
+
+		await foreach(var Ent in Ents.WithCancellation(Ct)){
+			await Batch.Add(Ent, Ct);
+		}
+		await Batch.End(Ct);
+
+		return new RespUpd();
+	}
+
+	public async Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct){
+		if(T.SoftDelCol is null){
+			throw new Exception("SoftDeleteCol is null");
+		}
+
+		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
+		var CmdByCnt = new Dictionary<u64, ISqlCmd>();
+		var valToSet = T.SoftDelCol.FnDelete(null);
+
+		str MkSql(u64 Cnt){
+			var IdParams = T.NumParams(Cnt).ToList();
+			var PSoft = T.Prm("__SoftDelVal");
+			return $"UPDATE {T.Qt(T.DbTblName)} SET {T.QtCol(T.SoftDelCol.CodeColName)} = {PSoft} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", IdParams)})";
+		}
+
+		async Task<ISqlCmd> GetCmd(u64 Cnt, CT Ct){
+			if(CmdByCnt.TryGetValue(Cnt, out var Got)){
+				return Got;
+			}
+			var Cmd = await SqlCmdMkr.Prepare(Ctx, MkSql(Cnt), Ct);
+			Ctx.AddToDispose(Cmd);
+			CmdByCnt[Cnt] = Cmd;
+			return Cmd;
+		}
+
+		await using var Batch = new BatchCollector<TId, nil>(async(BatchIds, Ct)=>{
+			var Cnt = (u64)BatchIds.Count;
+			var Arg = new Dictionary<str, obj?>();
+			var IdParams = T.NumParams(Cnt).ToList();
+			Arg[T.Prm("__SoftDelVal").Name] = valToSet;
+			for(i32 i = 0; i < BatchIds.Count; i++){
+				Arg[IdParams[i].Name] = T.UpperToRaw(BatchIds[i], T.CodeIdName);
+			}
+			var Cmd = await GetCmd(Cnt, Ct);
+			await Cmd.RawArgs(Arg).AsyE1d(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		}, BatchSize);
+
+		await foreach(var Id in Ids.WithCancellation(Ct)){
+			await Batch.Add(Id, Ct);
+		}
+		await Batch.End(Ct);
+
+		return new BatSoftDel();
+	}
+
+	public async Task<IBatHardDel> BatHardDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct){
+		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 1ul : 500ul;
+		var CmdByCnt = new Dictionary<u64, ISqlCmd>();
+
+		str MkSql(u64 Cnt){
+			var IdParams = T.NumParams(Cnt).ToList();
+			return $"DELETE FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", IdParams)})";
+		}
+
+		async Task<ISqlCmd> GetCmd(u64 Cnt, CT Ct){
+			if(CmdByCnt.TryGetValue(Cnt, out var Got)){
+				return Got;
+			}
+			var Cmd = await SqlCmdMkr.Prepare(Ctx, MkSql(Cnt), Ct);
+			Ctx.AddToDispose(Cmd);
+			CmdByCnt[Cnt] = Cmd;
+			return Cmd;
+		}
+
+		await using var Batch = new BatchCollector<TId, nil>(async(BatchIds, Ct)=>{
+			var Cnt = (u64)BatchIds.Count;
+			var Arg = new Dictionary<str, obj?>();
+			var IdParams = T.NumParams(Cnt).ToList();
+			for(i32 i = 0; i < BatchIds.Count; i++){
+				Arg[IdParams[i].Name] = T.UpperToRaw(BatchIds[i], T.CodeIdName);
+			}
+			var Cmd = await GetCmd(Cnt, Ct);
+			await Cmd.RawArgs(Arg).AsyE1d(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		}, BatchSize);
+
+		await foreach(var Id in Ids.WithCancellation(Ct)){
+			await Batch.Add(Id, Ct);
+		}
+		await Batch.End(Ct);
+
+		return new BatHardDel();
+	}
+
 	
 }

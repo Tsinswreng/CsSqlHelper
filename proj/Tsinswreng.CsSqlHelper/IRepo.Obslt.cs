@@ -8,6 +8,7 @@ using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 #TParams([Entity type],[Entity ID type])
 ")]
 public partial interface IRepo<TEntity, TId>{
+	[Obsolete]
 	public Task<Func<
 		IEnumerable<TEntity>
 		,CT
@@ -17,7 +18,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
-
+	[Obsolete]
 	public Task<Func<
 		IAsyncEnumerable<TEntity>
 		,CT
@@ -28,6 +29,7 @@ public partial interface IRepo<TEntity, TId>{
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		TEntity
 		,CT
@@ -37,7 +39,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
-
+	[Obsolete]
 	public Task<Func<
 		CT
 		,Task<u64>
@@ -46,7 +48,7 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 
-
+	[Obsolete]
 	public Task<Func<
 		TId
 		,CT
@@ -56,12 +58,14 @@ public partial interface IRepo<TEntity, TId>{
 		,CT Ct
 	);
 	
-public Task<Func<
+	[Obsolete]
+	public Task<Func<
 		IPageQry
 		,CT, Task<IPageAsyE<IDictionary<str, obj?>>>
 	>> FnPageAllDict(IDbFnCtx Ctx, CT Ct);
 
 
+	[Obsolete]
 	public Task<Func<
 		IPageQry
 		,CT, Task<IPageAsyE<TEntity>>
@@ -92,6 +96,7 @@ public Task<Func<
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		TEntity
 		,CT, Task<nil>
@@ -102,6 +107,7 @@ public Task<Func<
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		IEnumerable<TEntity>
 		,CT
@@ -113,6 +119,7 @@ public Task<Func<
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		IAsyncEnumerable<TEntity>
 		,CT
@@ -124,6 +131,7 @@ public Task<Func<
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		IEnumerable<obj?>
 		,CT
@@ -136,6 +144,7 @@ public Task<Func<
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		IEnumerable<TKey>
 		,CT
@@ -149,6 +158,7 @@ public Task<Func<
 
 
 	/// 不預編譯。適用于況芝 在事務中 初建表後即添數據
+	[Obsolete]
 	public Task<Func<
 		IEnumerable<TEntity>
 		,CT
@@ -159,6 +169,7 @@ public Task<Func<
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		TId
 		,obj?
@@ -171,6 +182,7 @@ public Task<Func<
 	);
 
 
+	[Obsolete]
 	public Task<Func<
 		IList<TVal>
 		,CT
@@ -183,6 +195,7 @@ public Task<Func<
 		,CT Ct
 	);
 	
+	[Obsolete]
 	public Task<Func<
 		IList<TCol>
 		,CT

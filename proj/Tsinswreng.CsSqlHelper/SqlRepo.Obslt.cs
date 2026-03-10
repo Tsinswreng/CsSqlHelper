@@ -705,8 +705,8 @@ str NId = T.CodeIdName;
 var PTarget = T.Prm("__Target");var PId = T.Prm(NId);
 var Sql = $"""
 UPDATE {T.Qt(T.DbTblName)}
-SET {T.Qt(Col)} = {PTarget}
-WHERE {T.QtCol(NId)} = {PId}
+SET {T.DbCol(Col)} = {PTarget}
+WHERE {T.DbCol(NId)} = {PId}
 """;
 var SqlCmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		Ctx?.AddToDispose(SqlCmd);
