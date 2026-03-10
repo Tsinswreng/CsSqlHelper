@@ -446,7 +446,7 @@ Func<
 		,CT Ct
 	){
 		var DbDicts = Dicts.Select(x=>T.ToDbDict(x));
-		return BatUpdByDbDict(Ctx, DbDicts, Ids, Ct);
+		return BatUpdByDbDict(Ctx, Ids, DbDicts, Ct);
 	}
 
 	public async Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct){

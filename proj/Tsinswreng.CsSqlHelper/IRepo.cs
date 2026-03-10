@@ -14,19 +14,19 @@ public partial interface IRepo<TEntity, TId>{
 	which would ignore unexisted Id and returned list may be unordered.
 	")]
 	public Task<IAsyncEnumerable<TEntity?>> SlctManyInIdsWithDel(
-		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids
 		,CT Ct
 	);
 
 	[Doc(@$"Got Entities are corresponding to the given Ids. if not found, the place will be null.")]
 	public Task<IAsyncEnumerable<TEntity?>> BatSlctById(
-		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids
 		,CT Ct
 	);
 
 	[Doc(@$"Batch select aggregate roots by ids; aggregate metadata should be registered in ITblMgr.AddAgg().")]
 	public Task<IAsyncEnumerable<TAgg?>> BatSlctAggById<TAgg>(
-		IDbFnCtx Ctx, IEnumerable<TId> Ids
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids
 		,CT Ct
 	)
 		where TAgg: class;
