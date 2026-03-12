@@ -92,9 +92,8 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids
 		,CT Ct
 	){
-		var PId = T.Prm(T.CodeIdName);
 		var Sql = T.SqlSplicer().Select("*").From().Where1()
-		.Raw("And "+T.QtCol(T.CodeIdName)+"="+PId);
+		.And().Bool(T.CodeIdName, "=", out var PId);
 
 		var bat = AutoBatch<TId, IAsyncEnumerable<TEntity?>>.Mk(
 			Ctx, SqlCmdMkr, Sql,
