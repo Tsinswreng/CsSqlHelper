@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 /// <summary>
 /// A struct that contains an Id and a dictionary of key-value pairs.

@@ -1,6 +1,6 @@
 using Tsinswreng.CsDictMapper;
 
-namespace Tsinswreng.CsSqlHelper.Test.Domains;
+namespace Tsinswreng.CsSql.Test.Domains;
 
 [DictType(typeof(PoAllBasicTypes))]
 public partial class TestDictMapper {

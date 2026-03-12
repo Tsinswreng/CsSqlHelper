@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public interface ISqlDuplicator{
 	public str DuplicateSql(u64 Cnt);

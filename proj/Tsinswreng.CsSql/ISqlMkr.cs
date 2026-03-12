@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public partial interface ISqlMkr:I_DbSrcType{
 	public ISqlTypeMapper SqlTypeMapper{get;set;}

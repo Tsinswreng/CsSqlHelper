@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 file class __FileDoc{
 	str Doc = @"""

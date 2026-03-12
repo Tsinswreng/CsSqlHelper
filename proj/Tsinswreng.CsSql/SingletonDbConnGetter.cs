@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 using System.Data;
 

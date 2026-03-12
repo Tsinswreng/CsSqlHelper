@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.Postgres;
+namespace Tsinswreng.CsSql.Postgres;
 
 using System.Data;
 using Npgsql;

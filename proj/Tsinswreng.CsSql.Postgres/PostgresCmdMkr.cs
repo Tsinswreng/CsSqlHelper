@@ -1,8 +1,8 @@
-namespace Tsinswreng.CsSqlHelper.Postgres;
+namespace Tsinswreng.CsSql.Postgres;
 using System.Data;
 using Npgsql;
 using Tsinswreng.CsCore;
-using IDbFnCtx = Tsinswreng.CsSqlHelper.IDbFnCtx;
+using IDbFnCtx = Tsinswreng.CsSql.IDbFnCtx;
 
 public partial class PostgresCmdMkr
 	:ISqlCmdMkr

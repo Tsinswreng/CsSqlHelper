@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.EFCore;
+namespace Tsinswreng.CsSql.EFCore;
 
 using Microsoft.EntityFrameworkCore;
 using Tsinswreng.CsPage;

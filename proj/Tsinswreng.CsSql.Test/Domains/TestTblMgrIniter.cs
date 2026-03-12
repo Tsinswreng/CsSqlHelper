@@ -1,7 +1,7 @@
-using Tsinswreng.CsSqlHelper.Postgres;
-using Tsinswreng.CsSqlHelper.Sqlite;
+using Tsinswreng.CsSql.Postgres;
+using Tsinswreng.CsSql.Sqlite;
 
-namespace Tsinswreng.CsSqlHelper.Test.Domains;
+namespace Tsinswreng.CsSql.Test.Domains;
 
 public static class TestTblMgrIniter {
 	public static ITblMgr MkSqliteMgr() {

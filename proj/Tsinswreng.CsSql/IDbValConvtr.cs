@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 
 [Doc(@$"Database Value Converter for Sql Parameter")]

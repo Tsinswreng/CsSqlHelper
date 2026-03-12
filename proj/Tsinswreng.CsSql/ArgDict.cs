@@ -2,7 +2,7 @@ using System.Collections;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsPage;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public partial class ArgDict: IArgDict{
 	public static ArgDict Mk(){

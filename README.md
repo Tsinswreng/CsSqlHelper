@@ -1,4 +1,4 @@
-# CsSqlHelper
+# CsSql
 
 For Java version, see
 [JavaSqlHelper](https://github.com/Tsinswreng/JavaSqlHelper)
@@ -10,7 +10,7 @@ recommand you to clone the code and reference the source code directly
 
 **⚠️This doc may be outdated, incomplete, or incorrect⚠️**
 
-CsSqlHelper is a tiny ORM
+CsSql is a tiny ORM
 
 -   AOT-compatible using
     [CsDictMapper](https://github.com/Tsinswreng/CsDictMapper)

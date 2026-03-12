@@ -1,6 +1,6 @@
 using Tsinswreng.CsCore;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 //TODO配置忽略之字段
 public partial class TblMgr:ITblMgr{

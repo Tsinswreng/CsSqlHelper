@@ -3,10 +3,10 @@ using System.Data.Common;
 using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsSqlHelper;
+using Tsinswreng.CsSql;
 using Tsinswreng.CsTools;
 
-namespace Tsinswreng.CsSqlHelper.BaseImpl;
+namespace Tsinswreng.CsSql.BaseImpl;
 
 public abstract partial class BaseSqlCmd<
 	TRawCmd ,TRawTxn

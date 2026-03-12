@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public class Field:IField{
 	public Field(ITable Tbl, str CodeName){

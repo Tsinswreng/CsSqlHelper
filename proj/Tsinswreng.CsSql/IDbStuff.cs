@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 [Doc(@$"Collection of things of a specialized Database Type(e,g Sqlite, Postgres)")]
 public interface IDbStuff:I_DbSrcType{

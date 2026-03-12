@@ -1,5 +1,5 @@
 //pandoc .\README.typ -o README.md
-= CsSqlHelper//https://github.com/Tsinswreng/CsSqlHelper
+= CsSql//https://github.com/Tsinswreng/CsSql
 
 For Java version, see #link("https://github.com/Tsinswreng/JavaSqlHelper")[JavaSqlHelper]
 
@@ -10,7 +10,7 @@ For Java version, see #link("https://github.com/Tsinswreng/JavaSqlHelper")[JavaS
 
 //TODO page
 
-CsSqlHelper is a tiny ORM
+CsSql is a tiny ORM
 - AOT-compatible using #link("https://github.com/Tsinswreng/CsDictMapper")[CsDictMapper]
 - Functional Crud
 - Make your sql string portable(database independent)

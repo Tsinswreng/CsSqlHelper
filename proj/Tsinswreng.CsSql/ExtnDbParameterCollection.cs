@@ -1,7 +1,7 @@
 using System.Data.Common;
 using System.Text;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public static class ExtnDbParameterCollection {
 	extension<TSelf>(TSelf z)

@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 using TDbFnCtx = IDbFnCtx;
 public partial class TxnWrapper{

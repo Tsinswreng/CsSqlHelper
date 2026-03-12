@@ -1,6 +1,6 @@
 using Tsinswreng.CsTools;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 public class AutoBatch<TItem, TRet> : BatchCollector<TItem, TRet> {
 	public AutoBatch() {
 

@@ -1,5 +1,5 @@
-namespace Tsinswreng.CsSqlHelper.Sqlite;
-using Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql.Sqlite;
+using Tsinswreng.CsSql;
 
 public class SqliteStuff:IDbStuff{
 	public static SqliteStuff Inst => field??=new SqliteStuff();

@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.Postgres;
+namespace Tsinswreng.CsSql.Postgres;
 
 
 public partial class PostgresTypeMapper : ISqlTypeMapper {

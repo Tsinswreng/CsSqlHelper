@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Tsinswreng.CsSqlHelper.EFCore;
+namespace Tsinswreng.CsSql.EFCore;
 
 public partial class EfTxnMkr(
 	DbContext DbContext

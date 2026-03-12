@@ -1,5 +1,5 @@
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 [Obsolete]
 public interface IDbFn:IAsyncDisposable{

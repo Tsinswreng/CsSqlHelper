@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public interface IMkrTblMgr{
 	public ITblMgr MkTblMgr();

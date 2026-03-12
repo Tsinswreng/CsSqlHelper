@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Tsinswreng.CsTools;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 [Doc(@$"
 should be pure function, should return strings instead of directly modifying {nameof(ITable.OuterAdditionalSqls)}

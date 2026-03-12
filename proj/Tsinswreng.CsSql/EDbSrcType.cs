@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 [Doc(@$"database source type enum")]
 public enum EDbSrcType{

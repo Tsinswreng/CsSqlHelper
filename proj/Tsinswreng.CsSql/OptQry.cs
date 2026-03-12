@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 public record class OptQry{
 	public bool IncludeDeleted{get; set;}
 	/// IN (@_0, ...) 參數數量

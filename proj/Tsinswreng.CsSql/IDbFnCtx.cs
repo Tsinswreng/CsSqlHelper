@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public partial interface IDbFnCtx
 	:IAsyncDisposable

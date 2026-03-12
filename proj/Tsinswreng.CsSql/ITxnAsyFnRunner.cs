@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 // [Obsolete]
 // public  partial interface IRunInTxn{

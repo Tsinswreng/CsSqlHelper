@@ -1,7 +1,7 @@
 #define Impl
 using Tsinswreng.CsCore;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public class UpperTypeMapFn
 	:IUpperTypeMapFn

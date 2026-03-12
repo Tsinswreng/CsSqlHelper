@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 [Doc(@$"option to create index on a table")]
 public interface IOptMkIdx{

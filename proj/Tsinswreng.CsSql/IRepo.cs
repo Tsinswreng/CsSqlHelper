@@ -1,5 +1,5 @@
 //此文件中的API已廢棄
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 using Tsinswreng.CsPage;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;

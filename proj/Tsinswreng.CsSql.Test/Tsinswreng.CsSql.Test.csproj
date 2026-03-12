@@ -8,9 +8,9 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="../Tsinswreng.CsSqlHelper/Tsinswreng.CsSqlHelper.csproj" />
-		<ProjectReference Include="../Tsinswreng.CsSqlHelper.Sqlite/Tsinswreng.CsSqlHelper.Sqlite.csproj" />
-		<ProjectReference Include="../Tsinswreng.CsSqlHelper.Postgres/Tsinswreng.CsSqlHelper.Postgres.csproj" />
+		<ProjectReference Include="../Tsinswreng.CsSql/Tsinswreng.CsSql.csproj" />
+		<ProjectReference Include="../Tsinswreng.CsSql.Sqlite/Tsinswreng.CsSql.Sqlite.csproj" />
+		<ProjectReference Include="../Tsinswreng.CsSql.Postgres/Tsinswreng.CsSql.Postgres.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 public interface IMigrationMgr{
 	public IList<IMigration> Migrations{get;set;}
 	public IMigrationMgr AddMigration(IMigration Migration){

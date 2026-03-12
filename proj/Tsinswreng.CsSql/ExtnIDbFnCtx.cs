@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public static partial class ExtnIDbFnCtx{
 	extension<TSelf>(TSelf z)

@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 
 public interface IResultReader{

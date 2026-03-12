@@ -1,5 +1,5 @@
 //TODO 類似ₐXxxCmd間 做抽象復用。SqliteCmd 新於 PostgresCmd
-namespace Tsinswreng.CsSqlHelper.Postgres;
+namespace Tsinswreng.CsSql.Postgres;
 
 using System.Collections;
 using System.Data.Common;
@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Npgsql;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsSqlHelper.BaseImpl;
+using Tsinswreng.CsSql.BaseImpl;
 public partial class PostgresCmd : BaseSqlCmd<NpgsqlCommand, NpgsqlTransaction> {
 	public PostgresCmd(NpgsqlCommand RawCmd):base(RawCmd){
 

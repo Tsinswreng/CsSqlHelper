@@ -2,7 +2,7 @@ using System.Data.Common;
 using System.Runtime.CompilerServices;
 using Tsinswreng.CsTools;
 
-namespace Tsinswreng.CsSqlHelper.BaseImpl;
+namespace Tsinswreng.CsSql.BaseImpl;
 
 public class BaseResultReader : IResultReader{
 	

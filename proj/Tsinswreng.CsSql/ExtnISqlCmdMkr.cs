@@ -1,6 +1,6 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
-using Tsinswreng.CsSqlHelper;
+using Tsinswreng.CsSql;
 using System.Collections;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -115,7 +115,7 @@ public static class ExtnISqlCmdMkr{
 					BatchSize = 500;
 				}
 			}
-			return CsSqlHelper.AutoBatch<TItem, TRet>.Mk(Ctx, z, SqlDuplicator, FnAsy, BatchSize);
+			return CsSql.AutoBatch<TItem, TRet>.Mk(Ctx, z, SqlDuplicator, FnAsy, BatchSize);
 		}
 		
 		[Doc(@$"

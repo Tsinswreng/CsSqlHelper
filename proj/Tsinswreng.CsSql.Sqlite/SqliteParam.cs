@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.Sqlite;
+namespace Tsinswreng.CsSql.Sqlite;
 
 public class SqliteParamPrefix:I_AddParamPrefix{
 protected static SqliteParamPrefix? _Inst = null;

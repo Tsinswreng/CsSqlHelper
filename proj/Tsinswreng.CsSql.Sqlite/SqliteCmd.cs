@@ -5,9 +5,9 @@ using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsTools;
-using Tsinswreng.CsSqlHelper.BaseImpl;
-namespace Tsinswreng.CsSqlHelper.Sqlite;
-using IDbFnCtx = Tsinswreng.CsSqlHelper.IDbFnCtx;
+using Tsinswreng.CsSql.BaseImpl;
+namespace Tsinswreng.CsSql.Sqlite;
+using IDbFnCtx = Tsinswreng.CsSql.IDbFnCtx;
 
 public partial class SqliteCmd : BaseSqlCmd<SqliteCommand, SqliteTransaction> {
 	public override EDbSrcType DbSrcType => EDbSrcType.Sqlite;

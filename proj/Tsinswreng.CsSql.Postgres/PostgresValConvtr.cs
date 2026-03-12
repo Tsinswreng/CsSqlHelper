@@ -1,6 +1,6 @@
 using Tsinswreng.CsCore;
 
-namespace Tsinswreng.CsSqlHelper.Postgres;
+namespace Tsinswreng.CsSql.Postgres;
 
 public class PostgresValConvtr: IDbValConvtr{
 	public static PostgresValConvtr Inst => field??=new PostgresValConvtr();

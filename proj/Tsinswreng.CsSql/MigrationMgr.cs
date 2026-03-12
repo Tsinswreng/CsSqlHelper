@@ -1,7 +1,7 @@
 using Tsinswreng.CsCore;
 using Tsinswreng.CsPage;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public class MigrationMgr: IMigrationMgr{
 	public IList<IMigration> Migrations{get;set;} = new List<IMigration>();

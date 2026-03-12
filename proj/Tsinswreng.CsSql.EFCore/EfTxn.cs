@@ -1,6 +1,6 @@
 using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
-namespace Tsinswreng.CsSqlHelper.EFCore;
+namespace Tsinswreng.CsSql.EFCore;
 
 
 public  partial class EfTxn:ITxn{

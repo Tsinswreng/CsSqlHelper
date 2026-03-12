@@ -1,6 +1,6 @@
 using Tsinswreng.CsCore;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 public partial class AdoTxnRunner(
 	//IDbConnection DbConnection
 )

@@ -1,5 +1,5 @@
 //此文件中的API已廢棄
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 using System.Data;
 using Tsinswreng.CsCore;

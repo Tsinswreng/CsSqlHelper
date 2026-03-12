@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Collections;
 using Tsinswreng.CsTools;
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public class ISqlSplicer<E>: IAutoBindSqlDuplicator{
 	public ITable Tbl{get;set;}

@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public static class ExtnTblMgr{
 	extension<TSelf>(TSelf z)

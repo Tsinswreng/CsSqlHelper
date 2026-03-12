@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.Postgres;
+namespace Tsinswreng.CsSql.Postgres;
 
 public class PostgresParamPrefix:I_AddParamPrefix{
 	protected static PostgresParamPrefix? _Inst = null;

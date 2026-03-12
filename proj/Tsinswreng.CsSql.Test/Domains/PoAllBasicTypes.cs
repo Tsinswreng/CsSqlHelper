@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper.Test.Domains;
+namespace Tsinswreng.CsSql.Test.Domains;
 
 /// <summary>
 /// 測試實體：主鍵使用 blob(byte[])，其餘字段覆蓋常見基礎類型

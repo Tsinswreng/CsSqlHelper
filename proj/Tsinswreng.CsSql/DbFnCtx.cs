@@ -1,5 +1,5 @@
 #define Impl
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 using System.Data;
 
 

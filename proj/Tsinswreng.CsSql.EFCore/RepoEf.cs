@@ -9,7 +9,7 @@ using Ngaq.Core.Infra;
 using Ngaq.Core.Infra.Db;
 using Ngaq.Core.Model;
 using Ngaq.Core.Model.Po;
-using Tsinswreng.CsSqlHelper;
+using Tsinswreng.CsSql;
 
 namespace Ngaq.Local.Db;
 //using T = Bo_Word;

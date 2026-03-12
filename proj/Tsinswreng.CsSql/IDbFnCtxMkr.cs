@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 [Doc(@$"Maker of Database Function Context")]
 public partial interface IMkrDbFnCtx{

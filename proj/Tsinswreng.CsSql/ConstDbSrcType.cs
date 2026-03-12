@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 [Doc(@$"constants for database source type.")]
 [Obsolete(@$"use {nameof(EDbSrcType)} instead.")]

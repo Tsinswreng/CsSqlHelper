@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 public partial interface IArgDict{
 	public IDictionary<str, obj?> ParamName_RawValue{get;set;}

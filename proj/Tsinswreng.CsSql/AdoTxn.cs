@@ -1,7 +1,7 @@
 using System.Data;
 using Tsinswreng.CsCore;
 
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 
 /// <summary>
 /// ADO.NET 事務

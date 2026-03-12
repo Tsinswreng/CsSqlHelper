@@ -1,5 +1,5 @@
-namespace Tsinswreng.CsSqlHelper.Postgres;
-using Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql.Postgres;
+using Tsinswreng.CsSql;
 
 public class PostgresStuff:IDbStuff{
 	public static PostgresStuff Inst => field??= new PostgresStuff();

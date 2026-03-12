@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsSqlHelper;
+namespace Tsinswreng.CsSql;
 using Tsinswreng.CsCore;
 
 public partial interface I_AddParamPrefix{
