@@ -1,32 +1,13 @@
 namespace Tsinswreng.CsSql;
 
-/// <summary>
 /// 事務
 /// Transaction
-/// </summary>
 public partial interface ITxn : IDisposable{
-/// <summary>
 /// 原始事務對象
 /// Raw transaction object
-/// </summary>
 	public object? RawTxn{get;}
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="Ct"></param>
-	/// <returns>null</returns>
 	public Task<nil> Begin(CT Ct);
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="Ct"></param>
-	/// <returns>null</returns>
 	public Task<nil> Commit(CT Ct);
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="Ct"></param>
-	/// <returns>null</returns>
 	public Task<nil> Rollback(CT Ct);
 
 	public Task<nil> Rollback(Func<Exception, nil> OnErr, CT Ct);
@@ -34,14 +15,7 @@ public partial interface ITxn : IDisposable{
 
 
 public static class ExtnITxn{
-	/// <summary>
 	/// run a function in a transaction
-	/// </summary>
-	/// <typeparam name="TRet"></typeparam>
-	/// <param name="Txn"></param>
-	/// <param name="FnAsy"></param>
-	/// <param name="Ct"></param>
-	/// <returns></returns>
 	public static async Task<TRet> RunTxn<TRet>(
 		this ITxn Txn
 		,Func<

@@ -1,7 +1,10 @@
 namespace Tsinswreng.CsSql;
 
 
-public partial interface ISqlCmdMkr:I_DbSrcType{
+public partial interface ISqlCmdMkr
+	:I_DbSrcType
+	,IMkrTxn
+{
 
 	/// 璫允 先Prepare後傳參數。㕥便 複用SqlCmd、每次傳不同參數。
 	public Task<ISqlCmd> Prepare(ISqlCmd Cmd, CT Ct);

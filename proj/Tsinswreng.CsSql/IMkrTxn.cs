@@ -4,7 +4,8 @@ public partial interface IMkrTxn{
 	// [Obsolete]
 	// public Task<ITxn> GetTxnAsy(CT Ct);
 
-	public Task<ITxn> MkTxn(
+	[Doc(@$"make and bind transaction to `{nameof(Ctx)}`")]
+	public Task<ITxn> MkEtBindTxn(
 		IDbFnCtx Ctx, CT Ct
 	);
 

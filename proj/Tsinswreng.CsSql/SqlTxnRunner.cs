@@ -8,28 +8,7 @@ public partial class AdoTxnRunner(
 	:ITxnRunner
 {
 
-	// [Obsolete]
-	// public async Task<TRet> RunInTxn<TRet>(
-	// 	Func<
-	// 		CT, Task<TRet>
-	// 	> FnAsy
-	// 	,CT ct
-	// ){
-	// 	using var Tx = DbConnection.BeginTransaction(IsolationLevel.Serializable);
-	// 	try{
-	// 		var ans = await FnAsy(ct);
-
-	// 		Tx.Commit();
-	// 		return ans;
-	// 	}
-	// 	catch (Exception) {
-	// 		Tx.Rollback();
-	// 		throw;
-	// 	}
-	// }
-
 	[Impl]
-
 	public async Task<TRet> RunTxn<TRet>(
 		ITxn? Txn
 		,Func<

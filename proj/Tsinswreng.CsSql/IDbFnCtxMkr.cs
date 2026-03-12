@@ -9,7 +9,7 @@ public partial interface IMkrDbFnCtx{
 	")]
 	public async Task<IDbFnCtx> MkTxnDbFnCtx(CT Ct){
 		var R = new DbFnCtx();
-		R.Txn = await TxnGetter.MkTxn(R, Ct);
+		R.Txn = await TxnGetter.MkEtBindTxn(R, Ct);
 		return R;
 	}
 }

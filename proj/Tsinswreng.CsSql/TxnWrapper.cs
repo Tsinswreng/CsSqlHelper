@@ -1,6 +1,7 @@
 namespace Tsinswreng.CsSql;
 
 using TDbFnCtx = IDbFnCtx;
+[Obsolete]
 public partial class TxnWrapper{
 	public IMkrDbFnCtx DbFnCtxMkr{get;set;}
 	public ITxnRunner TxnRunner{get;set;}

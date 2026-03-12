@@ -118,6 +118,31 @@ public static class ExtnISqlCmdMkr{
 			return CsSql.AutoBatch<TItem, TRet>.Mk(Ctx, z, SqlDuplicator, FnAsy, BatchSize);
 		}
 		
+		// public async Task<IDbFnCtx> MkTxnDbFnCtx(CT Ct){
+		// 	var R = new DbFnCtx();
+		// 	await z.MkEtBindTxn(R, Ct);
+		// 	return R;
+		// }
+		
+		public async Task<TRtn> RunInTxn<TRtn>(
+			CT Ct
+			,Func<IDbFnCtx, Task<TRtn>> Fn
+		){
+			var Ctx = new DbFnCtx{};
+			await z.MkEtBindTxn(Ctx, Ct);
+			try{
+				var R = await Fn(Ctx);
+				return R;
+			}
+			catch (System.Exception ex){
+				if(Ctx.Txn is not null){
+					await Ctx.Txn.Rollback(Ct);
+				}
+				throw;
+			}
+		}
+		
+		
 		[Doc(@$"
 #Sum[Execute auto-bound duplicated SQL lazily and flatten as row stream]
 #Params([Db function context],[SQL splicer carrying auto binders],[Cancellation token])

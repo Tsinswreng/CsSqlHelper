@@ -61,7 +61,7 @@ public partial class PostgresCmdMkr
 	}
 
 
-	public async Task<ITxn> MkTxn(
+	public async Task<ITxn> MkEtBindTxn(
 		IDbFnCtx Ctx, CT Ct
 	){
 		// pg中同一交易中 ʹ多條命令 須屬于同一連接。後MkCmd旹所用ʹ連接 亦 優先從Ctx.DbConn中取
