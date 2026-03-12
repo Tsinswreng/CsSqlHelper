@@ -100,8 +100,8 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 			Ctx, SqlCmdMkr, Sql,
 			async(z, Ids, Ct)=>{
 				var Args = ArgDict.Mk(T).AddManyT(PId, Ids, T.CodeIdName);
-				var RawDicts = z.SqlCmd.Args(Args).AsyE1d(Ct);
-				return RawDicts.Select(x=>T.DbDictToEntity<TEntity>(x));
+				var RawDicts = z.SqlCmd.Args(Args).AsyE1dWithNull(Ct);
+				return RawDicts.Select(x=>x is null? null : T.DbDictToEntity<TEntity>(x));
 			}
 		);
 

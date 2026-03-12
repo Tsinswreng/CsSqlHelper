@@ -29,13 +29,19 @@ public interface IResultReader{
 #Params([Cancellation token])
 #Rtn[Asynchronous stream containing rows from all result sets]
 ")]
-	public IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(CT Ct);
+	public IAsyncEnumerable<IDictionary<str, obj?>> AsyE1dSkipNull(CT Ct);
+	[Doc(@$"
+#Sum[Execute and return a flattened async stream; keep one slot per result-set, null for empty]
+#Params([Cancellation token])
+#Rtn[Asynchronous stream containing first row per result-set or null if empty]
+")]
+	public IAsyncEnumerable<IDictionary<str, obj?>?> AsyE1dWithNull(CT Ct);
 	[Doc(@$"
 #Sum[Execute and materialize flattened rows as a list]
 #Params([Cancellation token])
 #Rtn[In-memory rows combined from all result sets]
 ")]
-	public Task<IList<IDictionary<str, obj?>>> All1d(CT Ct);
+	public Task<IList<IDictionary<str, obj?>>> All1dSkipNull(CT Ct);
 }
 
 
@@ -59,19 +65,28 @@ public static class ExtnTaskIResultReader{
 			return await r.All2d(Ct);
 		}
 
-		public async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(
+		public async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1dSkipNull(
 			[EnumeratorCancellation] CT Ct
 		){
 			var r = await z;
-			var itbl = r.AsyE1d(Ct);
+			var itbl = r.AsyE1dSkipNull(Ct);
+			await foreach(var row in itbl){
+				yield return row;
+			}
+		}
+		public async IAsyncEnumerable<IDictionary<str, obj?>?> AsyE1dWithNull(
+			[EnumeratorCancellation] CT Ct
+		){
+			var r = await z;
+			var itbl = r.AsyE1dWithNull(Ct);
 			await foreach(var row in itbl){
 				yield return row;
 			}
 		}
 
-		public async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
+		public async Task<IList<IDictionary<str, obj?>>> All1dSkipNull(CT Ct){
 			var r = await z;
-			return await r.All1d(Ct);
+			return await r.All1dSkipNull(Ct);
 		}
 	}
 }

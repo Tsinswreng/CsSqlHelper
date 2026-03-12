@@ -77,7 +77,7 @@ var v = DbValConvtr.ToCodeVal(reader.GetValue(i));
 
 
 	/// 多個結果集ʹ內容ˇ 皆扁平化
-	public virtual async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1d(
+	public virtual async IAsyncEnumerable<IDictionary<str, obj?>> AsyE1dSkipNull(
 		[EnumeratorCancellation]
 		CT Ct
 	){
@@ -85,6 +85,29 @@ var v = DbValConvtr.ToCodeVal(reader.GetValue(i));
 		await foreach (var d1 in d2){
 			await foreach (var row in d1){
 				yield return row;
+			}
+		}
+	}
+
+	/// 每個結果集保留一個位置；空結果集輸出null
+	public virtual async IAsyncEnumerable<IDictionary<str, obj?>?> AsyE1dWithNull(
+		[EnumeratorCancellation]
+		CT Ct
+	){
+		var d2 = AsyE2d(Ct);
+		await foreach (var d1 in d2.WithCancellation(Ct)){
+			var hasAny = false;
+			IDictionary<str, obj?>? first = null;
+			await foreach (var row in d1.WithCancellation(Ct)){
+				if(!hasAny){
+					first = row;
+					hasAny = true;
+				}
+			}
+			if(!hasAny){
+				yield return null;
+			}else{
+				yield return first;
 			}
 		}
 	}
@@ -100,8 +123,8 @@ var v = DbValConvtr.ToCodeVal(reader.GetValue(i));
 	}
 
 
-	public virtual async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
-		return await AsyE1d(Ct).ToListAsync(Ct);
+	public virtual async Task<IList<IDictionary<str, obj?>>> All1dSkipNull(CT Ct){
+		return await AsyE1dSkipNull(Ct).ToListAsync(Ct);
 	}
 
 }

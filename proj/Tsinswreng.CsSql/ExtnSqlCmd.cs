@@ -9,14 +9,25 @@ public static class ExtnSqlCmd{
 			CT Ct
 		){
 			var R = await z.ExeReader(Ct);
-			var itbl = R.AsyE1d(Ct);
+			var itbl = R.AsyE1dSkipNull(Ct);
+			await foreach(var e in itbl){
+				yield return e;
+			}
+		}
+		/// 保留每個結果集一個位置；空結果集輸出null
+		public async IAsyncEnumerable<IDictionary<str, obj?>?> AsyE1dWithNull(
+			[EnumeratorCancellation]
+			CT Ct
+		){
+			var R = await z.ExeReader(Ct);
+			var itbl = R.AsyE1dWithNull(Ct);
 			await foreach(var e in itbl){
 				yield return e;
 			}
 		}
 		public async Task<IList<IDictionary<str, obj?>>> All1d(CT Ct){
 			var R = await z.ExeReader(Ct);
-			return await R.All1d(Ct);
+			return await R.All1dSkipNull(Ct);
 		}
 		public async IAsyncEnumerable<IAsyncEnumerable<IDictionary<str, obj?>>> AsyE2d(
 			[EnumeratorCancellation]
