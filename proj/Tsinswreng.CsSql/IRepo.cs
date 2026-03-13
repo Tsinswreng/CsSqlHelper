@@ -127,6 +127,14 @@ public partial interface IRepo<TEntity, TId>{
 	public Task<IBatHardDel> BatHardDelById(
 		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct
 	);
+	
+	public Task<ISoftDelInId> SoftDelInId(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct
+	);
+	
+	public Task<IHardDelInId> HardDelInId(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct
+	);
 
 }
 
@@ -153,3 +161,14 @@ public class BatSoftDel:IBatSoftDel{}
 public class IBatHardDel{}
 
 public class BatHardDel:IBatHardDel{}
+
+public class IHardDelInId{
+	
+}
+
+public class HardDelInId:IHardDelInId{}
+
+
+public class ISoftDelInId{}
+
+public class SoftDelInId:ISoftDelInId{}
