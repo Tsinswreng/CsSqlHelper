@@ -489,6 +489,88 @@ Func<
 		return BatUpdByDbDict(Ctx, Ids, DbDicts, Ct);
 	}
 
+	public async Task<ISoftDelInId> SoftDelInId(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct
+	){
+		if(T.SoftDelCol is null){
+			throw new Exception("SoftDeleteCol is null");
+		}
+		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 50ul : 500ul;
+		var CmdByCnt = new Dictionary<u64, ISqlCmd>();
+		var valToSet = T.SoftDelCol.FnDelete(null);
+
+		str MkSql(u64 Cnt){
+			var IdParams = T.NumParams(Cnt).ToList();
+			var PSoft = T.Prm("__SoftDelVal");
+			return $"UPDATE {T.Qt(T.DbTblName)} SET {T.QtCol(T.SoftDelCol.CodeColName)} = {PSoft} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", IdParams)})";
+		}
+
+		async Task<ISqlCmd> GetCmd(u64 Cnt, CT Ct){
+			if(CmdByCnt.TryGetValue(Cnt, out var Got)){
+				return Got;
+			}
+			var Cmd = await SqlCmdMkr.Prepare(Ctx, MkSql(Cnt), Ct);
+			Ctx.AddToDispose(Cmd);
+			CmdByCnt[Cnt] = Cmd;
+			return Cmd;
+		}
+
+		await using var Batch = new BatchCollector<TId, nil>(async(BatchIds, Ct)=>{
+			var Cnt = (u64)BatchIds.Count;
+			var IdParams = T.NumParams(Cnt).ToList();
+			var Arg = ArgDict.Mk(T)
+				.AddManyT(IdParams, BatchIds, T.CodeIdName)
+				.AddRaw(T.Prm("__SoftDelVal"), valToSet)
+				.ToDict();
+			var Cmd = await GetCmd(Cnt, Ct);
+			await Cmd.RawArgs(Arg).AsyE1d(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		}, BatchSize);
+
+		await foreach(var Id in Ids.WithCancellation(Ct)){
+			await Batch.Add(Id, Ct);
+		}
+		await Batch.End(Ct);
+		return new SoftDelInId();
+	}
+
+	public async Task<IHardDelInId> HardDelInId(
+		IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct
+	){
+		u64 BatchSize = TblMgr.DbSrcType == EDbSrcType.Sqlite ? 50ul : 500ul;
+		var CmdByCnt = new Dictionary<u64, ISqlCmd>();
+
+		str MkSql(u64 Cnt){
+			var IdParams = T.NumParams(Cnt).ToList();
+			return $"DELETE FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(", ", IdParams)})";
+		}
+
+		async Task<ISqlCmd> GetCmd(u64 Cnt, CT Ct){
+			if(CmdByCnt.TryGetValue(Cnt, out var Got)){
+				return Got;
+			}
+			var Cmd = await SqlCmdMkr.Prepare(Ctx, MkSql(Cnt), Ct);
+			Ctx.AddToDispose(Cmd);
+			CmdByCnt[Cnt] = Cmd;
+			return Cmd;
+		}
+
+		await using var Batch = new BatchCollector<TId, nil>(async(BatchIds, Ct)=>{
+			var Cnt = (u64)BatchIds.Count;
+			var IdParams = T.NumParams(Cnt).ToList();
+			var Arg = ArgDict.Mk(T).AddManyT(IdParams, BatchIds, T.CodeIdName).ToDict();
+			var Cmd = await GetCmd(Cnt, Ct);
+			await Cmd.RawArgs(Arg).AsyE1d(Ct).FirstOrDefaultAsync(Ct);
+			return NIL;
+		}, BatchSize);
+
+		await foreach(var Id in Ids.WithCancellation(Ct)){
+			await Batch.Add(Id, Ct);
+		}
+		await Batch.End(Ct);
+		return new HardDelInId();
+	}
+
 	public async Task<IBatSoftDel> BatSoftDelById(IDbFnCtx Ctx, IAsyncEnumerable<TId> Ids, CT Ct){
 		if(T.SoftDelCol is null){
 			throw new Exception("SoftDeleteCol is null");
