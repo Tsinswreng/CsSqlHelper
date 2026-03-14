@@ -47,8 +47,8 @@ public partial class Table:ITable{
 			Col.DbName = Key;
 			Columns[Key] = Col;
 			DbColName_CodeColName[Key] = Key;
-			Col.RawCodeType = Type;
-			Col.UpperCodeType = Type;
+			Col.RawClrType = Type;
+			Col.UpperClrType = Type;
 			// if(v != null){
 			// 	Col.RawClrType = v.GetType();
 			// 	Col.UpperClrType = v.GetType();

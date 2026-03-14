@@ -13,16 +13,16 @@ public partial interface IColumn{
 	public str DbType{get;set;}
 	[Doc(@$"
 	#Sum[Type of the data that is retrieved from the database]
-	#See[{nameof(UpperCodeType)}]
+	#See[{nameof(UpperClrType)}]
 	")]
-	public Type? RawCodeType{get;set;}
+	public Type? RawClrType{get;set;}
 	/// 自封裝ʹ類型
 	[Doc(@$"
 	Type defined in entity class.
 	e.g, when you use strongly typed id struct encapsulating an int64,
-	in this way {nameof(RawCodeType)} is `long` and {nameof(UpperCodeType)} is your custom struct
+	in this way {nameof(RawClrType)} is `long` and {nameof(UpperClrType)} is your custom struct
 	")]
-	public Type? UpperCodeType{get;set;}
+	public Type? UpperClrType{get;set;}
 	[Doc(@$"Additional SQL statements to be executed when creating the column
 	e.g `UNIQUE(Email)`")]
 	public IList<str> AdditionalSqls{get;set;}
@@ -37,7 +37,7 @@ public partial interface IColumn{
 	public IUpperTypeMapFn? UpperTypeMapper{get;set;}
 
 	[Doc(@$"
-	Convert from {nameof(UpperCodeType)} to {nameof(RawCodeType)}
+	Convert from {nameof(UpperClrType)} to {nameof(RawClrType)}
 	better not to be null. when use, better do like var Tar = Fn?.Invoke(Src)??Src
 	#See[{nameof(RawToUpper)}]
 	")]

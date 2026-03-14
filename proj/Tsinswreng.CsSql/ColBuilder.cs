@@ -93,8 +93,8 @@ public static class ExtnColMkr{
 			if(TypeNameInDb != null){
 				z.Column.DbType = TypeNameInDb;
 			}
-			z.Column.RawCodeType = typeof(TRaw);
-			z.Column.UpperCodeType = typeof(TUpper);
+			z.Column.RawClrType = typeof(TRaw);
+			z.Column.UpperClrType = typeof(TUpper);
 			return z;
 		}
 
@@ -176,8 +176,8 @@ public static class ExtnColMkr{
 			IUpperTypeMapFnT<TRaw, TUpper> Fns
 		){
 			var col = z.Column;
-			col.RawCodeType = typeof(TRaw);
-			col.UpperCodeType = typeof(TUpper);
+			col.RawClrType = typeof(TRaw);
+			col.UpperClrType = typeof(TUpper);
 			return HasConv(z, Fns);
 		}
 

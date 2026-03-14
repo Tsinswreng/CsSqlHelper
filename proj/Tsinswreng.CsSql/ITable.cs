@@ -11,33 +11,6 @@ public partial interface ITable<T>:ITable{
 
 }
 
-[Obsolete("Unfinished yet. Do not use.")]
-public enum ERelationType{
-	Unknown,
-	OneToOne,
-	OneToMany,
-	ManyToMany,
-	ManyToOne,
-}
-
-[Obsolete("Unfinished yet. Do not use.")]
-public class JoinCond{
-	public IColumn Left{get;set;}
-	public IColumn Right{get;set;}
-}
-
-[Obsolete("Unfinished yet. Do not use.")]
-public class Relation{
-	public ERelationType Type{get;set;}
-	public ITable TargetTbl{get;set;}
-	//public
-}
-
-[Obsolete("Unfinished yet. Do not use.")]
-public class Relations{
-
-}
-
 public partial interface ITable{
 	public ITblMgr TblMgr{get;set;}
 	public IDbStuff DbStuff => TblMgr.DbStuff;
@@ -82,7 +55,7 @@ public partial interface ITable{
 #endif
 
 	[Doc($@"Code column(property name in entity class) to upper type mapping
-	#See[{nameof(IColumn.UpperCodeType)}]")]
+	#See[{nameof(IColumn.UpperClrType)}]")]
 	public IDictionary<str, Type> CodeCol_UpperType{get;set;}
 #if Impl
 	= new Dictionary<str, Type>();
@@ -102,7 +75,7 @@ public partial interface ITable{
 #endif
 
 	[Doc($@"Upper type to default mapper mapping
-	#See[{nameof(IColumn.UpperCodeType)}]")]
+	#See[{nameof(IColumn.UpperClrType)}]")]
 	public IDictionary<Type, IUpperTypeMapFn> UpperType_DfltMapper{get;set;}
 #if Impl
 	= new Dictionary<Type, IUpperTypeMapperFn>();

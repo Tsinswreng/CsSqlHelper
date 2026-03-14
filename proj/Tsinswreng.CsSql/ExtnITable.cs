@@ -516,12 +516,12 @@ public static class ExtnITable {
 					R.Add(Col.DbType);
 				}
 				else {
-					if (Col.RawCodeType == null) {
+					if (Col.RawClrType == null) {
 						var Msg = $"{Col.DbName}:\nCol.RawClrType == null";
 						throw new Exception("Col.RawClrType == null");
 					}
 					try {
-						var DbTypeName = z.SqlMkr.SqlTypeMapper.ToDbTypeName(Col.RawCodeType);
+						var DbTypeName = z.SqlMkr.SqlTypeMapper.ToDbTypeName(Col.RawClrType);
 						R.Add(DbTypeName);
 					}
 					catch (System.Exception e) {
