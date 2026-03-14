@@ -3,22 +3,16 @@ namespace Tsinswreng.CsSql;
 using Tsinswreng.CsDictMapper;
 
 
-/// <summary>
 /// 遷移表實體類
-/// </summary>
 public partial class SchemaHistory{
 	public static SchemaHistory Sample = new();
-	/// <summary>
 	/// 主鍵。用插入旹之毫秒時間戳
-	/// </summary>
 	public i64 Id{get;set;} = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-	/// <summary>
 	/// 非 被應用之時
-	/// </summary>
 	public i64 CreatedMs{get;set;} = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 	public str? Name{get;set;}
 	public str? Descr{get;set;}
-	public i64 ProductVersionTime{get;set;} = Version.Time;
+	public i64 ProductVersionTime{get;set;} = LibVersion.Time;
 
 }
 

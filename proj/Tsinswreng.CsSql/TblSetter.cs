@@ -57,9 +57,7 @@ public class TblSetter<T>:ITblSetter<T>{
 	public ITable<T> Tbl{get;set;}
 	public FnSetIdx FnSetIdx{get;set;}
 	
-	/// <summary>
 	/// Default implementation for FnSetIdx - pure function that only generates SQL
-	/// </summary>
 	private IList<str> DefaultFnSetIdx(
 		IOptMkIdx? Opt
 		, ITable Tbl
@@ -84,9 +82,7 @@ public class TblSetter<T>:ITblSetter<T>{
 		return results;
 	}
 	
-	/// <summary>
 	/// Define index using member expressions
-	/// </summary>
 	public ITable<T> IdxExpr(
 		IOptMkIdx? Opt,
 		params Expression<Func<T, obj?>>[] Exprs
@@ -99,9 +95,7 @@ public class TblSetter<T>:ITblSetter<T>{
 		return Idx(Opt, colSets.ToArray());
 	}
 
-	/// <summary>
 	/// Define index using code column names
-	/// </summary>
 	public ITable<T> Idx(
 		IOptMkIdx? Opt,
 		params IEnumerable<str>[] Cols
@@ -113,9 +107,7 @@ public class TblSetter<T>:ITblSetter<T>{
 		return Tbl;
 	}
 
-	/// <summary>
 	/// Build CREATE INDEX SQL using code column names
-	/// </summary>
 	public str MkIndexSqlByCodeCols(
 		str IndexName
 		, IEnumerable<str> CodeColNames
@@ -149,9 +141,7 @@ ON {Tbl.Qt(Tbl.DbTblName)} ({str.Join(", ", flds)})
 		return sql;
 	}
 
-	/// <summary>
 	/// Build and append CREATE INDEX SQL to OuterAdditionalSqls
-	/// </summary>
 	public ITable<T> AddIndexByCodeCols(
 		str IndexName
 		, IEnumerable<str> CodeColNames

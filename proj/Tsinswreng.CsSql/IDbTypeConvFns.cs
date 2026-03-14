@@ -1,8 +1,8 @@
 namespace Tsinswreng.CsSql;
 
-/// <summary>
+
 /// 帶泛型
-/// </summary>
+
 /// <typeparam name="TRaw"></typeparam>
 /// <typeparam name="TUpper"></typeparam>
 public partial interface IUpperTypeMapFnT<TRaw, TUpper>{

@@ -3,9 +3,7 @@ namespace Tsinswreng.CsSql;
 using System.Linq.Expressions;
 using Tsinswreng.CsTools;
 using Self = ColMkr;
-/// <summary>
 /// A helper class to build a `IColumn` object.
-/// </summary>
 public partial class ColMkr{
 	protected ColMkr(){}
 	public ITable Table{get;set;}
@@ -113,11 +111,9 @@ public static class ExtnColMkr{
 		}
 
 
-	/// <summary>
 	/// 見 HasConversionʹ註
 	/// 用強轉 轉作Func<object?, object?>。
 	/// 需保證入參強轉不報錯
-	/// </summary>
 	/// <typeparam name="TRaw"></typeparam>
 	/// <typeparam name="TUpper"></typeparam>
 	/// <param name="z"></param>
@@ -182,7 +178,6 @@ public static class ExtnColMkr{
 		}
 
 
-	/// <summary>
 	/// 用強轉 轉作Func<object?, object?>。
 	/// 需保證入參強轉不報錯
 	/// 例
@@ -191,7 +186,6 @@ public static class ExtnColMkr{
 	/// 	val=>new PoStatus(val)
 	/// );
 	/// 用sqlite旹 緣sqlite中 只有i64洏無i32、故實際取出之原始類型潙i64。return ToUpperType((TRaw)x!);則報錯
-	/// </summary>
 	/// <typeparam name="TRaw"></typeparam>
 	/// <typeparam name="TUpper"></typeparam>
 	/// <param name="z"></param>

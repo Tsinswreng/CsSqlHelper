@@ -1,12 +1,12 @@
 namespace Tsinswreng.CsSql.Test.Domains;
 
-/// <summary>
+
 /// 測試實體：主鍵使用 blob(byte[])，其餘字段覆蓋常見基礎類型
-/// </summary>
+
 public class PoAllBasicTypes {
-	/// <summary>
+	
 	/// 主鍵：u8[] / blob
-	/// </summary>
+	
 	public byte[] Id { get; set; } = [];
 
 	public byte U8Val { get; set; }

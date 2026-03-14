@@ -3,9 +3,9 @@ using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsSql;
 
-/// <summary>
+
 /// ADO.NET 事務
-/// </summary>
+
 public partial class AdoTxn:ITxn{
 	public AdoTxn(IDbTransaction _RawTxn){
 		this._RawTxn = _RawTxn;

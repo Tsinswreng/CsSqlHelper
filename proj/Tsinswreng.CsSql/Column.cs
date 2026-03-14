@@ -4,9 +4,9 @@ namespace Tsinswreng.CsSql;
 
 //類型映射與字段映射
 public partial class Column: IColumn{
-	/// <summary>
+	
 	/// 在數據庫中 字段ʹ名
-	/// </summary>
+	
 	public string DbName { get; set; } = "";
 	public str DbType{get;set;} = "";
 	public Type? RawClrType{get;set;}
