@@ -28,7 +28,7 @@ WHERE 1=1
 ORDER BY {T.QtCol(PCreatedMs)} DESC
 {T.SqlMkr.ParamLimOfst(out var Lim, out var Ofst)}
 """;
-		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
+		var Cmd = await SqlCmdMkr.Prepare(Ctx, Sql, Ct);
 		return async (Ct)=>{
 			//相當於limit 1、但屏蔽sql方言ʹ異
 			var PageQry = new PageQry{
@@ -72,24 +72,4 @@ ORDER BY {T.QtCol(PCreatedMs)} DESC
 		return undeployed;
 	}
 
-	// public async Task<nil> UpAsy(CT Ct){
-	// 	IBaseDbFnCtx Ctx = new BaseDbFnCtx();
-	// 	Ctx.Txn = await MkrTxn.GetTxnAsy(Ctx, Ct);
-	// 	try{
-	// 		var Fn = await FnUpAsy(Ctx, Ct);
-	// 		await Fn(Ct);
-	// 	}
-	// 	catch (System.Exception){
-	// 		await Ctx.Txn.Rollback(Ct);
-	// 		throw;
-	// 	}
-	// 	await Ctx.DisposeAsync();
-	// 	return NIL;
-	// }
-
-	// public async Task<nil> SetupOneMigration(
-	// 	IBaseDbFnCtx Ctx, IMigration Migration, CT Ct
-	// ){
-	// 	await Migration.UpAsy(Ct);
-	// }
 }
