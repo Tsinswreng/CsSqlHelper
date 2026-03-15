@@ -4,7 +4,7 @@ using Tsinswreng.CsPage;
 namespace Tsinswreng.CsSql;
 
 public class MigrationMgr: IMigrationMgr{
-	public IList<IMigration> Migrations{get;set;} = new List<IMigration>();
+	public IList<ISqlMigrationInfo> SqlMigrationInfos{get;set;} = new List<ISqlMigrationInfo>();
 	ITblMgr TblMgr;
 	ISqlCmdMkr SqlCmdMkr;
 	public MigrationMgr(
@@ -51,25 +51,68 @@ ORDER BY {T.QtCol(PCreatedMs)} DESC
 		return R;
 	}
 
-
-	IList<IMigration> GetUndeployedMigrations(
-		[See(nameof(IMigration.CreatedMs))]
+	IList<ISqlMigrationInfo> GetUndeployedInfos(
+		[See(nameof(ISqlMigrationInfo.CreatedMs))]
 		i64 LastCreatedMs
-		,i64 BeforeMs
 	){
-		//this.Migrations//其中的CreatedMs已經是從小到大的了
-		var undeployed = new List<IMigration>();
-		foreach (var m in this.Migrations){
-			// 列表已按 CreatedMs 从小到大排好，一旦超过上限就可以提前退出
-			if (m.CreatedMs >= BeforeMs){
-				break;
-			}
-			if (m.CreatedMs > LastCreatedMs){
-				undeployed.Add(m);
+		var Undeployed = new List<ISqlMigrationInfo>();
+		foreach(var Info in SqlMigrationInfos){
+			if(Info.CreatedMs > LastCreatedMs){
+				Undeployed.Add(Info);
 			}
 		}
-
-		return undeployed;
+		return Undeployed;
 	}
 
+	[Impl(typeof(IMigrationMgr))]
+	public async Task<nil> RunPendingMigrations(
+		IDbFnCtx Ctx
+		,ISqlCmdMkr SqlCmdMkr
+		,IMkrTxn MkrTxn
+		,IRepo<SchemaHistory, i64> RepoHistory
+		,CT Ct
+	){
+		var LastHistory = await GetLastHistory(Ct);
+		var LastCreatedMs = LastHistory?.CreatedMs ?? 0;
+		var Undeployed = GetUndeployedInfos(LastCreatedMs);
+		if(Undeployed.Count == 0){ return NIL; }
+		var InsertHistory = await RepoHistory.FnInsertManyNoPrepare(Ctx, Ct);
+		foreach(var Info in Undeployed){
+			var Migration = SqlMigration.MkSqlMigration(
+				SqlCmdMkr: SqlCmdMkr
+				,MkrTxn: MkrTxn
+				,SqlMigrationInfo: Info
+			);
+			var FnUp = await Migration.FnUpAsy(Ctx, Ct);
+			await FnUp(Ct);
+			var History = new SchemaHistory{
+				Id = Info.CreatedMs
+				,CreatedMs = Info.CreatedMs
+				,Name = Info.GetType().Name
+			};
+			await InsertHistory([History], Ct);
+		}
+		return NIL;
+	}
+
+	[Impl(typeof(IMigrationMgr))]
+	public async Task<nil> MarkAllApplied(
+		IDbFnCtx Ctx
+		,IRepo<SchemaHistory, i64> RepoHistory
+		,CT Ct
+	){
+#pragma warning disable CS0618
+		var InsertHistory = await RepoHistory.FnInsertManyNoPrepare(Ctx, Ct);
+#pragma warning restore CS0618
+		foreach(var Info in SqlMigrationInfos){
+			var History = new SchemaHistory{
+				Id = Info.CreatedMs
+				,CreatedMs = Info.CreatedMs
+				,Name = Info.GetType().Name
+			};
+			await InsertHistory([History], Ct);
+		}
+		return NIL;
+	}
 }
+
