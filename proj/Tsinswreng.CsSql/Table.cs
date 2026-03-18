@@ -3,8 +3,8 @@ namespace Tsinswreng.CsSql;
 
 using System.Linq.Expressions;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsPage;
+using Tsinswreng.CsStrAcc;
 using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
@@ -20,7 +20,7 @@ public partial class Table:ITable{
 	public ITblMgr TblMgr{get;set;} = null!;
 	public IDbStuff DbStuff => TblMgr.DbStuff;
 
-	public IDictMapperShallow DictMapper{get;set;}
+	public IPropAccessorMgr PropAccessorMgr{get;set;}
 
 	public Type CodeEntityType{get;set;}
 
@@ -28,11 +28,11 @@ public partial class Table:ITable{
 	public Table(){}
 
 	public Table(
-		IDictMapperShallow DictMapper
+		IPropAccessorMgr PropAccessorMgr
 		,str Name
 		,IDictionary<str, Type> CodeCol_UpperType
 	){
-		this.DictMapper = DictMapper;
+		this.PropAccessorMgr = PropAccessorMgr;
 		this.DbTblName = Name;
 		this.CodeCol_UpperType = CodeCol_UpperType;
 	}
@@ -60,23 +60,49 @@ public partial class Table:ITable{
 	}
 
 
+	public static IDictionary<str, Type> GetTypeDictByAccessor(
+		IPropAccessorMgr PropAccessorMgr
+		,Type EntityClrType
+	){
+		if(!PropAccessorMgr.Type_PropAccessor.TryGetValue(EntityClrType, out var Accessor)){
+			throw new Exception($"No {nameof(IPropAccessor)} registered for entity type: {EntityClrType}");
+		}
+		var Ans = new Dictionary<str, Type>();
+		foreach(var Key in Accessor.GetGetterNames(null)){
+			if(!Accessor.TryGetType(Key, out var Type) || Type is null){
+				continue;
+			}
+			Ans[Key] = Type;
+		}
+		return Ans;
+	}
+
 	public static ITable<TEntity> Mk<TEntity>(
-		IDictMapperShallow DictMapper
+		IPropAccessorMgr PropAccessorMgr
 		,str DbTblName
 		,IDictionary<str, Type> Key_Type
 	){
-		return Mk<TEntity>(typeof(TEntity), DictMapper, DbTblName, Key_Type);
+		return Mk<TEntity>(typeof(TEntity), PropAccessorMgr, DbTblName, Key_Type);
+	}
+
+	public static ITable<TEntity> Mk<TEntity>(
+		IPropAccessorMgr PropAccessorMgr
+		,str DbTblName
+	){
+		var EntityClrType = typeof(TEntity);
+		var Key_Type = GetTypeDictByAccessor(PropAccessorMgr, EntityClrType);
+		return Mk<TEntity>(EntityClrType, PropAccessorMgr, DbTblName, Key_Type);
 	}
 
 
 	public static ITable<TEntity> Mk<TEntity>(
 		Type EntityClrType
-		,IDictMapperShallow DictMapper
+		,IPropAccessorMgr PropAccessorMgr
 		,str DbTblName
 		,IDictionary<str, Type> Key_Type
 	){
 		var t = new Table<TEntity>{
-			DictMapper = DictMapper
+			PropAccessorMgr = PropAccessorMgr
 			,DbTblName = DbTblName
 			,CodeCol_UpperType = Key_Type
 			,CodeEntityType = EntityClrType
@@ -88,11 +114,11 @@ public partial class Table:ITable{
 	
 
 	[Obsolete("")]
-	public static Func<str, ITable<T>> FnMkTbl<T>(IDictMapperShallow DictMapper){
+		public static Func<str, ITable<T>> FnMkTbl<T>(IPropAccessorMgr PropAccessorMgr){
  		ITable<T2> Mk<T2>(str DbTblName){
-			var TypeDict = DictMapper.GetTypeDictShallowT<T2>();
+				var TypeDict = GetTypeDictByAccessor(PropAccessorMgr, typeof(T2));
 			return Table.Mk<T2>(
-				DictMapper
+					PropAccessorMgr
 				,DbTblName
 				,TypeDict
 			);
@@ -100,11 +126,11 @@ public partial class Table:ITable{
 		return Mk<T>;
 	}
 	
-	public static Func<str, ITblSetter<T>> FnSetTbl<T>(IDictMapperShallow DictMapper){
+		public static Func<str, ITblSetter<T>> FnSetTbl<T>(IPropAccessorMgr PropAccessorMgr){
 		ITblSetter<T2> Set<T2>(str DbTblName){
-			var TypeDict = DictMapper.GetTypeDictShallowT<T2>();
+				var TypeDict = GetTypeDictByAccessor(PropAccessorMgr, typeof(T2));
 			var Tbl = Table.Mk<T2>(
-				DictMapper
+					PropAccessorMgr
 				,DbTblName
 				,TypeDict
 			);

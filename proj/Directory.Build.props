@@ -24,12 +24,12 @@
 		/>
 		<ProjectReference Include="../../../Tsinswreng.CsStrAcc/proj/Tsinswreng.CsStrAcc/Tsinswreng.CsStrAcc.csproj" />
 	</ItemGroup>
-	<ItemGroup>
+	<!-- <ItemGroup>
 		<ProjectReference Include="../../../Tsinswreng.CsDictMapper/proj/Tsinswreng.CsDictMapper.SrcGen/Tsinswreng.CsDictMapper.SrcGen.csproj"
 			OutputItemType="Analyzer" ReferenceOutputAssembly="false"
 		/>
 		<ProjectReference Include="../../../Tsinswreng.CsDictMapper/proj/Tsinswreng.CsDictMapper/Tsinswreng.CsDictMapper.csproj" />
-	</ItemGroup>
+	</ItemGroup> -->
 	<ItemGroup>
 		<ProjectReference Include="../../../Tsinswreng.CsCore/proj/Tsinswreng.CsCore/Tsinswreng.CsCore.csproj" />
 		<ProjectReference Include="../../../Tsinswreng.CsTools/proj/Tsinswreng.CsTools/Tsinswreng.CsTools.csproj" />

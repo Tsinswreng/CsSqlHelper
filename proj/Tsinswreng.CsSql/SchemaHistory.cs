@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsSql;
 
-using Tsinswreng.CsDictMapper;
+using Tsinswreng.CsStrAcc;
 
 
 /// 遷移表實體類
@@ -18,17 +18,16 @@ public partial class SchemaHistory{
 
 
 
-[DictType(typeof(SchemaHistory))]
-public partial class SqlHelperDictMapper{
-	protected static SqlHelperDictMapper? _Inst = null;
-	public static SqlHelperDictMapper Inst => _Inst??= new SqlHelperDictMapper();
+[StrAccType(typeof(SchemaHistory))]
+public partial class SqlHelperStrAcc{
+	protected static SqlHelperStrAcc? _Inst = null;
+	public static SqlHelperStrAcc Inst => _Inst??= new SqlHelperStrAcc();
 }
 
 public partial class SchemaHistoryTblMkr{
 	public str TblName = "__TsinswrengSchemaHistory";
 	public ITable MkTbl(){
-		var Key_Type = SqlHelperDictMapper.Inst.GetTypeDictShallowT<SchemaHistory>();
-		ITable R = Table.Mk<SchemaHistory>(SqlHelperDictMapper.Inst, TblName, Key_Type);
+		ITable R = Table.Mk<SchemaHistory>(SqlHelperStrAcc.Inst, TblName);
 		R.Col(nameof(SchemaHistory.Id)).AdditionalSqls(["PRIMARY KEY"]);
 		return R;
 	}

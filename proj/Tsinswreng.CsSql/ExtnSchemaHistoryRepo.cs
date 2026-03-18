@@ -6,7 +6,7 @@ namespace Tsinswreng.CsSql;
 public static class ExtnSchemaHistoryRepo{
 	extension(IRepo<SchemaHistory, i64> z)
 	{
-		/// 將 `SchemaHistory` 倉儲的 `DictMapper` 統一綁定到 `SqlHelperDictMapper`。
+		/// 將 `SchemaHistory` 倉儲的 `PropAccessorMgr` 統一綁定到 `SqlHelperStrAcc`。
 		///
 		/// 原因：
 		/// - `SchemaHistory` 是 `CsSql` 內建輔助表
@@ -14,11 +14,11 @@ public static class ExtnSchemaHistoryRepo{
 		///
 		/// 若調用方註冊的不是 `SqlRepo<SchemaHistory, i64>`，直接拋異常，
 		/// 以便盡早暴露配置錯誤。
-		public IRepo<SchemaHistory, i64> UseSqlHelperDictMapper(){
+		public IRepo<SchemaHistory, i64> UseSqlHelperStrAcc(){
 			if(z is not SqlRepo<SchemaHistory, i64> SqlRepoSchemaHistory){
 				throw new ArgumentException("RepoSchemaHistory must be SqlRepo<SchemaHistory, i64>");
 			}
-			SqlRepoSchemaHistory.DictMapper = SqlHelperDictMapper.Inst;
+			SqlRepoSchemaHistory.PropAccessorMgr = SqlHelperStrAcc.Inst;
 			return z;
 		}
 	}

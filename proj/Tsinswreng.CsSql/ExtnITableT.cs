@@ -2,7 +2,6 @@ namespace Tsinswreng.CsSql;
 
 using System.Linq.Expressions;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsPage;
 using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;

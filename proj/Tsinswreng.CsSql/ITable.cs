@@ -1,5 +1,5 @@
 using System.Collections;
-using Tsinswreng.CsDictMapper;
+using Tsinswreng.CsStrAcc;
 
 namespace Tsinswreng.CsSql;
 
@@ -16,8 +16,8 @@ public partial interface ITable{
 	public IDbStuff DbStuff => TblMgr.DbStuff;
 	public ISqlMkr SqlMkr=>DbStuff.SqlMkr;
 
-	[Doc($@"Mapper to convert between object and dictionary")]
-	public IDictMapperShallow DictMapper{get;set;}
+	[Doc($@"Accessor manager to read/write entity properties by string keys")]
+	public IPropAccessorMgr PropAccessorMgr{get;set;}
 
 	[Doc($@"Entity type for this table")]
 	public Type CodeEntityType{get;set;}

@@ -3,9 +3,9 @@ namespace Tsinswreng.CsSql;
 
 using System.Data;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;
 using Tsinswreng.CsPage;
+using Tsinswreng.CsStrAcc;
 using System.Collections;
 using System.Diagnostics;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
@@ -21,14 +21,14 @@ public partial class SqlRepo<
 
 	public ITblMgr TblMgr{get;set;}
 	public ISqlCmdMkr SqlCmdMkr{get;set;}
-	public IDictMapperShallow DictMapper{get;set;}
+	public IPropAccessorMgr PropAccessorMgr{get;set;}
 
 	public SqlRepo(
 		ITblMgr TblMgr
 		,ISqlCmdMkr SqlCmdMkr
-		,IDictMapperShallow DictMapper
+		,IPropAccessorMgr PropAccessorMgr
 	){
-		this.DictMapper = DictMapper;
+		this.PropAccessorMgr = PropAccessorMgr;
 		this.TblMgr = TblMgr;
 		this.SqlCmdMkr = SqlCmdMkr;
 	}
@@ -137,7 +137,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			,CT ct
 		)=>{
 			foreach(var (i,entity) in Entitys.Index()){
-				var CodeDict = DictMapper.ToDictShallowT(entity);
+				var CodeDict = T.EntityToCodeDict(entity);
 				var DbDict = T.ToDbDict(CodeDict);
 				await Cmd.RawArgs(DbDict).AsyE1d(ct).FirstOrDefaultAsync(ct);
 			}
@@ -241,7 +241,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			);
 
 			foreach(var (i,entity) in Entitys.Index()){
-				var CodeDict = DictMapper.ToDictShallowT(entity);
+				var CodeDict = T.EntityToCodeDict(entity);
 				var DbDict = T.ToDbDict(CodeDict);
 				await BatchList.Add(DbDict, Ct);
 			}
@@ -335,7 +335,7 @@ $"INSERT INTO {T.Qt(T.DbTblName)} {Clause}";
 			}
 			var CodeDict = T.ToCodeDict(RawDict);
 			var R = new TEntity();
-			DictMapper.AssignShallowT(R, CodeDict);
+			T.AssignEntityByCodeDict(typeof(TEntity), R, CodeDict);
 			return R;
 		};
 	}
@@ -386,7 +386,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.QtCol(NId)} = {T.Prm(NId)}";
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		return async(Id, Entity, Ct)=>{
 			var Arg = ArgDict.Mk(T);
-			var CodeDict = DictMapper.ToDictShallowT(Entity);
+			var CodeDict = T.EntityToCodeDict(Entity);
 			foreach(var (k,v) in CodeDict){
 				if(FieldsToUpdateMap.Contains(k)){
 					Arg.AddT(T.Prm(k), v, k);
@@ -416,7 +416,7 @@ $"UPDATE {T.Qt(T.DbTblName)} SET {Clause} WHERE {T.QtCol(NId)} = {T.Prm(NId)}";
 		var Cmd = await Ctx.PrepareToDispose(SqlCmdMkr, Sql, Ct);
 		return async(Entity, Ct)=>{
 			var Arg = ArgDict.Mk(T);
-			var CodeDict = DictMapper.ToDictShallowT(Entity);
+			var CodeDict = T.EntityToCodeDict(Entity);
 			foreach(var (k,v) in CodeDict){
 				if(FieldsToUpdateMap.Contains(k)){
 					Arg.AddT(T.Prm(k), v, k);

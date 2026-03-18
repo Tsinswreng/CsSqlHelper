@@ -4,7 +4,6 @@ using System.Data;
 
 
 using Tsinswreng.CsCore;
-using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsTools;
 using Tsinswreng.CsPage;
 using System.Collections;
@@ -177,7 +176,7 @@ SELECT * FROM {T.Qt(T.DbTblName)} WHERE {T.QtCol(T.CodeIdName)} IN ({str.Join(",
 					await foreach(var dbDict in dbAsy.WithCancellation(Ct)){
 						var codeDict = include.Tbl.ToCodeDict(dbDict);
 						var entity = include.FnNewEntityObj();
-						include.Tbl.DictMapper.AssignShallow(include.EntityType, entity, codeDict);
+						include.Tbl.AssignEntityByCodeDict(include.EntityType, entity, codeDict);
 						var keyObj = include.FnFKeyToRootIdObj(entity);
 						if(keyObj is null){
 							continue;
@@ -329,7 +328,7 @@ Func<
 			var Arg = new Dictionary<str, obj?>();
 			for(i32 i = 0; i < BatchEnts.Count; i++){
 				var Ent = BatchEnts[i];
-				var DbDict = T.ToDbDict(DictMapper.ToDictShallowT(Ent));
+				var DbDict = T.ToDbDict(T.EntityToCodeDict(Ent));
 				foreach(var (k, v) in DbDict){
 					Arg[T.NumFieldParam(k, (u64)i).Name] = v;
 				}
@@ -382,7 +381,7 @@ Func<
 			var Arg = new Dictionary<str, obj?>();
 			for(i32 i = 0; i < BatchEnts.Count; i++){
 				var Ent = BatchEnts[i];
-				var DbDict = T.ToDbDict(DictMapper.ToDictShallowT(Ent));
+				var DbDict = T.ToDbDict(T.EntityToCodeDict(Ent));
 				foreach(var Col in fieldsToUpdate){
 					if(DbDict.TryGetValue(Col, out var Val)){
 						Arg[T.NumFieldParam(Col, (u64)i).Name] = Val;

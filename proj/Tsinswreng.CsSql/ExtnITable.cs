@@ -2,8 +2,8 @@ namespace Tsinswreng.CsSql;
 
 using System.Linq.Expressions;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsDictMapper;
 using Tsinswreng.CsPage;
+using Tsinswreng.CsStrAcc;
 using Tsinswreng.CsTools;
 using IStr_Any = System.Collections.Generic.IDictionary<str, obj?>;
 using Str_Any = System.Collections.Generic.Dictionary<str, obj?>;
@@ -162,7 +162,7 @@ public static class ExtnITable {
 			, T ToBeAssigned
 		) {
 			var CodeDict = z.ToCodeDict(DbDict);
-			z.DictMapper.AssignShallowT(ToBeAssigned, CodeDict);
+			z.AssignEntityByCodeDict(typeof(T), ToBeAssigned!, CodeDict);
 			return ToBeAssigned;
 		}
 
@@ -177,8 +177,51 @@ public static class ExtnITable {
 		) where TPo : new() {
 			var CodeDict = z.ToCodeDict(DbDict);
 			R ??= new TPo();
-			z.DictMapper.AssignShallowT(R, CodeDict);
+			z.AssignEntityByCodeDict(typeof(TPo), R!, CodeDict);
 			return R;
+		}
+
+		[Doc($@"
+		#Sum[Assign code dictionary to entity via string accessor]
+		#Params([Entity clr type], [Entity instance], [Dictionary with code field names as keys])
+		")]
+		public obj AssignEntityByCodeDict(
+			Type EntityType
+			,obj Entity
+			,IStr_Any CodeDict
+		) {
+			if (!z.PropAccessorMgr.Type_PropAccessor.TryGetValue(EntityType, out var accessor)) {
+				throw new Exception($"No {nameof(IPropAccessor)} registered for type: {EntityType}");
+			}
+			foreach (var (kCode, vCode) in CodeDict) {
+				if (!accessor.TrySet(Entity, kCode, vCode)) {
+					continue;
+				}
+			}
+			return Entity;
+		}
+
+		[Doc($@"
+		#Sum[Convert entity to code dictionary via string accessor]
+		#Params([Entity instance], [Optional entity clr type])
+		#Rtn[Dictionary with code field names as keys]
+		")]
+		public IStr_Any EntityToCodeDict(
+			obj Entity
+			,Type? EntityType = null
+		) {
+			EntityType ??= Entity.GetType();
+			if (!z.PropAccessorMgr.Type_PropAccessor.TryGetValue(EntityType, out var accessor)) {
+				throw new Exception($"No {nameof(IPropAccessor)} registered for type: {EntityType}");
+			}
+			var ans = new Str_Any();
+			foreach (var key in accessor.GetGetterNames(Entity)) {
+				if (!accessor.TryGet(Entity, key, out var vCode)) {
+					continue;
+				}
+				ans[key] = vCode;
+			}
+			return ans;
 		}
 
 		[Doc($@"
