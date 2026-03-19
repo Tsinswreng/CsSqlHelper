@@ -8,18 +8,18 @@ using System.Runtime.CompilerServices;
 public static class ExtnISqlCmdMkr{
 	private static (
 		IList<IParamAutoBinderMulti> ManyBinders,
-		IList<IParamAutoBinderMultiAsync> ManyAsyncBinders,
+		IList<IParamAutoBinderMultiAsy> ManyAsyncBinders,
 		IList<IParamAutoBinder> OneBinders
 	) SplitBinders(IList<IParamAutoBinder> binders){
 		var many = binders
-			.Where(x=>x is IParamAutoBinderMulti && x is not IParamAutoBinderMultiAsync)
+			.Where(x=>x is IParamAutoBinderMulti && x is not IParamAutoBinderMultiAsy)
 			.Cast<IParamAutoBinderMulti>()
 			.ToList();
 		var manyAsync = binders
-			.Where(x=>x is IParamAutoBinderMultiAsync)
-			.Cast<IParamAutoBinderMultiAsync>()
+			.Where(x=>x is IParamAutoBinderMultiAsy)
+			.Cast<IParamAutoBinderMultiAsy>()
 			.ToList();
-		var one = binders.Where(x=>x is not IParamAutoBinderMulti && x is not IParamAutoBinderMultiAsync).ToList();
+		var one = binders.Where(x=>x is not IParamAutoBinderMulti && x is not IParamAutoBinderMultiAsy).ToList();
 		return (many, manyAsync, one);
 	}
 
@@ -181,7 +181,7 @@ public static class ExtnISqlCmdMkr{
 #Sum[Execute auto-bound duplicated SQL lazily and flatten as row stream]
 #Params([Db function context],[SQL splicer carrying auto binders],[Cancellation token])
 #Rtn[Flattened async row stream; emits null placeholder for empty result-set]
-#See([{nameof(IAutoBindSqlDuplicator.ParamAutoBinders)}],[{nameof(IParamAutoBinderMultiAsync)}])
+#See([{nameof(IAutoBindSqlDuplicator.ParamAutoBinders)}],[{nameof(IParamAutoBinderMultiAsy)}])
 ")]
 		public async IAsyncEnumerable<
 			IDictionary<str, obj?>
@@ -263,7 +263,7 @@ public static class ExtnISqlCmdMkr{
 			IDbFnCtx Ctx,
 			IAutoBindSqlDuplicator Sql,
 			IList<IParamAutoBinder> oneBinders,
-			IList<IParamAutoBinderMultiAsync> manyAsyncBinders,
+			IList<IParamAutoBinderMultiAsy> manyAsyncBinders,
 			u64 BatchSize,
 			[EnumeratorCancellation] CT Ct
 		){
