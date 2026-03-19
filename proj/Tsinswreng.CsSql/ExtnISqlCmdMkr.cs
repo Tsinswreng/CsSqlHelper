@@ -8,14 +8,19 @@ using System.Runtime.CompilerServices;
 public static class ExtnISqlCmdMkr{
 	private static (
 		IList<IParamAutoBinderMulti> ManyBinders,
+		IList<IParamAutoBinderMultiAsync> ManyAsyncBinders,
 		IList<IParamAutoBinder> OneBinders
 	) SplitBinders(IList<IParamAutoBinder> binders){
 		var many = binders
-			.Where(x=>x is IParamAutoBinderMulti)
+			.Where(x=>x is IParamAutoBinderMulti && x is not IParamAutoBinderMultiAsync)
 			.Cast<IParamAutoBinderMulti>()
 			.ToList();
-		var one = binders.Where(x=>x is not IParamAutoBinderMulti).ToList();
-		return (many, one);
+		var manyAsync = binders
+			.Where(x=>x is IParamAutoBinderMultiAsync)
+			.Cast<IParamAutoBinderMultiAsync>()
+			.ToList();
+		var one = binders.Where(x=>x is not IParamAutoBinderMulti && x is not IParamAutoBinderMultiAsync).ToList();
+		return (many, manyAsync, one);
 	}
 
 	private static async IAsyncEnumerable<IDictionary<str, obj?>> YieldRowsOrNull(
@@ -176,24 +181,23 @@ public static class ExtnISqlCmdMkr{
 #Sum[Execute auto-bound duplicated SQL lazily and flatten as row stream]
 #Params([Db function context],[SQL splicer carrying auto binders],[Cancellation token])
 #Rtn[Flattened async row stream; emits null placeholder for empty result-set]
-#See([{nameof(IAutoBindSqlDuplicator.ParamAutoBinders)}],[{nameof(IParamAutoBinderMulti)}])
+#See([{nameof(IAutoBindSqlDuplicator.ParamAutoBinders)}],[{nameof(IParamAutoBinderMultiAsync)}])
 ")]
 		public async IAsyncEnumerable<
 			IDictionary<str, obj?>
-		> RunBatSql(//AsyE1d
+		> RunDupliSql(
 			IDbFnCtx Ctx
 			,IAutoBindSqlDuplicator Sql
 			,[EnumeratorCancellation] CT Ct
 		){
-			// Keep same default policy as AutoBatch helper.
 			var BatchSize = z.DbSrcType.Eq(EDbSrcType.Sqlite) ? 1ul : 500ul;
-			var (multiBinders, oneBinders) = SplitBinders(Sql.ParamAutoBinders);
+			var (multiBinders, manyAsyncBinders, oneBinders) = SplitBinders(Sql.ParamAutoBinders);
 
 			ISqlCmd? fullBatchCmd = null;
 			ISqlCmd? finalBatchCmd = null;
 			try{
-				// No Multi binder: run once with fixed binders only.
-				if(multiBinders.Count == 0){
+				// 无 Multi binder 和异步 binder：执行一次固定参数
+				if(multiBinders.Count == 0 && manyAsyncBinders.Count == 0){
 					var cmd = await z.Prepare(Ctx, Sql.DuplicateSql(1), Ct);
 					finalBatchCmd = cmd;
 					var args = ArgDict.Mk();
@@ -205,9 +209,22 @@ public static class ExtnISqlCmdMkr{
 					}
 					yield break;
 				}
-				//有 Multi Binder
+
+				// 只有异步 binder，无同步 binder
+				if(multiBinders.Count == 0 && manyAsyncBinders.Count > 0){
+					await foreach(var row in z.RunDupliSql(Ctx, Sql, oneBinders, manyAsyncBinders, BatchSize, Ct)){
+						yield return row;
+					}
+					yield break;
+				}
+
+				// 同时有同步和异步 binder（不支持混合，报错）
+				if(manyAsyncBinders.Count > 0){
+					throw new NotSupportedException("Cannot mix sync and async binders in same query");
+				}
+
+				// 仅有同步 Multi binder
 				while(true){
-					// Take one logical batch from first sequence binder.
 					if(!TryTakeAlignedBatches(multiBinders, BatchSize, out var firstBatch, out var batches)){
 						break;
 					}
@@ -215,11 +232,9 @@ public static class ExtnISqlCmdMkr{
 
 					ISqlCmd curCmd;
 					if(cnt == BatchSize){
-						// Reuse prepared full-batch command.
 						fullBatchCmd ??= await EnsureCmdForBatch(z, Ctx, Sql, BatchSize, cnt, fullBatchCmd, Ct);
 						curCmd = fullBatchCmd;
 					}else{
-						// Tail batch needs different duplicated SQL; prepare a separate command.
 						if(finalBatchCmd != null && !ReferenceEquals(finalBatchCmd, fullBatchCmd)){
 							await finalBatchCmd.DisposeAsync();
 						}
@@ -227,8 +242,76 @@ public static class ExtnISqlCmdMkr{
 						curCmd = finalBatchCmd;
 					}
 
-				var args = BuildArgsForBatch(oneBinders, multiBinders, batches);
+					var args = BuildArgsForBatch(oneBinders, multiBinders, batches);
 
+					await foreach(var row in YieldRowsOrNull(curCmd, args, Ct)){
+						yield return row;
+					}
+				}
+			}finally{
+				if(finalBatchCmd != null && !ReferenceEquals(finalBatchCmd, fullBatchCmd)){
+					await finalBatchCmd.DisposeAsync();
+				}
+				if(fullBatchCmd != null){
+					await fullBatchCmd.DisposeAsync();
+				}
+			}
+		}
+
+		/// 处理仅有异步 binder 的情况
+		private async IAsyncEnumerable<IDictionary<str, obj?>> RunDupliSql(
+			IDbFnCtx Ctx,
+			IAutoBindSqlDuplicator Sql,
+			IList<IParamAutoBinder> oneBinders,
+			IList<IParamAutoBinderMultiAsync> manyAsyncBinders,
+			u64 BatchSize,
+			[EnumeratorCancellation] CT Ct
+		){
+			ISqlCmd? fullBatchCmd = null;
+			ISqlCmd? finalBatchCmd = null;
+			try{
+				while(true){
+					// 从第一个异步 binder 取一批
+					var (hasAny, firstBatch) = await manyAsyncBinders[0].TryTakeBatchArgsAsync(BatchSize, Ct);
+					if(!hasAny){
+						break;
+					}
+
+					var cnt = (u64)firstBatch.Count;
+					var asyncBatches = new List<IList>{firstBatch};
+
+					// 从其他异步 binder 取相同数量的值
+					for(var i = 1; i < manyAsyncBinders.Count; i++){
+						var (hasAnyI, batchI) = await manyAsyncBinders[i].TryTakeBatchArgsAsync(cnt, Ct);
+						if(!hasAnyI || (u64)batchI.Count != cnt){
+							throw new InvalidOperationException("ParamAutoBinderAsync.Many(...) length mismatch.");
+						}
+						asyncBatches.Add(batchI);
+					}
+
+					// 准备 SQL 命令
+					ISqlCmd curCmd;
+					if(cnt == BatchSize){
+						fullBatchCmd ??= await z.Prepare(Ctx, Sql.DuplicateSql(BatchSize), Ct);
+						curCmd = fullBatchCmd;
+					}else{
+						if(finalBatchCmd != null && !ReferenceEquals(finalBatchCmd, fullBatchCmd)){
+							await finalBatchCmd.DisposeAsync();
+						}
+						finalBatchCmd = await z.Prepare(Ctx, Sql.DuplicateSql(cnt), Ct);
+						curCmd = finalBatchCmd;
+					}
+
+					// 绑定参数
+					var args = ArgDict.Mk();
+					foreach(var binder in oneBinders){
+						binder.Bind(args);
+					}
+					for(var i = 0; i < manyAsyncBinders.Count; i++){
+						manyAsyncBinders[i].BindBatch(args, asyncBatches[i]);
+					}
+
+					// 执行并返回结果
 					await foreach(var row in YieldRowsOrNull(curCmd, args, Ct)){
 						yield return row;
 					}
