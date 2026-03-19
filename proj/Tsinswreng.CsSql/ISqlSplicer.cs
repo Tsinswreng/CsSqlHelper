@@ -316,16 +316,10 @@ public interface IAutoBindSqlDuplicator: ISqlDuplicator{
 public interface IParamAutoBinder{
 	[Doc(@$"
 #Sum[Bind values into argument dictionary for current execution]
-#Params(
-	[Argument dictionary],
-	[Current batch items.
-	why it is List instead of Enumerable?
-	the List is only Current batch items so not all args will be loaded in memory at once.
-	],
-)
+#Params([Argument dictionary])
 #Rtn[Void]
 ")]
-	public void Bind(IArgDict Args, IList Items);
+	public void Bind(IArgDict Args);
 }
 
 /// Binder for "Many(values)" that can stream values by batch size.
@@ -400,11 +394,10 @@ public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 
 	[Doc(@$"
 #Sum[Bind one fixed value]
-#Params([Argument dictionary],[Ignored batch items])
+#Params([Argument dictionary])
 #Rtn[Void]
 ")]
-// why Items is unused?
-	public void Bind(IArgDict Args, IList Items){
+	public void Bind(IArgDict Args){
 		if(Tbl != null){
 			Args.AddRaw(Param, Tbl.UpperToRaw(Value));
 			return;
@@ -435,10 +428,10 @@ public class ParamAutoBinderManyValues<TVal>: IParamAutoBinderMulti{
 
 	[Doc(@$"
 #Sum[Bind all values in sequence]
-#Params([Argument dictionary],[Ignored batch items])
+#Params([Argument dictionary])
 #Rtn[Void]
 ")]
-	public void Bind(IArgDict Args, IList Items){
+	public void Bind(IArgDict Args){
 		foreach(var (i, value) in this.Args.Index()){
 			var p = Param.ToOfst((u64)i);
 			if(Tbl != null){

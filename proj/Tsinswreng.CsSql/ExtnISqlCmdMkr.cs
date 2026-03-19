@@ -56,12 +56,11 @@ public static class ExtnISqlCmdMkr{
 	private static IArgDict BuildArgsForBatch(
 		IList<IParamAutoBinder> oneBinders,
 		IList<IParamAutoBinderMulti> manyBinders,
-		IList firstBatch,
 		IList<IList> batches
 	){
 		var args = ArgDict.Mk();
 		foreach(var binder in oneBinders){
-			binder.Bind(args, firstBatch);
+			binder.Bind(args);
 		}
 		for(var i=0; i<manyBinders.Count; i++){
 			manyBinders[i].BindBatch(args, batches[i]);
@@ -199,7 +198,7 @@ public static class ExtnISqlCmdMkr{
 					finalBatchCmd = cmd;
 					var args = ArgDict.Mk();
 					foreach(var binder in oneBinders){
-						binder.Bind(args, new List<obj?>());
+						binder.Bind(args);
 					}
 					await foreach(var row in YieldRowsOrNull(cmd, args, Ct)){
 						yield return row;
@@ -228,7 +227,7 @@ public static class ExtnISqlCmdMkr{
 						curCmd = finalBatchCmd;
 					}
 
-					var args = BuildArgsForBatch(oneBinders, multiBinders, firstBatch, batches);
+				var args = BuildArgsForBatch(oneBinders, multiBinders, batches);
 
 					await foreach(var row in YieldRowsOrNull(curCmd, args, Ct)){
 						yield return row;
