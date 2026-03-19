@@ -316,7 +316,13 @@ public interface IAutoBindSqlDuplicator: ISqlDuplicator{
 public interface IParamAutoBinder{
 	[Doc(@$"
 #Sum[Bind values into argument dictionary for current execution]
-#Params([Argument dictionary],[Current batch items])
+#Params(
+	[Argument dictionary],
+	[Current batch items.
+	why it is List instead of Enumerable?
+	the List is only Current batch items so not all args will be loaded in memory at once.
+	],
+)
 #Rtn[Void]
 ")]
 	public void Bind(IArgDict Args, IList Items);
@@ -373,6 +379,10 @@ public class SqlArgBinderFactory{
 	public IParamAutoBinder Many<TVal>(IEnumerable<TVal> Values){
 		return new ParamAutoBinderManyValues<TVal>(Param, Values){Tbl=Tbl};
 	}
+	
+	public IParamAutoBinder Many<TVal>(IAsyncEnumerable<TVal> Values){
+		throw new NotImplementedException();
+	}
 
 }
 
@@ -393,6 +403,7 @@ public class ParamAutoBinderOne<TVal>: IParamAutoBinder{
 #Params([Argument dictionary],[Ignored batch items])
 #Rtn[Void]
 ")]
+// why Items is unused?
 	public void Bind(IArgDict Args, IList Items){
 		if(Tbl != null){
 			Args.AddRaw(Param, Tbl.UpperToRaw(Value));

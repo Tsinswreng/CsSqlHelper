@@ -74,6 +74,9 @@ public partial interface IRepo<TEntity, TId>{
 		IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct
 	);
 	
+	[Doc(@$"by the primary key of the entity,
+	so you don't need to provide the entity id independantly.
+	")]
 	public Task<IRespBatUpd> BatUpdById(
 		IDbFnCtx Ctx, IAsyncEnumerable<TEntity> Ents, CT Ct
 	);

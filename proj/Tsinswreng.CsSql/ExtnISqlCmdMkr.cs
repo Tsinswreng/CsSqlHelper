@@ -124,6 +124,9 @@ public static class ExtnISqlCmdMkr{
 		// 	return R;
 		// }
 		
+		[Doc(@$"Exe function in transaction
+		no need to provide {nameof(IDbFnCtx)}
+		")]
 		public async Task<TRtn> RunInTxn<TRtn>(
 			CT Ct
 			,Func<IDbFnCtx, Task<TRtn>> Fn
@@ -141,6 +144,33 @@ public static class ExtnISqlCmdMkr{
 				throw;
 			}
 		}
+		
+		[Doc(@$"Exe function in transaction if {nameof(Ctx)} is null.
+		suitable for making API that don't need the caller to provide {nameof(IDbFnCtx)}
+		")]
+		public async Task<TRtn> RunInTxnIfNoCtx<TRtn>(
+			IDbFnCtx? Ctx
+			,CT Ct
+			,Func<IDbFnCtx, Task<TRtn>> Fn
+		){
+			if(Ctx is not null){
+				return await Fn(Ctx);
+			}
+			Ctx = new DbFnCtx();
+			await z.MkEtBindTxn(Ctx, Ct);
+			try{
+				var R = await Fn(Ctx);
+				return R;
+			}
+			catch (System.Exception ex){
+				if(Ctx.Txn is not null){
+					await Ctx.Txn.Rollback(Ct);
+				}
+				throw;
+			}
+		}
+		
+		
 		
 		
 		[Doc(@$"
